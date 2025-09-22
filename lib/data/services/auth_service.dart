@@ -38,7 +38,7 @@ final class AuthService {
 
     // Clear iOS Keychain after reinstall
     // (the app is starting for the first time after an uninstall)
-    if (AppStatus.isFirstTimeAppLaunch && Platform.isIOS) {
+    if (AppStatus.isFirstTimeAppLaunch && !kIsWeb && Platform.isIOS) {
       for (final key in _keysToEliminate) {
         await instance._secureStorage.delete(key);
       }
@@ -74,8 +74,11 @@ final class AuthService {
 
   Future<void> _loadToken() async {
     _accessToken = await _secureStorage.read(_accessTokenKey);
-    final String? rawTokenExpiresTime = await _secureStorage.read(_tokenExpiresTimeKey);
-    _tokenExpiresTime = rawTokenExpiresTime == null ? null : int.tryParse(rawTokenExpiresTime);
+    final String? rawTokenExpiresTime = await _secureStorage.read(
+      _tokenExpiresTimeKey,
+    );
+    _tokenExpiresTime =
+        rawTokenExpiresTime == null ? null : int.tryParse(rawTokenExpiresTime);
     _refreshToken = await _secureStorage.read(_refreshTokenKey);
   }
 
@@ -126,7 +129,10 @@ final class AuthService {
   @visibleForTesting
   Future<void> saveExpiresTime(int tokenInMicroseconds) async {
     _tokenExpiresTime = tokenInMicroseconds;
-    await _secureStorage.write(_tokenExpiresTimeKey, tokenInMicroseconds.toString());
+    await _secureStorage.write(
+      _tokenExpiresTimeKey,
+      tokenInMicroseconds.toString(),
+    );
   }
 
   Future<void> refreshTokenIfNeeded({
@@ -154,9 +160,7 @@ final class AuthService {
       final res = await ApiClient().fetch(
         ApiPath.refreshToken,
         RequestMethod.post,
-        rawData: {
-          'refresh-token': _refreshToken,
-        },
+        rawData: {'refresh-token': _refreshToken},
       );
 
       if (res.hasError || !res.hasData) {
@@ -181,7 +185,9 @@ final class AuthService {
 
   bool get isAccessTokenExpired {
     final int currentTimeStamp = DateTime.now().microsecondsSinceEpoch;
-    final int effectiveCurrentTimeStamp = int.parse(currentTimeStamp.toString().substring(0, 10));
+    final int effectiveCurrentTimeStamp = int.parse(
+      currentTimeStamp.toString().substring(0, 10),
+    );
 
     if (_tokenExpiresTime == null) return false;
 
@@ -200,13 +206,17 @@ final class AuthService {
     return options.path.contains(ApiPath.refreshToken);
   }
 
-  void notifyAuthenticated() => AppAuthenticationBinding.instance!.notifyAuthenticated();
+  void notifyAuthenticated() =>
+      AppAuthenticationBinding.instance!.notifyAuthenticated();
 
-  void notifyUnauthenticated() => AppAuthenticationBinding.instance!.notifyUnauthenticated();
+  void notifyUnauthenticated() =>
+      AppAuthenticationBinding.instance!.notifyUnauthenticated();
 
-  void notifyTokenChanged() => AppAuthenticationBinding.instance!.notifyTokenChanged();
+  void notifyTokenChanged() =>
+      AppAuthenticationBinding.instance!.notifyTokenChanged();
 
-  void notifyAuthenticationFailed() => AppAuthenticationBinding.instance!.notifyAuthenticationFailed();
+  void notifyAuthenticationFailed() =>
+      AppAuthenticationBinding.instance!.notifyAuthenticationFailed();
 
   Future<void> clearToken() async {
     await _secureStorage.delete(_accessTokenKey);

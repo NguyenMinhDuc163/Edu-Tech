@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/foundation.dart';
 
 class ConnectivityService {
   ConnectivityService._();
@@ -9,7 +10,7 @@ class ConnectivityService {
     final List<ConnectivityResult> result = await Connectivity().checkConnectivity();
 
     if (result.contains(ConnectivityResult.none)) {
-      if (Platform.isIOS) {
+      if (!kIsWeb && Platform.isIOS) {
         // https://pub.dev/packages/connectivity_plus#ios--macos
         //
         // ```
@@ -34,6 +35,10 @@ class ConnectivityService {
   }
 
   static Future<bool> _checkConnection() async {
+    if (kIsWeb) {
+      return true;
+    }
+    
     try {
       final result = await InternetAddress.lookup('example.com');
 
