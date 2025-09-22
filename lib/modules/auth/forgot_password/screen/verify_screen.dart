@@ -1,0 +1,116 @@
+import 'package:disposable_provider/disposable_provider.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:ed_tech/core/widgets/app_gap.dart';
+import 'package:ed_tech/modules/auth/forgot_password/bloc/forgot_pass_cubit.dart';
+import 'package:ed_tech/modules/auth/forgot_password/bloc/forgot_pass_state.dart';
+import 'package:ed_tech/modules/auth/forgot_password/bloc/verify_otp_controller.dart';
+import 'package:ed_tech/modules/auth/forgot_password/bloc/verify_otp_cubit.dart';
+import 'package:ed_tech/modules/auth/forgot_password/bloc/verify_otp_state.dart';
+import 'package:ed_tech/modules/auth/forgot_password/screen/reset_password_screen.dart';
+import 'package:ed_tech/modules/auth/widgets/countdown_widget.dart';
+import 'package:ed_tech/init.dart';
+
+class VerifyScreen extends StatelessWidget {
+  const VerifyScreen({super.key});
+  static const String routeName = '/verifyScreen';
+  @override
+  Widget build(BuildContext context) {
+    final VerifyOtpController controller = context.read();
+    return BlocListener<VerifyOtpCubit, VerifyOtpState>(
+      listener: controller.handleListener,
+      listenWhen:
+          (previous, next) => previous.runtimeType != next.runtimeType,
+      child: _VerifyScreenContent(controller: controller),
+    );
+  }
+}
+
+class _VerifyScreenContent extends StatelessWidget {
+  const _VerifyScreenContent({required this.controller});
+
+  final VerifyOtpController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    final VerifyOtpState state = context.watch<VerifyOtpCubit>().state;
+
+    final Widget contentWidget = Padding(
+      padding: AppPad.h22v10,
+      child: Center(
+        child: SingleChildScrollView(
+          child: Column(
+            spacing: height_30,
+            children: [
+              Text(
+                "forgot_password.verification_code".tr(),
+                style: AppTextStyles.textHeader1,
+              ),
+              SvgPicture.asset(ImagePath.imgForgotPassword),
+              AppGap.g2,
+              PinCodeTextField(
+                appContext: context,
+                controller: controller.otpController,
+                length: 4,
+                onChanged: (value) {},
+                onCompleted: (value) {
+                  controller.onSubmitOpt(context, value: value);
+                },
+                autoDisposeControllers: false,
+                pinTheme: PinTheme(
+                  shape: PinCodeFieldShape.box,
+                  borderRadius: BorderRadius.circular(12),
+                  fieldHeight: 70,
+                  fieldWidth: 60,
+                  activeColor: Colors.grey[300]!,
+                  selectedColor: Colors.grey[400]!,
+                  inactiveColor: Colors.grey[200]!,
+                ),
+                textStyle: TextStyle(
+                  fontSize: 28,
+                  color: Colors.black,
+                  fontWeight: FontWeight.w500,
+                ),
+                keyboardType: TextInputType.number,
+              ),
+              AppGap.h100,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CountdownWidget(seconds: 120, onResend: () {}),
+                  Text(
+                    'forgot_password.resend_confirmation_code'.tr(),
+                    textAlign: TextAlign.center,
+                    style: AppTextStyles.textContent2.copyWith(
+                      color: AppColors.coolGray,
+                    ),
+                  ),
+                ],
+              ),
+              AppGap.g1,
+            ],
+          ),
+        ),
+      ),
+    );
+
+    return Stack(
+      children: [
+        FunctionScreenTemplate(
+          titleButtonBottom: "forgot_password.confirm_code".tr(),
+          onClickBottomButton: () {
+            controller.onSubmitOpt(context);
+          },
+          screen: contentWidget,
+        ),
+        if (state is VerifyOtpInProgress)
+          Container(
+            color: Colors.black.withOpacity(0.3),
+            child: const Center(child: CircularProgressIndicator()),
+          ),
+      ],
+    );
+  }
+}
