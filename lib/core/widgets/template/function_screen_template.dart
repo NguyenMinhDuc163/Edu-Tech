@@ -144,7 +144,6 @@ class _FunctionScreenTemplateState extends State<FunctionScreenTemplate>
                   ? IconButton(
                     icon: SvgPicture.asset(IconPath.iconMenu),
                     onPressed: () {
-                      print("ádasdsd");
                       _scaffoldKey.currentState?.openDrawer();
                     },
                   )

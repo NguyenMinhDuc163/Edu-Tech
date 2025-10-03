@@ -1,7 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:ed_tech/modules/course/screen/course_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 import 'package:ed_tech/core/constants/icon_path.dart';
 import 'package:ed_tech/core/theme/app_colors.dart';
@@ -19,7 +21,7 @@ class DashboardScreen extends StatefulWidget {
 
 final List<TabItem> _tabs = [
   TabItem(widget: HomeScreen(), route: HomeScreen.routeName),
-  TabItem(widget: HomeScreen(), route: HomeScreen.routeName),
+  TabItem(widget: CourseScreen(), route: CourseScreen.routeName),
   TabItem(widget: HomeScreen(), route: HomeScreen.routeName),
   TabItem(widget: HomeScreen(), route: HomeScreen.routeName),
 ];
@@ -63,18 +65,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 activeIcon: SizedBox.shrink(),
               ),
               SalomonBottomBarItem(
-                icon: SvgPicture.asset(IconPath.iconHome),
-                title: Text("home_screen.wishlist".tr()),
+                icon: Icon(FontAwesomeIcons.book),
+                title: Text("home_screen.course".tr()),
                 activeIcon: SizedBox.shrink(),
               ),
               SalomonBottomBarItem(
                 icon: SvgPicture.asset(IconPath.iconHome),
-                title: Text("home_screen.cart".tr()),
+                title: Text("home_screen.message".tr()),
                 activeIcon: SizedBox.shrink(),
               ),
               SalomonBottomBarItem(
                 icon: SvgPicture.asset(IconPath.iconHome),
-                title: Text("home_screen.wallet".tr()),
+                title: Text("home_screen.account".tr()),
                 activeIcon: SizedBox.shrink(),
               ),
             ],

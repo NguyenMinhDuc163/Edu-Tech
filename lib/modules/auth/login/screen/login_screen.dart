@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:ed_tech/modules/dashboard/screen/dashboard_screen.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ed_tech/core/values/login_type.dart';
@@ -70,7 +71,8 @@ class _LoginContent extends StatelessWidget {
                       iconPath: IconPath.iconGoogle,
                     ),
                     onPressed: () {
-                      controller.onLogin(context, LoginType.facebook);
+                      // controller.onLogin(context, LoginType.facebook);
+                      Navigator.pushNamed(context, DashboardScreen.routeName);
                     },
                     backgroundColor: AppColors.deepBlue,
                     padding: AppPad.v14,

@@ -15,9 +15,9 @@
   "home_screen": {
     "title": "trang chủ",
     "home": "Trang chủ",
-    "wishlist": "yêu thích",
-    "cart": "Giỏ hàng",
-    "wallet": "Ví"
+    "course": "Khóa học",
+    "message": "Tin nhắn",
+    "account": "Tài khoản"
   },
   "login_screen": {
     "title": "Đăng nhập",

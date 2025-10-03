@@ -15,9 +15,9 @@
   "home_screen": {
     "title": "Home Screen",
     "home": "Home",
-    "wishlist": "Wishlist",
-    "cart": "Cart",
-    "wallet": "Wallet"
+    "course": "Course",
+    "message": "Message",
+    "account": "Account"
   },
   "login_screen": {
     "title": "Login Screen",

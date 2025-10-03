@@ -10,7 +10,7 @@ class ButtonWidget extends StatelessWidget {
     this.titleStyle,
     this.titleWidget,
     this.onPressed,
-    this.backgroundColor = AppColors.lavenderColor,
+    this.backgroundColor = AppColors.color0961F5,
     this.boderRadius = BorderRadius.zero,
     this.margin = EdgeInsets.zero,
     this.padding = EdgeInsets.zero,

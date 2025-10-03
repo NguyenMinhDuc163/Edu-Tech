@@ -1,4 +1,5 @@
 import 'package:disposable_provider/disposable_provider.dart';
+import 'package:ed_tech/modules/course/screen/course_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ed_tech/core/public/global_utils.dart';
@@ -157,8 +158,8 @@ class Routers {
           ),
         );
 
-      // case DetailProduct.routeName:
-      //   return MaterialPageRoute(settings: settings, builder: (_) => DetailProduct());
+      case CourseScreen.routeName:
+        return MaterialPageRoute(settings: settings, builder: (_) => CourseScreen());
       default:
         return MaterialPageRoute(
           settings: settings,
