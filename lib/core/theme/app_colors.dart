@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 
 class AppColors {
-  static const Color electricBlue = Color(0xFF04589C);
+  static const Color electricBlue = Color(0xFF3D5CFF);
 
   static const Color deepBlue = Color(0xFF4267B2);
 
@@ -120,6 +120,9 @@ class AppColors {
   static const Color color707070 = Color(0xFF707070);
   static const Color colorF4F3FD = Color(0xFFF4F3FD);
   static const Color colorB8B8D2 = Color(0xFFB8B8D2);
+  static const Color colorFFEBF0 = Color(0xFFFFEBF0);
+  static const Color colorFF6905 = Color(0xFFFF6905);
+  static const Color color8F959E = Color(0xFF8F959E);
 
   // gradient
   static const LinearGradient gradientPrimaryColor = LinearGradient(

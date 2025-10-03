@@ -38,11 +38,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: AnnotatedRegion(
         value: SystemUiOverlayStyle.light.copyWith(
           systemNavigationBarColor: AppColors.white,
-          systemNavigationBarContrastEnforced:false,
+          systemNavigationBarContrastEnforced: false,
         ),
         child: Scaffold(
           backgroundColor: Colors.white,
-          drawer: DrawerWidget() ,
+          drawer: DrawerWidget(),
           body: IndexedStack(
             index: _currentIndex,
             children: _tabs.map((tab) => tab.widget).toList(),
@@ -60,22 +60,42 @@ class _DashboardScreenState extends State<DashboardScreen> {
             },
             items: [
               SalomonBottomBarItem(
-                icon: SvgPicture.asset(IconPath.iconHome),
+                icon: SvgPicture.asset(
+                  IconPath.iconHome,
+                  width: 25,
+                  height: 25,
+                  color: AppColors.color8F959E,
+                ),
                 title: Text("home_screen.home".tr()),
                 activeIcon: SizedBox.shrink(),
               ),
               SalomonBottomBarItem(
-                icon: Icon(FontAwesomeIcons.book),
+                icon: SvgPicture.asset(
+                  IconPath.iconBook,
+                  width: 25,
+                  height: 25,
+                  color: AppColors.color8F959E,
+                ),
                 title: Text("home_screen.course".tr()),
                 activeIcon: SizedBox.shrink(),
               ),
               SalomonBottomBarItem(
-                icon: SvgPicture.asset(IconPath.iconHome),
+                icon: SvgPicture.asset(
+                  IconPath.iconChat,
+                  width: 25,
+                  height: 25,
+                  color: AppColors.color8F959E,
+                ),
                 title: Text("home_screen.message".tr()),
                 activeIcon: SizedBox.shrink(),
               ),
               SalomonBottomBarItem(
-                icon: SvgPicture.asset(IconPath.iconHome),
+                icon: SvgPicture.asset(
+                  IconPath.iconSetting,
+                  width: 25,
+                  height: 25,
+                  color: AppColors.color8F959E,
+                ),
                 title: Text("home_screen.account".tr()),
                 activeIcon: SizedBox.shrink(),
               ),

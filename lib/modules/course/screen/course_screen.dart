@@ -1,4 +1,8 @@
 import 'package:ed_tech/init.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:ed_tech/modules/course/widgets/course_card_widget.dart';
+import 'package:ed_tech/modules/course/widgets/course_category_tabs_widget.dart';
+import 'package:ed_tech/modules/course/widgets/course_list_widget.dart';
 
 class CourseScreen extends StatefulWidget {
   const CourseScreen({super.key});
@@ -21,28 +25,35 @@ class _CourseScreenState extends State<CourseScreen> {
     return FunctionScreenTemplate(
       isShowAppBar: false,
       isShowBottomButton: false,
-      screen: Column(
-        children: [
-          Padding(
-            padding: AppPad.h24.add(AppPad.t24),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text('Course', style: AppTextStyles.textHeader2),
-                const CircleAvatar(
-                  radius: 22,
-                  backgroundColor: AppColors.white,
-                  child: Icon(Icons.person, color: AppColors.primary),
-                ),
-              ],
+      screen: SingleChildScrollView(
+        child: Column(
+          children: [
+            Padding(
+              padding: AppPad.h24.add(AppPad.t24),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text('Course', style: AppTextStyles.textHeader2),
+                  CircleAvatar(
+                    radius: 22,
+                    child: SvgPicture.asset(IconPath.iconFilter),
+                  ),
+                ],
+              ),
             ),
-          ),
-          Padding(
-            padding: AppPad.h24.add(AppPad.v12),
-            child: _SearchBar(controller: _searchController),
-          ),
-        ],
+            Padding(
+              padding: AppPad.h24.add(AppPad.v12),
+              child: _SearchBar(controller: _searchController),
+            ),
+            const SizedBox(height: 20),
+            const CourseCardsCarousel(),
+            const CourseCategoryTabsWidget(),
+            const SizedBox(height: 20),
+            const CourseListWidget(),
+            const SizedBox(height: 20), // Thêm padding bottom để tránh bị cắt
+          ],
+        ),
       ),
     );
   }
