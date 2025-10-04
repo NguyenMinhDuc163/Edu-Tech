@@ -78,5 +78,41 @@
     "women": "Nữ",
     "men": "Nam",
     "skip": "Bỏ qua"
+  },
+  "payment": {
+    "title": "Thanh toán",
+    "name": "Tên",
+    "country": "Quốc gia",
+    "city": "Thành phố",
+    "phone_number": "Số điện thoại",
+    "address": "Địa chỉ",
+    "save_as_primary_address": "Lưu làm địa chỉ chính",
+    "card_owner": "Chủ thẻ",
+    "card_number": "Số thẻ",
+    "save_card_info": "Lưu thông tin thẻ",
+    "save_address": "Lưu địa chỉ",
+    "save_card": "Lưu thẻ",
+    "add_new_card": "Thêm thẻ mới",
+    "add_card": "Thêm thẻ",
+    "order_confirmed": "Đơn hàng đã được xác nhận!",
+    "order_confirmation_message": "Đơn hàng của bạn đã được xác nhận, chúng tôi sẽ sớm gửi email xác nhận cho bạn.",
+    "go_to_orders": "Đi đến Đơn hàng",
+    "continue_shopping": "Tiếp tục mua sắm"
+  },
+  "review": {
+    "title": "Đánh giá",
+    "view_all": "Xem tất cả",
+    "description": "Mô tả",
+    "size_guide": "Hướng dẫn kích thước",
+    "size": "Kích thước",
+    "price": "Giá",
+    "rating": "Xếp hạng",
+    "add_review": "Thêm đánh giá",
+    "type_your_name": "Nhập tên của bạn",
+    "name": "Tên",
+    "how_was_your_experience": "Trải nghiệm của bạn thế nào?",
+    "describe_your_experience": "Mô tả trải nghiệm của bạn?",
+    "star": "Sao",
+    "submit_review": "Gửi đánh giá"
   }
 }

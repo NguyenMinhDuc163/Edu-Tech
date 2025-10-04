@@ -68,7 +68,7 @@ class _LoginContent extends StatelessWidget {
                   ButtonWidget(
                     titleWidget: TitleWidget(
                       title: "Facebook",
-                      iconPath: IconPath.iconGoogle,
+                      iconPath: IconPath.iconFacebook,
                     ),
                     onPressed: () {
                       // controller.onLogin(context, LoginType.facebook);
@@ -81,7 +81,7 @@ class _LoginContent extends StatelessWidget {
                   ButtonWidget(
                     titleWidget: TitleWidget(
                       title: "Twitter",
-                      iconPath: IconPath.iconGoogle,
+                      iconPath: IconPath.iconTwitter,
                     ),
                     onPressed: () {
                       controller.onLogin(context, LoginType.twitter);

@@ -1,5 +1,7 @@
 import 'package:disposable_provider/disposable_provider.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:ed_tech/modules/dashboard/screen/dashboard_screen.dart';
+import 'package:ed_tech/modules/home/screen/home_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ed_tech/core/widgets/app_gap.dart';
 import 'package:ed_tech/core/widgets/switch_botton_widget.dart';
@@ -119,7 +121,8 @@ class _SignInContent extends StatelessWidget {
         FunctionScreenTemplate(
           titleButtonBottom: 'login.title'.tr(),
           onClickBottomButton: () {
-            controller.onSignIn(context);
+            // controller.onSignIn(context);
+            Navigator.pushNamed(context, DashboardScreen.routeName);
           },
           screen: contentWidget,
         ),

@@ -108,7 +108,9 @@ class _FunctionScreenTemplateState extends State<FunctionScreenTemplate>
                 : widget.backgroundColor ?? AppColors.white,
         appBar: appBar ? appBarWidget() : null,
         drawer: DrawerWidget(), // Thêm drawer property
-        body: SafeArea(child: body),
+        body: SafeArea(
+            // top: false,
+            child: body),
         bottomNavigationBar:
             widget.isShowBottomButton
                 ? Column(

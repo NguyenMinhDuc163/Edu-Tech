@@ -1,5 +1,11 @@
 import 'package:disposable_provider/disposable_provider.dart';
 import 'package:ed_tech/modules/course/screen/course_screen.dart';
+import 'package:ed_tech/modules/payment/screen/address_form_screen.dart';
+import 'package:ed_tech/modules/payment/screen/confirm_screen.dart';
+import 'package:ed_tech/modules/payment/screen/new_card_screen.dart';
+import 'package:ed_tech/modules/payment/screen/payment_method_screen.dart';
+import 'package:ed_tech/modules/reviews/screen/add_review_screen.dart';
+import 'package:ed_tech/modules/reviews/screen/review_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ed_tech/core/public/global_utils.dart';
@@ -160,6 +166,20 @@ class Routers {
 
       case CourseScreen.routeName:
         return MaterialPageRoute(settings: settings, builder: (_) => CourseScreen());
+      case ReviewScreen.routeName:
+        return MaterialPageRoute(settings: settings, builder: (_) => ReviewScreen());
+      case AddressFormScreen.routeName:
+        return MaterialPageRoute(settings: settings, builder: (_) => AddressFormScreen());
+      case ConfirmScreen.routeName:
+        return MaterialPageRoute(settings: settings, builder: (_) => ConfirmScreen());
+      case NewCardScreen.routeName:
+        return MaterialPageRoute(settings: settings, builder: (_) => NewCardScreen());
+      case PaymentMethodScreen.routeName:
+        return MaterialPageRoute(settings: settings, builder: (_) => PaymentMethodScreen());
+      case ReviewScreen.routeName:
+        return MaterialPageRoute(settings: settings, builder: (_) => ReviewScreen());
+      case AddReviewScreen.routeName:
+        return MaterialPageRoute(settings: settings, builder: (_) => AddReviewScreen());
       default:
         return MaterialPageRoute(
           settings: settings,
