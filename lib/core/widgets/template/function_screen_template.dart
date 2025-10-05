@@ -31,7 +31,7 @@ class FunctionScreenTemplate extends StatefulWidget {
     this.title,
     this.screen,
     this.titleButtonBottom,
-    this.isShowBottomButton = false,
+    this.isShowBottomButton = true,
     this.onBack,
     this.resizeToAvoidBottomInset = true,
     this.titleWidget,

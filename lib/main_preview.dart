@@ -1,5 +1,6 @@
 ﻿import 'package:device_preview_plus/device_preview_plus.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:ed_tech/modules/auth/initial/screen/onboarding_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -67,6 +68,7 @@ class MyApp extends StatelessWidget {
           darkTheme: ThemeData.dark(),
           onGenerateRoute: Routers.generateRoute,
           routes: Routers.routes,
+          initialRoute: OnboardingScreen.routeName,
           navigatorKey: NavigationService.navigatorKey,
           navigatorObservers: [NavigationService.routeObserver],
           home: const SplashScreen(),

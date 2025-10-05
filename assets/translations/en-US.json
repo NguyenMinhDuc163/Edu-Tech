@@ -77,7 +77,15 @@
     "description": "Create your individual & unique style and look amazing everyday.",
     "women": "Women",
     "men": "Men",
-    "skip": "Skip"
+    "skip": "Skip",
+    "trial_courses": "Numerous free\ntrial courses",
+    "free_courses": "Free courses for you to\nfind your way to learning",
+    "quick_learning": "Quick and easy\nlearning",
+    "flexible_learning": "Easy and fast learning at\nany time to help you\nimprove various skills",
+    "create_study_plan": "Create your own\nstudy plan",
+    "study_with_plan": "Study according to the\nstudy plan, make study\nmore motivated",
+    "sign_up": "Sign up",
+    "log_in": "Log in"
   },
   "payment": {
     "title": "Payment",

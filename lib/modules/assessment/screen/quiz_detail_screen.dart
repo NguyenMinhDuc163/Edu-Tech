@@ -56,6 +56,7 @@ class _QuizDetailScreenState extends State<QuizDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return FunctionScreenTemplate(
+      isShowBottomButton: false,
       screen: SingleChildScrollView(
         padding: AppPad.a16,
         child: Column(

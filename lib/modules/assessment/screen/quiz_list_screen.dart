@@ -61,6 +61,7 @@ class _QuizListScreenState extends State<QuizListScreen> {
       actionsWidget: [
         SvgPicture.asset(IconPath.iconRanking, width: 25, height: 25, color: AppColors.black50),
       ],
+      isShowBottomButton: false,
       screen: SingleChildScrollView(
         padding: AppPad.a16,
         child: Column(

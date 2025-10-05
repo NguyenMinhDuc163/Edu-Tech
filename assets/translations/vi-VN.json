@@ -77,7 +77,15 @@
     "description": "Tạo phong cách cá nhân & độc đáo của bạn và trông tuyệt vời mỗi ngày.",
     "women": "Nữ",
     "men": "Nam",
-    "skip": "Bỏ qua"
+    "skip": "Bỏ qua",
+    "trial_courses": "Nhiều khóa học\ndùng thử miễn phí",
+    "free_courses": "Các khóa học miễn phí giúp bạn\ntìm ra cách học phù hợp",
+    "quick_learning": "Học tập nhanh chóng\nvà dễ dàng",
+    "flexible_learning": "Học tập mọi lúc, mọi nơi để\ncải thiện nhiều kỹ năng",
+    "create_study_plan": "Tạo kế hoạch học tập\ncủa riêng bạn",
+    "study_with_plan": "Học theo kế hoạch để\ncó thêm động lực",
+    "sign_up": "Đăng ký",
+    "log_in": "Đăng nhập"
   },
   "payment": {
     "title": "Thanh toán",

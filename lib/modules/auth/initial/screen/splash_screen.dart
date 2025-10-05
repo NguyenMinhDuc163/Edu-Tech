@@ -16,7 +16,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    redirectIntroScreen();
+    // redirectIntroScreen();
   }
 
   void redirectIntroScreen() async {
