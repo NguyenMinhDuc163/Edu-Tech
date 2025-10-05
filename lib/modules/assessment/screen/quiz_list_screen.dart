@@ -3,6 +3,8 @@ import 'package:ed_tech/core/theme/app_colors.dart';
 import 'package:ed_tech/core/theme/app_text_styles.dart';
 import 'package:ed_tech/core/theme/app_pad.dart';
 import 'package:ed_tech/modules/assessment/screen/quiz_detail_screen.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../models/quiz_model.dart';
 import '../widgets/quiz_card_widget.dart';
 
@@ -14,13 +16,12 @@ class QuizListScreen extends StatefulWidget {
 }
 
 class _QuizListScreenState extends State<QuizListScreen> {
-  // Mock data based on the image
   final List<QuizModel> recentQuizzes = [
     const QuizModel(
       id: '1',
       title: 'Đề Toán',
       type: 'Đề thi',
-      timeLimit: 0, // No time limit
+      timeLimit: 0,
       questionCount: 4,
       status: QuizStatus.notTaken,
       subject: 'Toán',
@@ -57,27 +58,26 @@ class _QuizListScreenState extends State<QuizListScreen> {
   @override
   Widget build(BuildContext context) {
     return FunctionScreenTemplate(
+      actionsWidget: [
+        SvgPicture.asset(IconPath.iconRanking, width: 25, height: 25, color: AppColors.black50),
+      ],
       screen: SingleChildScrollView(
         padding: AppPad.a16,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Recent Section
             if (recentQuizzes.isNotEmpty) ...[
               _buildSectionHeader('Gần đây'),
               ...recentQuizzes.map(
-                (quiz) =>
-                    QuizCardWidget(quiz: quiz, onTap: () => _onQuizTap(quiz)),
+                (quiz) => QuizCardWidget(quiz: quiz, onTap: () => _onQuizTap(quiz)),
               ),
               const SizedBox(height: 20),
             ],
 
-            // Completed Section
             if (completedQuizzes.isNotEmpty) ...[
               _buildSectionHeader('Đã hoàn thành(${completedQuizzes.length})'),
               ...completedQuizzes.map(
-                (quiz) =>
-                    QuizCardWidget(quiz: quiz, onTap: () => _onQuizTap(quiz)),
+                (quiz) => QuizCardWidget(quiz: quiz, onTap: () => _onQuizTap(quiz)),
               ),
             ],
           ],

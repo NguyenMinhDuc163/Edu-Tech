@@ -6,15 +6,10 @@ class CourseLessonBottomSheet extends StatefulWidget {
   final String courseTitle;
   final List<LessonData> lessons;
 
-  const CourseLessonBottomSheet({
-    super.key,
-    required this.courseTitle,
-    required this.lessons,
-  });
+  const CourseLessonBottomSheet({super.key, required this.courseTitle, required this.lessons});
 
   @override
-  State<CourseLessonBottomSheet> createState() =>
-      _CourseLessonBottomSheetState();
+  State<CourseLessonBottomSheet> createState() => _CourseLessonBottomSheetState();
 }
 
 class _CourseLessonBottomSheetState extends State<CourseLessonBottomSheet> {
@@ -35,7 +30,6 @@ class _CourseLessonBottomSheetState extends State<CourseLessonBottomSheet> {
           ),
           child: Column(
             children: [
-              // Handle bar
               Container(
                 margin: const EdgeInsets.only(top: 12),
                 width: 40,
@@ -46,7 +40,6 @@ class _CourseLessonBottomSheetState extends State<CourseLessonBottomSheet> {
                 ),
               ),
 
-              // Header
               Padding(
                 padding: AppPad.h24.add(const EdgeInsets.only(top: 20)),
                 child: Row(
@@ -55,9 +48,7 @@ class _CourseLessonBottomSheetState extends State<CourseLessonBottomSheet> {
                     Expanded(
                       child: Text(
                         widget.courseTitle,
-                        style: AppTextStyles.textHeader3.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: AppTextStyles.textHeader3.copyWith(fontWeight: FontWeight.bold),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -71,18 +62,13 @@ class _CourseLessonBottomSheetState extends State<CourseLessonBottomSheet> {
                           color: AppColors.lightGray,
                           borderRadius: BorderRadius.circular(16),
                         ),
-                        child: const Icon(
-                          Icons.close,
-                          color: AppColors.text,
-                          size: 18,
-                        ),
+                        child: const Icon(Icons.close, color: AppColors.text, size: 18),
                       ),
                     ),
                   ],
                 ),
               ),
 
-              // Lessons list
               Expanded(
                 child: ListView.builder(
                   controller: scrollController,
@@ -109,10 +95,7 @@ class _CourseLessonBottomSheetState extends State<CourseLessonBottomSheet> {
         color: AppColors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color:
-              lesson.isCompleted
-                  ? AppColors.primary.withOpacity(0.3)
-                  : AppColors.lightGray,
+          color: lesson.isCompleted ? AppColors.primary.withOpacity(0.3) : AppColors.lightGray,
           width: 1,
         ),
         boxShadow: [
@@ -125,25 +108,17 @@ class _CourseLessonBottomSheetState extends State<CourseLessonBottomSheet> {
       ),
       child: Row(
         children: [
-          // Lesson number
           Container(
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color:
-                  lesson.isCompleted
-                      ? AppColors.primary.withOpacity(0.1)
-                      : AppColors.lightGray,
+              color: lesson.isCompleted ? AppColors.primary.withOpacity(0.1) : AppColors.lightGray,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Center(
               child:
                   lesson.isCompleted
-                      ? const Icon(
-                        Icons.check,
-                        color: AppColors.primary,
-                        size: 20,
-                      )
+                      ? const Icon(Icons.check, color: AppColors.primary, size: 20)
                       : Text(
                         lessonNumber.toString().padLeft(2, '0'),
                         style: AppTextStyles.textContent1.copyWith(
@@ -156,7 +131,6 @@ class _CourseLessonBottomSheetState extends State<CourseLessonBottomSheet> {
 
           const SizedBox(width: 16),
 
-          // Lesson details
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -165,10 +139,7 @@ class _CourseLessonBottomSheetState extends State<CourseLessonBottomSheet> {
                   lesson.title,
                   style: AppTextStyles.textContent1.copyWith(
                     fontWeight: FontWeight.w600,
-                    color:
-                        lesson.isLocked
-                            ? AppColors.color8F959E
-                            : AppColors.text,
+                    color: lesson.isLocked ? AppColors.color8F959E : AppColors.text,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -176,17 +147,12 @@ class _CourseLessonBottomSheetState extends State<CourseLessonBottomSheet> {
                   children: [
                     Text(
                       lesson.duration,
-                      style: AppTextStyles.textContent3.copyWith(
-                        color: AppColors.color8F959E,
-                      ),
+                      style: AppTextStyles.textContent3.copyWith(color: AppColors.color8F959E),
                     ),
                     if (lesson.isCompleted) ...[
                       const SizedBox(width: 8),
                       Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 2,
-                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(
                           color: AppColors.primary.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(8),
@@ -206,15 +172,13 @@ class _CourseLessonBottomSheetState extends State<CourseLessonBottomSheet> {
             ),
           ),
 
-          // Action button
           GestureDetector(
             onTap: lesson.isLocked ? null : () => _playLesson(lesson),
             child: Container(
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color:
-                    lesson.isLocked ? AppColors.lightGray : AppColors.primary,
+                color: lesson.isLocked ? AppColors.lightGray : AppColors.primary,
                 borderRadius: BorderRadius.circular(24),
               ),
               child: Icon(
@@ -234,10 +198,8 @@ class _CourseLessonBottomSheetState extends State<CourseLessonBottomSheet> {
   }
 
   void _playLesson(LessonData lesson) {
-    // TODO: Implement lesson playback
     print('Playing lesson: ${lesson.title}');
 
-    // Show a simple dialog for now
     showDialog(
       context: context,
       builder:
@@ -245,10 +207,7 @@ class _CourseLessonBottomSheetState extends State<CourseLessonBottomSheet> {
             title: Text(lesson.title),
             content: Text('Duration: ${lesson.duration}'),
             actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Close'),
-              ),
+              TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Close')),
             ],
           ),
     );

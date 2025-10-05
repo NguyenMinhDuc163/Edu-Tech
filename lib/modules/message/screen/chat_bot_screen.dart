@@ -12,7 +12,6 @@ class ChatBotScreen extends StatefulWidget {
 class _ChatBotScreenState extends State<ChatBotScreen> {
   final TextEditingController _textController = TextEditingController();
 
-  // Mock messages
   final List<_ChatMessage> _messages = [
     _ChatMessage(isUser: true, text: 'What is AI chat bot ?'),
     _ChatMessage(
@@ -39,9 +38,12 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
     return FunctionScreenTemplate(
       title: "Chat Bot",
       isShowDrawer: true,
-      actionsWidget: [InkWell(
+      actionsWidget: [
+        InkWell(
           onTap: () => Navigator.pushNamed(context, ChatHistoryScreen.routeName),
-          child: SvgPicture.asset(IconPath.iconHistory))],
+          child: SvgPicture.asset(IconPath.iconHistory),
+        ),
+      ],
       screen: Column(
         children: [
           Expanded(
@@ -91,11 +93,9 @@ class _MessageCard extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Avatar
         CircleAvatar(
           radius: 16,
-          backgroundColor:
-              isUser ? const Color(0xFFDEE7FF) : const Color(0xFFEDEBFF),
+          backgroundColor: isUser ? const Color(0xFFDEE7FF) : const Color(0xFFEDEBFF),
           child: Icon(
             isUser ? Icons.person : Icons.smart_toy,
             size: 18,
@@ -103,7 +103,7 @@ class _MessageCard extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 10),
-        // Card
+
         Expanded(
           child: Container(
             decoration: BoxDecoration(
@@ -119,26 +119,14 @@ class _MessageCard extends StatelessWidget {
                   if (!isUser)
                     const Text(
                       'User Input:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF1C2439),
-                      ),
+                      style: TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF1C2439)),
                     ),
                   if (!isUser) const SizedBox(height: 2),
-                  Text(
-                    message.text,
-                    style: const TextStyle(
-                      color: Color(0xFF1C2439),
-                      height: 1.4,
-                    ),
-                  ),
+                  Text(message.text, style: const TextStyle(color: Color(0xFF1C2439), height: 1.4)),
                   const SizedBox(height: 10),
                   Row(
                     children: const [
-                      _ActionIcon(
-                        icon: Icons.copy_outlined,
-                        label: 'Copy Text',
-                      ),
+                      _ActionIcon(icon: Icons.copy_outlined, label: 'Copy Text'),
                       SizedBox(width: 10),
                       _ActionIcon(icon: Icons.thumb_up_alt_outlined),
                       SizedBox(width: 10),
@@ -169,14 +157,7 @@ class _ActionIcon extends StatelessWidget {
         Icon(icon, size: 18, color: color),
         if (label != null) ...[
           const SizedBox(width: 6),
-          Text(
-            label!,
-            style: TextStyle(
-              color: color,
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
+          Text(label!, style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.w500)),
         ],
       ],
     );
@@ -217,10 +198,7 @@ class _ChatInput extends StatelessWidget {
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(
-                      Icons.attachment,
-                      color: Color(0xFF8491A5),
-                    ),
+                    icon: const Icon(Icons.attachment, color: Color(0xFF8491A5)),
                     onPressed: () {},
                   ),
                 ],
@@ -233,10 +211,7 @@ class _ChatInput extends StatelessWidget {
             child: Container(
               width: 48,
               height: 48,
-              decoration: const BoxDecoration(
-                color: Color(0xFF6C56F9),
-                shape: BoxShape.circle,
-              ),
+              decoration: const BoxDecoration(color: Color(0xFF6C56F9), shape: BoxShape.circle),
               child: const Icon(Icons.send_rounded, color: Colors.white),
             ),
           ),

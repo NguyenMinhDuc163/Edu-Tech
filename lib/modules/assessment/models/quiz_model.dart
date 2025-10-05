@@ -1,14 +1,14 @@
 class QuizModel {
   final String id;
   final String title;
-  final String type; // "Đề thi"
-  final int timeLimit; // in minutes, 0 means unlimited
+  final String type; 
+  final int timeLimit; 
   final int questionCount;
   final QuizStatus status;
   final int? score;
   final int attempts;
   final DateTime? completedAt;
-  final String subject; // "Toán", "Văn", "Anh"
+  final String subject; 
 
   const QuizModel({
     required this.id,

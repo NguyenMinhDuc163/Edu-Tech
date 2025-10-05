@@ -15,13 +15,11 @@ class CourseScreen extends StatefulWidget {
 class _CourseScreenState extends State<CourseScreen> {
   final TextEditingController _searchController = TextEditingController();
 
-  // Filter state
   List<String> _selectedCategories = ['Design', 'Coding'];
   List<String> _selectedDurations = ['3-8 Hours'];
   double _selectedMinPrice = 90;
   double _selectedMaxPrice = 200;
 
-  // Filter options
   final List<String> _categories = [
     'Design',
     'Coding',
@@ -63,7 +61,7 @@ class _CourseScreenState extends State<CourseScreen> {
           _selectedMinPrice = minPrice;
           _selectedMaxPrice = maxPrice;
         });
-        // TODO: Apply filter logic here
+
         print(
           'Applied filter: Categories: $categories, Durations: $durations, Price: \$${minPrice.toInt()} - \$${maxPrice.toInt()}',
         );
@@ -75,7 +73,7 @@ class _CourseScreenState extends State<CourseScreen> {
           _selectedMinPrice = _minPrice;
           _selectedMaxPrice = _maxPrice;
         });
-        // TODO: Clear filter logic here
+
         print('Filter cleared');
       },
     );
@@ -96,26 +94,20 @@ class _CourseScreenState extends State<CourseScreen> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text('Course', style: AppTextStyles.textHeader2),
-                  CircleAvatar(
-                    radius: 22,
-                    child: SvgPicture.asset(IconPath.iconAvatar),
-                  ),
+                  CircleAvatar(radius: 22, child: SvgPicture.asset(IconPath.iconAvatar)),
                 ],
               ),
             ),
             Padding(
               padding: AppPad.h24.add(AppPad.v12),
-              child: _SearchBar(
-                controller: _searchController,
-                onFilterTap: _showFilterBottomSheet,
-              ),
+              child: _SearchBar(controller: _searchController, onFilterTap: _showFilterBottomSheet),
             ),
             const SizedBox(height: 20),
             const CourseCardsCarousel(),
             const CourseCategoryTabsWidget(),
             const SizedBox(height: 20),
             const CourseListWidget(),
-            const SizedBox(height: 20), // Thêm padding bottom để tránh bị cắt
+            const SizedBox(height: 20),
           ],
         ),
       ),
@@ -146,9 +138,7 @@ class _SearchBar extends StatelessWidget {
               decoration: InputDecoration(
                 isDense: true,
                 hintText: 'Find Course',
-                hintStyle: AppTextStyles.inputHintText.copyWith(
-                  color: AppColors.colorB8B8D2,
-                ),
+                hintStyle: AppTextStyles.inputHintText.copyWith(color: AppColors.colorB8B8D2),
                 border: InputBorder.none,
               ),
             ),

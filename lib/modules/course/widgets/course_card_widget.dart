@@ -24,20 +24,16 @@ class CourseCardWidget extends StatelessWidget {
       height: 80,
       width: MediaQuery.of(context).size.width * 0.45,
       margin: const EdgeInsets.symmetric(horizontal: 8),
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(16),
-      ),
+      decoration: BoxDecoration(color: backgroundColor, borderRadius: BorderRadius.circular(16)),
       child: Stack(
         children: [
-          // Background illustration
           Positioned.fill(
             child: ClipRRect(
               borderRadius: BorderRadius.circular(16),
               child: SvgPicture.asset(imagePath, fit: BoxFit.cover),
             ),
           ),
-          // Title label
+
           Positioned(
             bottom: 12,
             right: 12,
@@ -71,22 +67,20 @@ class CourseCardsCarousel extends StatelessWidget {
       CourseCardData(
         title: 'Language',
         imagePath: ImagePath.persionLanguege,
-        backgroundColor: const Color(0xFFE3F2FD), // Light blue
-        textColor: const Color(0xFF1976D2), // Blue
+        backgroundColor: const Color(0xFFE3F2FD),
+        textColor: const Color(0xFF1976D2),
       ),
       CourseCardData(
         title: 'Painting',
         imagePath: ImagePath.persionPaint,
-        backgroundColor: const Color(0xFFF3E5F5), // Light purple
-        textColor: const Color(0xFF7B1FA2), // Purple
+        backgroundColor: const Color(0xFFF3E5F5),
+        textColor: const Color(0xFF7B1FA2),
       ),
       CourseCardData(
         title: 'Design',
-        imagePath:
-            ImagePath
-                .persionLanguege, // Tạm dùng ảnh Language, bạn có thể thay bằng ảnh khác
-        backgroundColor: const Color(0xFFE8F5E8), // Light green
-        textColor: const Color(0xFF2E7D32), // Green
+        imagePath: ImagePath.persionLanguege,
+        backgroundColor: const Color(0xFFE8F5E8),
+        textColor: const Color(0xFF2E7D32),
       ),
     ];
 

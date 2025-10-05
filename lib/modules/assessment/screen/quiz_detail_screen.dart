@@ -2,6 +2,8 @@ import 'package:ed_tech/init.dart';
 import 'package:ed_tech/core/theme/app_colors.dart';
 import 'package:ed_tech/core/theme/app_text_styles.dart';
 import 'package:ed_tech/core/theme/app_pad.dart';
+import 'package:ed_tech/modules/assessment/screen/quiz_result_screen.dart';
+import 'package:ed_tech/modules/assessment/screen/quiz_taking_screen.dart';
 import '../models/quiz_model.dart';
 import '../models/quiz_attempt_model.dart';
 import '../widgets/quiz_info_section.dart';
@@ -16,7 +18,7 @@ class QuizDetailScreen extends StatefulWidget {
 }
 
 class _QuizDetailScreenState extends State<QuizDetailScreen> {
-  // Mock data for quiz detail - based on the image
+  
   late QuizModel quiz;
   late QuizAttemptModel lastAttempt;
 
@@ -27,7 +29,7 @@ class _QuizDetailScreenState extends State<QuizDetailScreen> {
   }
 
   void _initializeData() {
-    // Mock quiz data based on the image
+    
     quiz = const QuizModel(
       id: '3',
       title: 'Đề Anh',
@@ -38,7 +40,7 @@ class _QuizDetailScreenState extends State<QuizDetailScreen> {
       subject: 'Anh',
     );
 
-    // Mock attempt data based on the image
+    
     lastAttempt = QuizAttemptModel(
       id: '1',
       quizId: '3',
@@ -59,12 +61,12 @@ class _QuizDetailScreenState extends State<QuizDetailScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Quiz Information Section
+            
             QuizInfoSection(quiz: quiz, onStartQuiz: _onStartQuiz),
 
             const SizedBox(height: 24),
 
-            // Test History Section
+            
             _buildTestHistorySection(),
           ],
         ),
@@ -76,7 +78,7 @@ class _QuizDetailScreenState extends State<QuizDetailScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Section title
+        
         Text(
           'Lịch sử làm bài',
           style: AppTextStyles.textStyleDefaultBold.copyWith(
@@ -87,29 +89,18 @@ class _QuizDetailScreenState extends State<QuizDetailScreen> {
 
         const SizedBox(height: 16),
 
-        // Attempt card
+        
         QuizAttemptCard(attempt: lastAttempt, onViewDetails: _onViewDetails),
       ],
     );
   }
 
   void _onStartQuiz() {
-    // Handle start quiz
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Bắt đầu làm bài: ${quiz.title}'),
-        duration: const Duration(seconds: 2),
-      ),
-    );
+    Navigator.pushNamed(context, QuizTakingScreen.routeName);
+
   }
 
   void _onViewDetails() {
-    // Handle view details
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Xem chi tiết bài làm: ${quiz.title}'),
-        duration: const Duration(seconds: 2),
-      ),
-    );
+    Navigator.pushNamed(context, QuizResultScreen.routeName);
   }
 }

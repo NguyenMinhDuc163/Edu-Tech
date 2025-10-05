@@ -31,10 +31,10 @@ class QuizCardWidget extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Top tags row
+            
             Row(
               children: [
-                // No time limit tag
+                
                 if (!quiz.hasTimeLimit)
                   Container(
                     padding: AppPad.h6v2,
@@ -61,7 +61,7 @@ class QuizCardWidget extends StatelessWidget {
                     ),
                   ),
                 const Spacer(),
-                // Quiz type tag
+                
                 Container(
                   padding: AppPad.h6v2,
                   decoration: BoxDecoration(
@@ -81,11 +81,11 @@ class QuizCardWidget extends StatelessWidget {
 
             const SizedBox(height: 8),
 
-            // Quiz content row
+            
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Score display (for completed quizzes)
+                
                 if (quiz.isCompleted) ...[
                   Container(
                     width: 40,
@@ -108,12 +108,12 @@ class QuizCardWidget extends StatelessWidget {
                   const SizedBox(width: 12),
                 ],
 
-                // Quiz info
+                
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Title
+                      
                       Text(
                         quiz.title,
                         style: AppTextStyles.textStyleDefaultBold.copyWith(
@@ -123,7 +123,7 @@ class QuizCardWidget extends StatelessWidget {
 
                       const SizedBox(height: 4),
 
-                      // Status
+                      
                       Text(
                         quiz.statusText,
                         style: AppTextStyles.textContent3.copyWith(
@@ -136,10 +136,10 @@ class QuizCardWidget extends StatelessWidget {
 
                       const SizedBox(height: 8),
 
-                      // Details row
+                      
                       Row(
                         children: [
-                          // Time icon and text
+                          
                           Icon(
                             Icons.access_time,
                             size: 14,
@@ -155,7 +155,7 @@ class QuizCardWidget extends StatelessWidget {
 
                           const SizedBox(width: 16),
 
-                          // Question count
+                          
                           Icon(
                             Icons.help_outline,
                             size: 14,
@@ -171,7 +171,7 @@ class QuizCardWidget extends StatelessWidget {
 
                           const SizedBox(width: 16),
 
-                          // Attempts (for completed quizzes)
+                          
                           if (quiz.isCompleted) ...[
                             Icon(
                               Icons.person_outline,

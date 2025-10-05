@@ -37,10 +37,8 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder:
-          (context) => CourseLessonBottomSheet(
-            courseTitle: widget.title,
-            lessons: _getSampleLessons(),
-          ),
+          (context) =>
+              CourseLessonBottomSheet(courseTitle: widget.title, lessons: _getSampleLessons()),
     );
   }
 
@@ -89,16 +87,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
     return Scaffold(
       backgroundColor: AppColors.white,
       body: Stack(
-        children: [
-          // Video Player Section (Top)
-          _buildVideoPlayerSection(),
-
-          // Bottom Sheet with Course Details
-          _buildBottomSheet(),
-
-          // Bottom Action Buttons
-          _buildBottomActionButtons(),
-        ],
+        children: [_buildVideoPlayerSection(), _buildBottomSheet(), _buildBottomActionButtons()],
       ),
     );
   }
@@ -115,7 +104,6 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
       ),
       child: Stack(
         children: [
-          // Back button
           Positioned(
             top: 50,
             left: 20,
@@ -128,21 +116,15 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
                   color: Colors.black.withOpacity(0.3),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: const Icon(
-                  Icons.arrow_back,
-                  color: Colors.white,
-                  size: 20,
-                ),
+                child: const Icon(Icons.arrow_back, color: Colors.white, size: 20),
               ),
             ),
           ),
 
-          // Video content
           Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Illustration placeholder
                 Container(
                   width: 200,
                   height: 200,
@@ -150,16 +132,11 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
                     color: AppColors.primary.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(100),
                   ),
-                  child: const Icon(
-                    Icons.play_circle_outline,
-                    size: 80,
-                    color: AppColors.primary,
-                  ),
+                  child: const Icon(Icons.play_circle_outline, size: 80, color: AppColors.primary),
                 ),
 
                 const SizedBox(height: 20),
 
-                // Play/Pause button
                 Container(
                   width: 60,
                   height: 60,
@@ -167,17 +144,12 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
                     color: Colors.white.withOpacity(0.9),
                     borderRadius: BorderRadius.circular(30),
                   ),
-                  child: const Icon(
-                    Icons.pause,
-                    color: AppColors.primary,
-                    size: 30,
-                  ),
+                  child: const Icon(Icons.pause, color: AppColors.primary, size: 30),
                 ),
               ],
             ),
           ),
 
-          // Progress bar
           Positioned(
             bottom: 20,
             left: 20,
@@ -212,7 +184,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
                   ),
                   child: FractionallySizedBox(
                     alignment: Alignment.centerLeft,
-                    widthFactor: 0.68, // 4:10 / 6:10
+                    widthFactor: 0.68,
                     child: Container(
                       decoration: BoxDecoration(
                         color: AppColors.colorFF6905,
@@ -225,7 +197,6 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
             ),
           ),
 
-          // Fullscreen button
           Positioned(
             bottom: 20,
             right: 20,
@@ -236,11 +207,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
                 color: Colors.black.withOpacity(0.3),
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: const Icon(
-                Icons.fullscreen,
-                color: Colors.white,
-                size: 20,
-              ),
+              child: const Icon(Icons.fullscreen, color: Colors.white, size: 20),
             ),
           ),
         ],
@@ -261,10 +228,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
               topLeft: Radius.circular(50),
               topRight: Radius.circular(50),
             ),
-            border: Border.all(
-              color: AppColors.lightGray.withOpacity(0.3),
-              width: 1,
-            ),
+            border: Border.all(color: AppColors.lightGray.withOpacity(0.3), width: 1),
             boxShadow: [
               BoxShadow(
                 offset: const Offset(0, -2),
@@ -277,7 +241,6 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
             controller: scrollController,
             child: Column(
               children: [
-                // Handle bar
                 Container(
                   margin: const EdgeInsets.only(top: 12),
                   width: 40,
@@ -288,16 +251,13 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
                   ),
                 ),
 
-                // Course Details Section
                 _buildCourseDetailsSection(),
 
-                // About Section
                 _buildAboutSection(),
 
-                // Lessons Preview Section
                 _buildLessonsPreviewSection(),
 
-                const SizedBox(height: 100), // Space for bottom buttons
+                const SizedBox(height: 100),
               ],
             ),
           ),
@@ -325,9 +285,8 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
         ),
         child: Row(
           children: [
-            // Favorite button
             GestureDetector(
-              onTap: (){
+              onTap: () {
                 Navigator.pushNamed(context, ReviewScreen.routeName);
               },
               child: Container(
@@ -338,17 +297,12 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: AppColors.colorFF6905),
                 ),
-                child: const Icon(
-                  Icons.star_border,
-                  color: AppColors.colorFF6905,
-                  size: 24,
-                ),
+                child: const Icon(Icons.star_border, color: AppColors.colorFF6905, size: 24),
               ),
             ),
 
             const SizedBox(width: 12),
 
-            // Buy Now button
             Expanded(
               child: Container(
                 height: 50,
@@ -378,9 +332,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
         children: [
           Text(
             widget.title,
-            style: AppTextStyles.textHeader2.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+            style: AppTextStyles.textHeader2.copyWith(fontWeight: FontWeight.bold),
           ),
           Text(
             widget.price,
@@ -402,25 +354,16 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
         children: [
           Text(
             'About this course',
-            style: AppTextStyles.textHeader3.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+            style: AppTextStyles.textHeader3.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 12),
           Text(
             widget.description ??
                 'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.',
-            style: AppTextStyles.textContent2.copyWith(
-              color: AppColors.color8F959E,
-              height: 1.5,
-            ),
+            style: AppTextStyles.textContent2.copyWith(color: AppColors.color8F959E, height: 1.5),
           ),
           const SizedBox(height: 16),
-          const Icon(
-            Icons.visibility_off,
-            color: AppColors.color8F959E,
-            size: 20,
-          ),
+          const Icon(Icons.visibility_off, color: AppColors.color8F959E, size: 20),
         ],
       ),
     );
@@ -432,22 +375,13 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Lessons',
-            style: AppTextStyles.textHeader3.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+          Text('Lessons', style: AppTextStyles.textHeader3.copyWith(fontWeight: FontWeight.bold)),
           const SizedBox(height: 16),
 
-          // Show first 3 lessons as preview
-          ..._getSampleLessons()
-              .take(3)
-              .map((lesson) => _buildLessonItem(lesson)),
+          ..._getSampleLessons().take(3).map((lesson) => _buildLessonItem(lesson)),
 
           const SizedBox(height: 16),
 
-          // View all lessons button
           GestureDetector(
             onTap: _showLessonBottomSheet,
             child: Container(
@@ -460,9 +394,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
               child: Text(
                 'View All Lessons',
                 textAlign: TextAlign.center,
-                style: AppTextStyles.textButton.copyWith(
-                  color: AppColors.primary,
-                ),
+                style: AppTextStyles.textButton.copyWith(color: AppColors.primary),
               ),
             ),
           ),
@@ -476,7 +408,6 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
       margin: const EdgeInsets.only(bottom: 16),
       child: Row(
         children: [
-          // Lesson number
           Container(
             width: 40,
             height: 40,
@@ -497,29 +428,23 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
 
           const SizedBox(width: 16),
 
-          // Lesson details
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   lesson.title,
-                  style: AppTextStyles.textContent1.copyWith(
-                    fontWeight: FontWeight.w500,
-                  ),
+                  style: AppTextStyles.textContent1.copyWith(fontWeight: FontWeight.w500),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   lesson.duration,
-                  style: AppTextStyles.textContent3.copyWith(
-                    color: AppColors.color8F959E,
-                  ),
+                  style: AppTextStyles.textContent3.copyWith(color: AppColors.color8F959E),
                 ),
               ],
             ),
           ),
 
-          // Action button
           Container(
             width: 40,
             height: 40,

@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:ed_tech/modules/auth/initial/screen/onboarding_screen.dart';
 import 'package:ed_tech/modules/home/screen/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -60,7 +61,7 @@ class App extends StatelessWidget {
           supportedLocales: context.supportedLocales,
           locale: context.locale,
           routes: Routers.routes,
-          // initialRoute: '/',
+          initialRoute: OnboardingScreen.routeName,
           onGenerateRoute: Routers.generateRoute,
           navigatorKey: NavigationService.navigatorKey,
           navigatorObservers: [NavigationService.routeObserver],

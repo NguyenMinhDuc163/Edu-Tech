@@ -9,7 +9,7 @@ class ChatHistoryScreen extends StatefulWidget {
 }
 
 class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
-  // Mock grouped data
+  
   final Map<String, List<String>> _groups = {
     'Today': ['What is AI chat bot', 'Real Estate brand Names'],
     'Yesterday, May 27': [
@@ -19,7 +19,7 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
     ],
   };
 
-  // Track selected item to show actions
+  
   String? _selectedGroup;
   int? _selectedIndex;
 

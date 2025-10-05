@@ -28,7 +28,7 @@ class QuizInfoSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header with title and icon
+          
           Row(
             children: [
               Expanded(
@@ -57,7 +57,7 @@ class QuizInfoSection extends StatelessWidget {
 
           const SizedBox(height: 16),
 
-          // Quiz parameters
+          
           _buildParameterItem(
             icon: Icons.access_time,
             iconColor: AppColors.error,
@@ -94,7 +94,7 @@ class QuizInfoSection extends StatelessWidget {
 
           const SizedBox(height: 20),
 
-          // Start test button
+          
           SizedBox(
             width: double.infinity,
             height: 48,

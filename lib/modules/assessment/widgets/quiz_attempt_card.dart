@@ -29,7 +29,7 @@ class QuizAttemptCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Total Score Row
+          
           Row(
             children: [
               Text(
@@ -48,7 +48,7 @@ class QuizAttemptCard extends StatelessWidget {
                 ),
               ),
               const Spacer(),
-              // Date time in top right
+              
               Text(
                 attempt.fullDateTime,
                 style: AppTextStyles.textContent4.copyWith(
@@ -60,10 +60,10 @@ class QuizAttemptCard extends StatelessWidget {
 
           const SizedBox(height: 16),
 
-          // Attempt Details
+          
           Row(
             children: [
-              // Time taken
+              
               Expanded(
                 child: _buildDetailItem(
                   icon: Icons.access_time,
@@ -75,7 +75,7 @@ class QuizAttemptCard extends StatelessWidget {
 
               const SizedBox(width: 16),
 
-              // Correct answers
+              
               Expanded(
                 child: _buildDetailItem(
                   icon: Icons.check_circle,
@@ -89,7 +89,7 @@ class QuizAttemptCard extends StatelessWidget {
 
           const SizedBox(height: 16),
 
-          // View details button
+          
           SizedBox(
             width: double.infinity,
             height: 40,

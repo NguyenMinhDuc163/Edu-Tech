@@ -4,7 +4,7 @@ class QuizAttemptModel {
   final double totalScore;
   final int correctAnswers;
   final int totalQuestions;
-  final int timeTaken; // in minutes
+  final int timeTaken; 
   final DateTime completedAt;
   final List<QuestionAttemptModel> questionAttempts;
 
