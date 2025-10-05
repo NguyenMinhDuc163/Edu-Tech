@@ -92,7 +92,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
               SalomonBottomBarItem(
                 icon: SvgPicture.asset(
-                  IconPath.iconExam,
+                  IconPath.iconAssigment,
                   width: 25,
                   height: 25,
                   color: AppColors.color8F959E,

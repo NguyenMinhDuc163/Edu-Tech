@@ -18,7 +18,7 @@ class HomeScreen extends StatelessWidget {
       actionsWidget: [
         GestureDetector(
           onTap: () => {},
-          child: SvgPicture.asset(IconPath.iconBag),
+          child: SvgPicture.asset(IconPath.iconBag, color: AppColors.black50, width: 20, height: 20,),
         ),
       ],
       screen: SingleChildScrollView(

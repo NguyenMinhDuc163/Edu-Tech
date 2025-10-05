@@ -1,4 +1,5 @@
 import 'package:ed_tech/init.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class ChatHistoryScreen extends StatefulWidget {
   const ChatHistoryScreen({super.key});
@@ -47,16 +48,11 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
   Widget build(BuildContext context) {
     return FunctionScreenTemplate(
       title: 'History',
+      isShowBottomButton: false,
       actionsWidget: [
-        TextButton(
-          onPressed: _onClearAll,
-          child: const Text(
-            'Clear all',
-            style: TextStyle(
-              color: Color(0xFF6C56F9),
-              fontWeight: FontWeight.w600,
-            ),
-          ),
+        InkWell(
+          onTap: _onClearAll,
+          child: SvgPicture.asset(IconPath.iconTrash, color: AppColors.crimson, width: 25, height: 25,),
         ),
       ],
       screen: ListView(

@@ -38,6 +38,7 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
     return FunctionScreenTemplate(
       title: "Chat Bot",
       isShowDrawer: true,
+      isShowBottomButton: false,
       actionsWidget: [
         InkWell(
           onTap: () => Navigator.pushNamed(context, ChatHistoryScreen.routeName),
