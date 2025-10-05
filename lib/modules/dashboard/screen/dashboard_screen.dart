@@ -1,15 +1,16 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:ed_tech/modules/course/screen/course_screen.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 import 'package:ed_tech/core/constants/icon_path.dart';
 import 'package:ed_tech/core/theme/app_colors.dart';
 import 'package:ed_tech/core/widgets/drawer_widget.dart';
+import 'package:ed_tech/modules/assessment/screen/quiz_list_screen.dart';
+import 'package:ed_tech/modules/course/screen/course_screen.dart';
 import 'package:ed_tech/modules/dashboard/model/tab_item.dart';
 import 'package:ed_tech/modules/home/screen/home_screen.dart';
+import 'package:ed_tech/modules/message/screen/chat_bot_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -22,8 +23,8 @@ class DashboardScreen extends StatefulWidget {
 final List<TabItem> _tabs = [
   TabItem(widget: HomeScreen(), route: HomeScreen.routeName),
   TabItem(widget: CourseScreen(), route: CourseScreen.routeName),
-  TabItem(widget: HomeScreen(), route: HomeScreen.routeName),
-  TabItem(widget: HomeScreen(), route: HomeScreen.routeName),
+  TabItem(widget: ChatBotScreen(), route: ChatBotScreen.routeName),
+  TabItem(widget: QuizListScreen(), route: QuizListScreen.routeName),
 ];
 
 class _DashboardScreenState extends State<DashboardScreen> {
@@ -96,7 +97,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   height: 25,
                   color: AppColors.color8F959E,
                 ),
-                title: Text("home_screen.account".tr()),
+                title: Text("Exam".tr()),
                 activeIcon: SizedBox.shrink(),
               ),
             ],

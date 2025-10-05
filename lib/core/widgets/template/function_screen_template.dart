@@ -24,13 +24,14 @@ class FunctionScreenTemplate extends StatefulWidget {
   List<Widget>? actionsWidget;
   Function? onClickBottomButton, onBack;
   Color? backgroundColor;
+  Color? appbarColor;
 
   FunctionScreenTemplate({
     super.key,
     this.title,
     this.screen,
     this.titleButtonBottom,
-    this.isShowBottomButton = true,
+    this.isShowBottomButton = false,
     this.onBack,
     this.resizeToAvoidBottomInset = true,
     this.titleWidget,
@@ -44,6 +45,7 @@ class FunctionScreenTemplate extends StatefulWidget {
     this.onClickBottomButton,
     this.backgroundColor,
     this.drawer,
+    this.appbarColor,
   });
 
   @override
@@ -109,8 +111,9 @@ class _FunctionScreenTemplateState extends State<FunctionScreenTemplate>
         appBar: appBar ? appBarWidget() : null,
         drawer: DrawerWidget(), // Thêm drawer property
         body: SafeArea(
-            // top: false,
-            child: body),
+          // top: false,
+          child: body,
+        ),
         bottomNavigationBar:
             widget.isShowBottomButton
                 ? Column(
@@ -133,18 +136,25 @@ class _FunctionScreenTemplateState extends State<FunctionScreenTemplate>
   // TODO tang kich thuoc nut back
   PreferredSizeWidget appBarWidget() {
     return AppBar(
-      backgroundColor: widget.backgroundColor ?? AppColors.white,
+      backgroundColor: widget.appbarColor ?? AppColors.white,
       toolbarHeight: 55,
+      actionsPadding: AppPad.h16,
       elevation: 0,
-      leading: Padding(
-        padding: AppPad.a8,
+      leading: Container(
+        margin: AppPad.l16,
         child: CircleAvatar(
+          radius: 20,
           backgroundColor: AppColors.lightGray,
           child:
               widget.leadingWidget ??
               (widget.isShowDrawer
                   ? IconButton(
-                    icon: SvgPicture.asset(IconPath.iconMenu),
+                    icon: SvgPicture.asset(
+                      IconPath.iconMenu,
+                      width: 20,
+                      height: 20,
+                    ),
+                    iconSize: 10,
                     onPressed: () {
                       _scaffoldKey.currentState?.openDrawer();
                     },

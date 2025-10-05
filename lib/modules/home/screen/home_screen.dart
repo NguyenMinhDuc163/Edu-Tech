@@ -12,8 +12,9 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return FunctionScreenTemplate(
       isShowBottomButton: false,
-      isShowAppBar: false,
-      isShowDrawer: false,
+      isShowAppBar: true,
+      isShowDrawer: true,
+      appbarColor:  AppColors.primary,
       actionsWidget: [
         GestureDetector(
           onTap: () => {},

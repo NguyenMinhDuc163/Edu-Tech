@@ -5,7 +5,7 @@ class HomeHeaderWidget extends StatelessWidget {
   final List<Widget> stackChildren;
   @override
   Widget build(BuildContext context) {
-    final double headerHeight = 180;
+    final double headerHeight = 150;
     const double cardHeight = 90;
 
     return SizedBox(
@@ -14,41 +14,27 @@ class HomeHeaderWidget extends StatelessWidget {
       child: Stack(
         clipBehavior: Clip.none,
         children: [
-          // Blue background with rounded bottom
           Container(
             height: headerHeight,
             width: double.infinity,
             decoration: const BoxDecoration(color: AppColors.color3D5CFF),
             child: Padding(
-              padding: AppPad.h24.add(AppPad.t24),
-              child: Row(
+              padding: AppPad.h20v10,
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Greeting texts
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Hi, Nguyen Duc',
-                        style: AppTextStyles.textHeader2.copyWith(
-                          color: AppColors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        "Let's start learning",
-                        style: AppTextStyles.text.copyWith(
-                          color: AppColors.offWhite,
-                        ),
-                      ),
-                    ],
+                  Text(
+                    'Hi, Nguyen Duc',
+                    style: AppTextStyles.textHeader2.copyWith(
+                      color: AppColors.white,
+                    ),
                   ),
-                  // Avatar
-                  const CircleAvatar(
-                    radius: 22,
-                    backgroundColor: AppColors.white,
-                    child: Icon(Icons.person, color: AppColors.primary),
+                  const SizedBox(height: 6),
+                  Text(
+                    "Let's start learning",
+                    style: AppTextStyles.text.copyWith(
+                      color: AppColors.offWhite,
+                    ),
                   ),
                 ],
               ),

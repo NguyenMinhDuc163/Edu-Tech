@@ -1,17 +1,11 @@
 import 'package:disposable_provider/disposable_provider.dart';
-import 'package:ed_tech/modules/course/screen/course_screen.dart';
-import 'package:ed_tech/modules/payment/screen/address_form_screen.dart';
-import 'package:ed_tech/modules/payment/screen/confirm_screen.dart';
-import 'package:ed_tech/modules/payment/screen/new_card_screen.dart';
-import 'package:ed_tech/modules/payment/screen/payment_method_screen.dart';
-import 'package:ed_tech/modules/reviews/screen/add_review_screen.dart';
-import 'package:ed_tech/modules/reviews/screen/review_screen.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ed_tech/core/public/global_utils.dart';
 import 'package:ed_tech/core/theme/app_text_styles.dart';
 import 'package:ed_tech/core/widgets/template/function_screen_template.dart';
 import 'package:ed_tech/data/api_client.dart';
+import 'package:ed_tech/modules/assessment/screen/quiz_detail_screen.dart';
+import 'package:ed_tech/modules/assessment/screen/quiz_result_screen.dart';
+import 'package:ed_tech/modules/assessment/screen/quiz_taking_screen.dart';
 import 'package:ed_tech/modules/auth/forgot_password/bloc/forgot_pass_controller.dart';
 import 'package:ed_tech/modules/auth/forgot_password/bloc/forgot_pass_cubit.dart';
 import 'package:ed_tech/modules/auth/forgot_password/bloc/reset_pass_controller.dart';
@@ -32,10 +26,21 @@ import 'package:ed_tech/modules/auth/sign_up/bloc/sign_up_controller.dart';
 import 'package:ed_tech/modules/auth/sign_up/bloc/sign_up_cubit.dart';
 import 'package:ed_tech/modules/auth/sign_up/repository/sign_up_repo.dart';
 import 'package:ed_tech/modules/auth/sign_up/screen/sign_up_screen.dart';
+import 'package:ed_tech/modules/course/screen/course_screen.dart';
 import 'package:ed_tech/modules/dashboard/screen/dashboard_screen.dart';
 import 'package:ed_tech/modules/home/bloc/home_cubit.dart';
 import 'package:ed_tech/modules/home/repository/home_repo.dart';
 import 'package:ed_tech/modules/home/screen/home_screen.dart';
+import 'package:ed_tech/modules/message/screen/chat_bot_screen.dart';
+import 'package:ed_tech/modules/message/screen/chat_history_screen.dart';
+import 'package:ed_tech/modules/payment/screen/address_form_screen.dart';
+import 'package:ed_tech/modules/payment/screen/confirm_screen.dart';
+import 'package:ed_tech/modules/payment/screen/new_card_screen.dart';
+import 'package:ed_tech/modules/payment/screen/payment_method_screen.dart';
+import 'package:ed_tech/modules/reviews/screen/add_review_screen.dart';
+import 'package:ed_tech/modules/reviews/screen/review_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 //part of in dart
 class Routers {
@@ -49,151 +54,218 @@ class Routers {
 
     switch (settings.name) {
       case '/':
-        return MaterialPageRoute(settings: settings, builder: (_) => const SplashScreen());
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => const SplashScreen(),
+        );
       case HomeScreen.routeName:
         return MaterialPageRoute(
           settings: settings,
           builder:
               (context) => RepositoryProvider(
-            create: (context) => HomeRepo(apiClient: ApiClient()),
-            child: BlocProvider(
-              create: (context) => HomeCubit(repo: context.read<HomeRepo>()),
-              child: HomeScreen(),
-            ),
-          ),
+                create: (context) => HomeRepo(apiClient: ApiClient()),
+                child: BlocProvider(
+                  create:
+                      (context) => HomeCubit(repo: context.read<HomeRepo>()),
+                  child: HomeScreen(),
+                ),
+              ),
         );
       case DashboardScreen.routeName:
-        return MaterialPageRoute(settings: settings, builder: (_) => DashboardScreen());
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => DashboardScreen(),
+        );
       case LoginScreen.routeName:
         return MaterialPageRoute(
           settings: settings,
           builder:
               (context) => DisposableProvider(
-            create: (BuildContext context) {
-              return LoginController();
-            },
-            child: LoginScreen(),
-          ),
+                create: (BuildContext context) {
+                  return LoginController();
+                },
+                child: LoginScreen(),
+              ),
         );
       case SignUpScreen.routeName:
         return MaterialPageRoute(
           settings: settings,
           builder:
               (context) => RepositoryProvider(
-            create: (context) => SignUpRepo(apiClient: ApiClient()),
-            child: BlocProvider(
-              create: (context) => SignUpCubit(repo: context.read<SignUpRepo>()),
-              child: DisposableProvider(
-                create: (BuildContext context) {
-                  return SignUpController();
-                },
-                child: SignUpScreen(),
+                create: (context) => SignUpRepo(apiClient: ApiClient()),
+                child: BlocProvider(
+                  create:
+                      (context) =>
+                          SignUpCubit(repo: context.read<SignUpRepo>()),
+                  child: DisposableProvider(
+                    create: (BuildContext context) {
+                      return SignUpController();
+                    },
+                    child: SignUpScreen(),
+                  ),
+                ),
               ),
-            ),
-          ),
         );
       case SignInScreen.routeName:
-        final Map<String, String>? prefillData = settings.arguments as Map<String, String>?;
+        final Map<String, String>? prefillData =
+            settings.arguments as Map<String, String>?;
         return MaterialPageRoute(
           settings: settings,
           builder:
               (_) => DisposableProvider(
-            create: (BuildContext context) {
-              return SignInController(prefillData: prefillData);
-            },
-            child: SignInScreen(),
-          ),
+                create: (BuildContext context) {
+                  return SignInController(prefillData: prefillData);
+                },
+                child: SignInScreen(),
+              ),
         );
       case ForgotPasswordScreen.routeName:
         return MaterialPageRoute(
           settings: settings,
           builder:
               (context) => RepositoryProvider(
-            create: (context) => ForgotPassRepo(apiClient: ApiClient()),
-            child: BlocProvider(
-              create: (context) => ForgotPassCubit(repo: context.read<ForgotPassRepo>()),
-              child: DisposableProvider(
-                create: (BuildContext context) {
-                  return ForgotPassController();
-                },
-                child: ForgotPasswordScreen(),
+                create: (context) => ForgotPassRepo(apiClient: ApiClient()),
+                child: BlocProvider(
+                  create:
+                      (context) =>
+                          ForgotPassCubit(repo: context.read<ForgotPassRepo>()),
+                  child: DisposableProvider(
+                    create: (BuildContext context) {
+                      return ForgotPassController();
+                    },
+                    child: ForgotPasswordScreen(),
+                  ),
+                ),
               ),
-            ),
-          ),
         );
 
       case VerifyScreen.routeName:
-        final Map<String, String>? data = settings.arguments as Map<String, String>?;
+        final Map<String, String>? data =
+            settings.arguments as Map<String, String>?;
         return MaterialPageRoute(
           settings: settings,
           builder:
               (context) => RepositoryProvider(
-            create: (context) => ForgotPassRepo(apiClient: ApiClient()),
+                create: (context) => ForgotPassRepo(apiClient: ApiClient()),
 
-            child: BlocProvider(
-              create: (context) => VerifyOtpCubit(repo: context.read<ForgotPassRepo>()),
+                child: BlocProvider(
+                  create:
+                      (context) =>
+                          VerifyOtpCubit(repo: context.read<ForgotPassRepo>()),
 
-              child: DisposableProvider(
-                create: (BuildContext context) {
-                  return VerifyOtpController(dataUser: data);
-                },
-                child: VerifyScreen(),
+                  child: DisposableProvider(
+                    create: (BuildContext context) {
+                      return VerifyOtpController(dataUser: data);
+                    },
+                    child: VerifyScreen(),
+                  ),
+                ),
               ),
-            ),
-          ),
         );
 
       case ResetPasswordScreen.routeName:
-        final Map<String, String>? data = settings.arguments as Map<String, String>?;
+        final Map<String, String>? data =
+            settings.arguments as Map<String, String>?;
         return MaterialPageRoute(
           settings: settings,
           builder:
               (context) => RepositoryProvider(
-            create: (context) => ForgotPassRepo(apiClient: ApiClient()),
+                create: (context) => ForgotPassRepo(apiClient: ApiClient()),
 
-            child: BlocProvider(
-              create: (context) => ResetPassCubit(repo: context.read<ForgotPassRepo>()),
+                child: BlocProvider(
+                  create:
+                      (context) =>
+                          ResetPassCubit(repo: context.read<ForgotPassRepo>()),
 
-              child: DisposableProvider(
-                create: (BuildContext context) {
-                  return ResetPassController(dataUser: data);
-                },
-                child: ResetPasswordScreen(),
+                  child: DisposableProvider(
+                    create: (BuildContext context) {
+                      return ResetPassController(dataUser: data);
+                    },
+                    child: ResetPasswordScreen(),
+                  ),
+                ),
               ),
-            ),
-          ),
         );
 
       case CourseScreen.routeName:
-        return MaterialPageRoute(settings: settings, builder: (_) => CourseScreen());
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => CourseScreen(),
+        );
       case ReviewScreen.routeName:
-        return MaterialPageRoute(settings: settings, builder: (_) => ReviewScreen());
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => ReviewScreen(),
+        );
       case AddressFormScreen.routeName:
-        return MaterialPageRoute(settings: settings, builder: (_) => AddressFormScreen());
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => AddressFormScreen(),
+        );
       case ConfirmScreen.routeName:
-        return MaterialPageRoute(settings: settings, builder: (_) => ConfirmScreen());
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => ConfirmScreen(),
+        );
       case NewCardScreen.routeName:
-        return MaterialPageRoute(settings: settings, builder: (_) => NewCardScreen());
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => NewCardScreen(),
+        );
       case PaymentMethodScreen.routeName:
-        return MaterialPageRoute(settings: settings, builder: (_) => PaymentMethodScreen());
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => PaymentMethodScreen(),
+        );
       case ReviewScreen.routeName:
-        return MaterialPageRoute(settings: settings, builder: (_) => ReviewScreen());
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => ReviewScreen(),
+        );
       case AddReviewScreen.routeName:
-        return MaterialPageRoute(settings: settings, builder: (_) => AddReviewScreen());
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => AddReviewScreen(),
+        );
+      case ChatBotScreen.routeName:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => ChatBotScreen(),
+        );
+      case ChatHistoryScreen.routeName:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => ChatHistoryScreen(),
+        );
+      case QuizDetailScreen.routeName:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => QuizDetailScreen(),
+        );
+      case QuizResultScreen.routeName:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => QuizResultScreen(),
+        );
+      case QuizTakingScreen.routeName:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => QuizTakingScreen(),
+        );
       default:
         return MaterialPageRoute(
           settings: settings,
           builder:
               (_) => FunctionScreenTemplate(
-            title: "Chức năng đang trong quá trình phát triển",
-            isShowBottomButton: false,
-            screen: Center(
-              child: Text(
-                "Chức năng đang trong quá trình phát triển",
-                style: AppTextStyles.text,
+                title: "Chức năng đang trong quá trình phát triển",
+                isShowBottomButton: false,
+                screen: Center(
+                  child: Text(
+                    "Chức năng đang trong quá trình phát triển",
+                    style: AppTextStyles.text,
+                  ),
+                ),
               ),
-            ),
-          ),
         );
     }
   }

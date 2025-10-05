@@ -5,12 +5,26 @@ class TabSelectorWidget extends StatefulWidget {
   final int initialIndex;
   final ValueChanged<int>? onTabChanged;
   final List<String> tabs;
+  final Set<int>? showDotAt; // indices with orange dot (e.g., notification)
+  final Color selectedColor;
+  final Color unselectedColor;
+  final Color underlineColor;
+  final double underlineWidth; // fixed underline width for simplicity
+  final double underlineHeight;
+  final double fontSize;
 
   const TabSelectorWidget({
     Key? key,
     this.initialIndex = 0,
     this.onTabChanged,
     required this.tabs,
+    this.showDotAt,
+    this.selectedColor = const Color(0xFF1C2439),
+    this.unselectedColor = const Color(0xFF1C2439),
+    this.underlineColor = const Color(0xFF386BF6),
+    this.underlineWidth = 44,
+    this.underlineHeight = 3,
+    this.fontSize = 18,
   }) : super(key: key);
 
   @override
@@ -20,7 +34,6 @@ class TabSelectorWidget extends StatefulWidget {
 class _TabSelectorWidgetState extends State<TabSelectorWidget>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
-  late Animation<double> _animation;
   int _selectedIndex = 0;
 
   @override
@@ -28,13 +41,9 @@ class _TabSelectorWidgetState extends State<TabSelectorWidget>
     super.initState();
     _selectedIndex = widget.initialIndex;
     _animationController = AnimationController(
-      duration: const Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 220),
       vsync: this,
-    );
-    _animation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
-    );
-    _animationController.forward();
+    )..forward();
   }
 
   @override
@@ -48,94 +57,102 @@ class _TabSelectorWidgetState extends State<TabSelectorWidget>
       setState(() {
         _selectedIndex = index;
       });
-      _animationController.reset();
-      _animationController.forward();
+      _animationController
+        ..reset()
+        ..forward();
       widget.onTabChanged?.call(index);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 50,
-      decoration: BoxDecoration(
-        color: const Color(0xFFE0F2F1), // Light teal background
-        borderRadius: BorderRadius.circular(25), // Pill shape
-      ),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final tabWidth = constraints.maxWidth / widget.tabs.length;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final tabCount = widget.tabs.length;
+        final tabWidth = constraints.maxWidth / tabCount;
+        final indicatorLeft =
+            _selectedIndex * tabWidth + (tabWidth - widget.underlineWidth) / 2;
 
-          return Stack(
-            children: [
-              // Animated background for selected tab
-              AnimatedBuilder(
-                animation: _animation,
-                builder: (context, child) {
-                  return Positioned(
-                    left: _selectedIndex * tabWidth + 3,
-                    top: 3,
-                    child: Container(
-                      width: tabWidth - 6,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: const Color(
-                          0xFF4DB6AC,
-                        ), // Darker teal for selected
-                        borderRadius: BorderRadius.circular(22),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
-              // Tab buttons
-              Row(
-                children:
-                    widget.tabs.asMap().entries.map((entry) {
-                      int index = entry.key;
-                      String tab = entry.value;
-                      bool isSelected = index == _selectedIndex;
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children:
+                  widget.tabs.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final label = entry.value;
+                    final isSelected = index == _selectedIndex;
+                    final textColor =
+                        isSelected
+                            ? widget.selectedColor
+                            : widget.unselectedColor.withOpacity(0.7);
 
-                      return Expanded(
-                        child: GestureDetector(
-                          onTap: () => _onTabTapped(index),
-                          child: Container(
-                            height: 50,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(25),
-                            ),
-                            child: Center(
-                              child: Text(
-                                tab.tr(),
-                                style: TextStyle(
-                                  color:
-                                      isSelected
-                                          ? Colors.white
-                                          : const Color(0xFF666666),
-                                  fontSize: 16,
-                                  fontWeight:
-                                      isSelected
-                                          ? FontWeight.w600
-                                          : FontWeight.w500,
+                    return Expanded(
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.translucent,
+                        onTap: () => _onTabTapped(index),
+                        child: SizedBox(
+                          height: 36,
+                          child: Center(
+                            child: Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                Text(
+                                  label.tr(),
+                                  style: TextStyle(
+                                    color: textColor,
+                                    fontSize: widget.fontSize,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
-                              ),
+                                if (widget.showDotAt?.contains(index) == true)
+                                  Positioned(
+                                    right: -14,
+                                    top: -4,
+                                    child: Container(
+                                      width: 8,
+                                      height: 8,
+                                      decoration: const BoxDecoration(
+                                        color: Color(0xFFFF7A00), // orange dot
+                                        shape: BoxShape.circle,
+                                      ),
+                                    ),
+                                  ),
+                              ],
                             ),
                           ),
                         ),
-                      );
-                    }).toList(),
+                      ),
+                    );
+                  }).toList(),
+            ),
+            const SizedBox(height: 6),
+            // Underline indicator
+            SizedBox(
+              height: widget.underlineHeight,
+              child: Stack(
+                children: [
+                  Container(color: Colors.transparent),
+                  AnimatedPositioned(
+                    duration: const Duration(milliseconds: 220),
+                    curve: Curves.easeInOut,
+                    left: indicatorLeft,
+                    child: Container(
+                      width: widget.underlineWidth,
+                      height: widget.underlineHeight,
+                      decoration: BoxDecoration(
+                        color: widget.underlineColor,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          );
-        },
-      ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
