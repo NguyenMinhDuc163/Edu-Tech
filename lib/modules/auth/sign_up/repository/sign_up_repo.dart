@@ -18,10 +18,9 @@ class SignUpRepo {
         "username": username,
         "password": password,
         "email": email,
-        "verification": "4 digit OTP"
       },
     );
-    return res.code == 200;
+    return res.code == 201;
   }
 
   Future<bool> checkUserName({required String username}) async {

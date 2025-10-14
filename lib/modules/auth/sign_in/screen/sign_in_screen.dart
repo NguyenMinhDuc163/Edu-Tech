@@ -121,8 +121,7 @@ class _SignInContent extends StatelessWidget {
         FunctionScreenTemplate(
           titleButtonBottom: 'login.title'.tr(),
           onClickBottomButton: () {
-            // controller.onSignIn(context);
-            Navigator.pushNamed(context, DashboardScreen.routeName);
+            controller.onSignIn(context);
           },
           screen: contentWidget,
         ),

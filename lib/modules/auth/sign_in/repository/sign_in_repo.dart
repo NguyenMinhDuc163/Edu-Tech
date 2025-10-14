@@ -25,7 +25,7 @@ class SignInRepo {
     }
 
     LoginResponse loginResponse = LoginResponse.fromJson(res.json);
-    authService.saveToken(accessToken: loginResponse.accessToken!, refreshToken: loginResponse.refreshToken!);
+    authService.saveToken(accessToken: loginResponse.data?.accessToken ?? "", refreshToken: loginResponse.data?.accessToken ?? "");
   }
 
   Future<bool> loginSocial({required String token}) async {

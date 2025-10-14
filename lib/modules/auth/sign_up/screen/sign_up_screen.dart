@@ -54,10 +54,12 @@ class _SignUpContent extends StatelessWidget {
                     controller: controller.usernameController,
                     hintText: "sign_up.enter_username".tr(),
                     validator: (text) {
-                      if (state is CheckUsernameSuccess) {
-                        return state.isAvailable;
-                      }
-                      return false;
+                      // if (state is CheckUsernameSuccess) {
+                      //   return state.isAvailable;
+                      // }
+                      // return false;
+                      return text.length > 4;
+
                     },
                     onChanged: (text) => context.read<SignUpCubit>().onUsernameChanged(text),
                   );
@@ -87,10 +89,11 @@ class _SignUpContent extends StatelessWidget {
                     controller: controller.emailController,
                     hintText: "sign_up.enter_email".tr(),
                     validator: (text) {
-                      if (state is CheckEmailSuccess) {
-                        return state.isAvailable;
-                      }
-                      return false;
+                      // if (state is CheckEmailSuccess) {
+                      //   return state.isAvailable;
+                      // }
+                      // return false;
+                     return text.length > 4;
                     },
                     onChanged: (text) => context.read<SignUpCubit>().onEmailChanged(text),
                   );

@@ -61,7 +61,7 @@ class App extends StatelessWidget {
           supportedLocales: context.supportedLocales,
           locale: context.locale,
           routes: Routers.routes,
-          initialRoute: OnboardingScreen.routeName,
+          // initialRoute: OnboardingScreen.routeName,
           onGenerateRoute: Routers.generateRoute,
           navigatorKey: NavigationService.navigatorKey,
           navigatorObservers: [NavigationService.routeObserver],

@@ -6,13 +6,13 @@ import 'dart:io';
 
 import 'package:curl_logger_dio_interceptor/curl_logger_dio_interceptor.dart';
 import 'package:dio/dio.dart';
+import 'package:dio/io.dart';
 import 'package:flutter/foundation.dart';
 
 import '../core/constants/api_path.dart';
 import '../core/constants/app_constants.dart';
 import '../core/error_handling/exceptions.dart';
 import '../utils/helpers/system_utils.dart';
-import 'interceptors/token_interceptor.dart';
 import 'interceptors/api_token_interceptor.dart';
 import 'models/request_method.dart';
 import 'models/request_response.dart';
@@ -49,6 +49,7 @@ String _prettyJson(Object? object) {
 const _exceptionCanResolveByReFetch = [
   'HttpException: Connection closed before full header was received',
   'HandshakeException: Connection terminated during handshake',
+  'HandshakeException: Handshake error in client',
   'Connecting timed out',
   'Receiving data timeout',
 ];
@@ -84,7 +85,23 @@ class ApiClient {
           // LogInterceptor(),
           CurlLoggerDioInterceptor(printOnSuccess: true, convertFormData: true),
           ApiTokenInterceptor(),
-        ]);
+        ]) {
+    (_dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient = () {
+      final client = HttpClient();
+      client.badCertificateCallback = (
+        X509Certificate cert,
+        String host,
+        int port,
+      ) {
+        // Chỉ cho phép bypass SSL cho development server
+        if (kDebugMode && host.contains('nguyenduc.click')) {
+          return true;
+        }
+        return false;
+      };
+      return client;
+    };
+  }
 
   static String buildBearerAuthorizationHeaderValue(String token) {
     return 'Bearer $token';

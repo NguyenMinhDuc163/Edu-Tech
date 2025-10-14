@@ -1,54 +1,53 @@
 class LoginResponse {
   LoginResponse({
-    required this.accessToken,
-    required this.refreshToken,
-    required this.id,
-    required this.username,
-    required this.email,
-    required this.firstName,
-    required this.lastName,
-    required this.gender,
-    required this.image,
+    required this.status,
+    required this.message,
+    required this.data,
   });
 
-  final String? accessToken;
-  final String? refreshToken;
-  final String? id;
-  final String? username;
-  final String? email;
-  final String? firstName;
-  final String? lastName;
-  final String? gender;
-  final String? image;
+  final int? status;
+  final String? message;
+  final Data? data;
 
   factory LoginResponse.fromJson(Map<String, dynamic> json){
     return LoginResponse(
-      accessToken: json["accessToken"],
-      refreshToken: json["refreshToken"],
-      id: json["id"],
-      username: json["username"],
-      email: json["email"],
-      firstName: json["firstName"],
-      lastName: json["lastName"],
-      gender: json["gender"],
-      image: json["image"],
+      status: json["status"],
+      message: json["message"],
+      data: json["data"] == null ? null : Data.fromJson(json["data"]),
     );
   }
 
   Map<String, dynamic> toJson() => {
-    "accessToken": accessToken,
-    "refreshToken": refreshToken,
-    "id": id,
-    "username": username,
-    "email": email,
-    "firstName": firstName,
-    "lastName": lastName,
-    "gender": gender,
-    "image": image,
+    "status": status,
+    "message": message,
+    "data": data?.toJson(),
   };
 
   @override
   String toString(){
-    return "$accessToken, $refreshToken, $id, $username, $email, $firstName, $lastName, $gender, $image, ";
+    return "$status, $message, $data, ";
+  }
+}
+
+class Data {
+  Data({
+    required this.accessToken,
+  });
+
+  final String? accessToken;
+
+  factory Data.fromJson(Map<String, dynamic> json){
+    return Data(
+      accessToken: json["access_token"],
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    "access_token": accessToken,
+  };
+
+  @override
+  String toString(){
+    return "$accessToken, ";
   }
 }

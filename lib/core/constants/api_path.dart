@@ -12,8 +12,8 @@ class ApiPath {
   @EnviedField(varName: 'REGISTER_ID', obfuscate: true)
   static String registerId = _ApiPath.registerId;
 
+  static const String login = '/auth/login';
   static const String refreshToken = '/refresh-token';
-  static const String login = '/auth/login-on-firebase';
   static const String register = '/auth/register';
   static const String products = '/products';
   static const String verifyOtp = '/auth/verify-otp';

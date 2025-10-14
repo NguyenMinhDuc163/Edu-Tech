@@ -22,3 +22,8 @@ spider build --watch --verbose
  fvm dart run  build_runner clean
  fvm dart run  build_runner build
 ```
+
+# gen env
+
+```dart run build_runner build --delete-conflicting-outputs
+```

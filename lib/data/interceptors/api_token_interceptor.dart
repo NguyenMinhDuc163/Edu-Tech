@@ -3,15 +3,7 @@ import 'package:ed_tech/core/constants/api_path.dart';
 
 class ApiTokenInterceptor extends InterceptorsWrapper {
   final List<String> _apisRequiringToken = [
-    '/refresh-token',
-    '/auth/login-on-firebase',
-    '/auth/register',
-    '/auth/verify-otp',
-    '/auth/reset-password',
-    '/auth/forgot-password',
-    '/auth/login-social',
-    '/auth/check-username-exist',
-    '/auth/check-email-exist',
+
   ];
 
   bool shouldAddTokenToApi(String path) {

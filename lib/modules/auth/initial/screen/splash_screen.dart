@@ -1,3 +1,5 @@
+import 'package:ed_tech/modules/auth/sign_in/screen/sign_in_screen.dart';
+import 'package:ed_tech/modules/dashboard/screen/dashboard_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ed_tech/init.dart';
 import 'package:ed_tech/modules/auth/login/screen/login_screen.dart';
@@ -16,7 +18,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    // redirectIntroScreen();
+    redirectIntroScreen();
   }
 
   void redirectIntroScreen() async {
@@ -24,7 +26,7 @@ class _SplashScreenState extends State<SplashScreen> {
     await Future.delayed(const Duration(seconds: 1));
     if (!mounted) return;
     if(token != null) {
-      Navigator.of(context).pushNamed(HomeScreen.routeName);
+      Navigator.of(context).pushNamed(DashboardScreen.routeName);
     }else{
       Navigator.of(context).pushNamed(LoginScreen.routeName);
 
