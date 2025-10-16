@@ -1,5 +1,6 @@
 import 'package:disposable_provider/disposable_provider.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:ed_tech/modules/auth/sign_up/screen/sign_up_screen.dart';
 import 'package:ed_tech/modules/dashboard/screen/dashboard_screen.dart';
 import 'package:ed_tech/modules/home/screen/home_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -77,20 +78,34 @@ class _SignInContent extends StatelessWidget {
               },
             ),
 
-            GestureDetector(
-              onTap:
-                  () => Navigator.pushNamed(
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                GestureDetector(
+                  onTap:
+                      () => Navigator.pushNamed(
+                        context,
+                        ForgotPasswordScreen.routeName,
+                        // ResetPasswordScreen.routeName,
+                      ),
+                  child: Text(
+                    "login.forgot_password".tr(),
+                    style: AppTextStyles.textContent1.copyWith(color: Colors.red),
+                  ),
+                ),
+                GestureDetector(
+                  onTap:
+                      () => Navigator.pushNamed(
                     context,
-                    ForgotPasswordScreen.routeName,
+                    SignUpScreen.routeName,
                     // ResetPasswordScreen.routeName,
                   ),
-              child: Align(
-                alignment: Alignment.centerRight,
-                child: Text(
-                  "login.forgot_password".tr(),
-                  style: AppTextStyles.textContent1.copyWith(color: Colors.red),
+                  child: Text(
+                    "sign_up.title".tr(),
+                    style: AppTextStyles.textHeader3.copyWith(color: Colors.black, fontSize: 14),
+                  ),
                 ),
-              ),
+              ],
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

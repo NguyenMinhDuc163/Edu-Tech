@@ -64,7 +64,7 @@ class DrawerWidget extends StatelessWidget {
               onTap: () async {
                 context.read<SignInRepo>().logout();
 
-                Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+                Navigator.pushReplacementNamed(context, SignInScreen.routeName);
               },
             ),
           ],

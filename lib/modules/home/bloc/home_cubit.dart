@@ -6,20 +6,15 @@ import 'package:ed_tech/modules/home/repository/home_repo.dart';
 class HomeCubit extends Cubit<HomeState> {
   final HomeRepo repo;
 
-  HomeCubit({required this.repo}) : super(ProductInitial());
+  HomeCubit({required this.repo}) : super(CourseInitial());
 
   Future getProduct() async {
-    emit(ProductInProgress());
+    emit(CourseProgress());
     try {
-      final res = await repo.getProduct();
-      if (res) {
-        emit(ProductSuccess());
-      } else {
-        emit(ProductFailure());
-      }
+      final courses = await repo.getProduct();
+      emit(CourseSuccess(courses: courses));
     } catch (e) {
-      emit(ProductError(message: AppErrorState.getFriendlyErrorString(e)));
-      throw Exception(e);
+      emit(CourseError(message: AppErrorState.getFriendlyErrorString(e)));
     }
   }
 }

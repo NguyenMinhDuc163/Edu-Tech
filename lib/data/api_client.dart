@@ -94,10 +94,10 @@ class ApiClient {
         int port,
       ) {
         // Chỉ cho phép bypass SSL cho development server
-        if (kDebugMode && host.contains('nguyenduc.click')) {
-          return true;
-        }
-        return false;
+        // if (kDebugMode && host.contains('nguyenduc.click')) {
+        //   return true;
+        // }
+        return true;
       };
       return client;
     };

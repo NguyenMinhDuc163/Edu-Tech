@@ -1,14 +1,22 @@
+import 'package:disposable_provider/disposable_provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:ed_tech/core/constants/icon_path.dart';
 import 'package:ed_tech/core/theme/app_colors.dart';
 import 'package:ed_tech/core/widgets/drawer_widget.dart';
+import 'package:ed_tech/data/api_client.dart';
+import 'package:ed_tech/modules/assessment/bloc/quiz_controller.dart';
 import 'package:ed_tech/modules/assessment/screen/quiz_list_screen.dart';
+import 'package:ed_tech/modules/course/bloc/course_controller.dart';
 import 'package:ed_tech/modules/course/screen/course_screen.dart';
-import 'package:ed_tech/modules/dashboard/model/tab_item.dart';
+import 'package:ed_tech/modules/home/bloc/home_controller.dart';
+import 'package:ed_tech/modules/home/bloc/home_cubit.dart';
+import 'package:ed_tech/modules/home/repository/home_repo.dart';
 import 'package:ed_tech/modules/home/screen/home_screen.dart';
+import 'package:ed_tech/modules/message/bloc/chat_controller.dart';
 import 'package:ed_tech/modules/message/screen/chat_bot_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 
@@ -20,15 +28,37 @@ class DashboardScreen extends StatefulWidget {
   State<DashboardScreen> createState() => _DashboardScreenState();
 }
 
-final List<TabItem> _tabs = [
-  TabItem(widget: HomeScreen(), route: HomeScreen.routeName),
-  TabItem(widget: CourseScreen(), route: CourseScreen.routeName),
-  TabItem(widget: ChatBotScreen(), route: ChatBotScreen.routeName),
-  TabItem(widget: QuizListScreen(), route: QuizListScreen.routeName),
+// Danh sách route names để sử dụng trong navigation
+final List<String> _tabRoutes = [
+  HomeScreen.routeName,
+  CourseScreen.routeName,
+  ChatBotScreen.routeName,
+  QuizListScreen.routeName,
 ];
 
 class _DashboardScreenState extends State<DashboardScreen> {
   int _currentIndex = 0;
+
+  List<Widget> get _tabWidgets => [
+    RepositoryProvider(
+      create: (context) => HomeRepo(apiClient: ApiClient()),
+      child: BlocProvider(
+        create:
+            (context) => HomeCubit(repo: context.read<HomeRepo>()),
+        child: DisposableProvider(create: (_) => HomeController(), child: HomeScreen()),
+      ),
+    ),
+    DisposableProvider(
+      create: (_) => CourseController(),
+      child: CourseScreen(),
+    ),
+    DisposableProvider(create: (_) => ChatController(), child: ChatBotScreen()),
+    DisposableProvider(
+      create: (_) => QuizController(),
+      child: QuizListScreen(),
+    ),
+  ];
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -44,10 +74,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         child: Scaffold(
           backgroundColor: Colors.white,
           drawer: DrawerWidget(),
-          body: IndexedStack(
-            index: _currentIndex,
-            children: _tabs.map((tab) => tab.widget).toList(),
-          ),
+          body: IndexedStack(index: _currentIndex, children: _tabWidgets),
           bottomNavigationBar: SalomonBottomBar(
             currentIndex: _currentIndex,
             selectedColorOpacity: 0.0,
@@ -57,7 +84,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               setState(() {
                 _currentIndex = index;
               });
-              print('====>: ${_tabs[index].route}');
+              print('====>: ${_tabRoutes[index]}');
             },
             items: [
               SalomonBottomBarItem(

@@ -1,3 +1,5 @@
+import 'package:ed_tech/modules/home/model/course_response.dart';
+
 sealed class HomeState {}
 
 class HomeInitial extends HomeState {}
@@ -18,20 +20,24 @@ class HomeError extends HomeState {
   HomeError({this.message = 'Đã xảy ra lỗi'});
 }
 
-class ProductInitial extends HomeState {}
+class CourseInitial extends HomeState {}
 
-class ProductInProgress extends HomeState {}
+class CourseProgress extends HomeState {}
 
-class ProductSuccess extends HomeState {}
+class CourseSuccess extends HomeState {
+  final List<DataCourse> courses;
 
-class ProductFailure extends HomeState {
-  final String message;
-
-  ProductFailure({this.message = 'Lấy dữ liệu thất bại'});
+  CourseSuccess({required this.courses});
 }
 
-class ProductError extends HomeState {
+class CourseFailure extends HomeState {
   final String message;
 
-  ProductError({this.message = 'Đã xảy ra lỗi'});
+  CourseFailure({this.message = 'Lấy dữ liệu thất bại'});
+}
+
+class CourseError extends HomeState {
+  final String message;
+
+  CourseError({this.message = 'Đã xảy ra lỗi'});
 }

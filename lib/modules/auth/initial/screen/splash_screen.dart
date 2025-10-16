@@ -28,7 +28,7 @@ class _SplashScreenState extends State<SplashScreen> {
     if(token != null) {
       Navigator.of(context).pushNamed(DashboardScreen.routeName);
     }else{
-      Navigator.of(context).pushNamed(LoginScreen.routeName);
+      Navigator.of(context).pushNamed(SignInScreen.routeName);
 
     }
 

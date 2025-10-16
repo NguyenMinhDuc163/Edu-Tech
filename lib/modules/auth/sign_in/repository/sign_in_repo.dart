@@ -54,11 +54,11 @@ class SignInRepo {
 
   Future<void> logout() async {
     try {
-      final GoogleSignIn googleSignIn = GoogleSignIn();
-      await googleSignIn.signOut();
-
-      final FirebaseAuth auth = FirebaseAuth.instance;
-      await auth.signOut();
+      // final GoogleSignIn googleSignIn = GoogleSignIn();
+      // await googleSignIn.signOut();
+      //
+      // final FirebaseAuth auth = FirebaseAuth.instance;
+      // await auth.signOut();
 
       final authService = AuthService.instance;
       authService.invalid();

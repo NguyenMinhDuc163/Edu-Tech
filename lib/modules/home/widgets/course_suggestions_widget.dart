@@ -1,5 +1,9 @@
 import 'package:ed_tech/core/widgets/app_gap.dart';
 import 'package:ed_tech/init.dart';
+import 'package:ed_tech/modules/home/bloc/home_cubit.dart';
+import 'package:ed_tech/modules/home/bloc/home_state.dart';
+import 'package:ed_tech/modules/home/model/course_response.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class CourseSuggestionsWidget extends StatelessWidget {
@@ -7,85 +11,134 @@ class CourseSuggestionsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<_CourseItem> items = const [
-      _CourseItem(
-        title: 'UI/UX Fundamentals',
-        author: 'Courtney Henry',
-        duration: '12h 30m',
-        rating: 4.8,
-        asset: 'assets/images/intro_step_1.svg',
-        color: Color(0xFFEFF4FF),
-      ),
-      _CourseItem(
-        title: 'Illustration Basics',
-        author: 'Jenny Wilson',
-        duration: '9h 10m',
-        rating: 4.6,
-        asset: 'assets/images/intro_step_2.svg',
-        color: Color(0xFFF6F9FF),
-      ),
-      _CourseItem(
-        title: 'Product Thinking',
-        author: 'Jacob Jones',
-        duration: '6h 45m',
-        rating: 4.7,
-        asset: 'assets/images/intro_step_3.svg',
-        color: Color(0xFFF4FBFF),
-      ),
-    ];
+    return BlocBuilder<HomeCubit, HomeState>(
+      builder: (context, state) {
+        if (state is CourseProgress) {
+          return Padding(
+            padding: AppPad.h16v8,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Recommended for you',
+                      style: AppTextStyles.textHeader3,
+                    ),
+                    TextButton(
+                      onPressed: () {},
+                      child: Text('See all', style: AppTextStyles.textButton),
+                    ),
+                  ],
+                ),
+                AppGap.h16,
+                const SizedBox(
+                  height: 140,
+                  child: Center(child: CircularProgressIndicator()),
+                ),
+              ],
+            ),
+          );
+        }
 
-    return Padding(
-      padding: AppPad.h16v8,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        if (state is CourseSuccess) {
+          final courses = state.courses;
+          if (courses.isEmpty) {
+            return Padding(
+              padding: AppPad.h16v8,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Recommended for you',
+                        style: AppTextStyles.textHeader3,
+                      ),
+                      TextButton(
+                        onPressed: () {},
+                        child: Text('See all', style: AppTextStyles.textButton),
+                      ),
+                    ],
+                  ),
+                  AppGap.h16,
+                  const SizedBox(
+                    height: 140,
+                    child: Center(child: Text('Không có khóa học nào')),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          return Padding(
+            padding: AppPad.h16v8,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Recommended for you',
+                      style: AppTextStyles.textHeader3,
+                    ),
+                    TextButton(
+                      onPressed: () {},
+                      child: Text('See all', style: AppTextStyles.textButton),
+                    ),
+                  ],
+                ),
+                AppGap.h16,
+                SizedBox(
+                  height: 140,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: courses.length,
+                    separatorBuilder: (_, __) => const SizedBox(width: 12),
+                    itemBuilder:
+                        (context, index) => _CourseCard(course: courses[index]),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
+        // Default state hoặc error
+        return Padding(
+          padding: AppPad.h16v8,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Recommended for you', style: AppTextStyles.textHeader3),
-              TextButton(
-                onPressed: () {},
-                child: Text('See all', style: AppTextStyles.textButton),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Recommended for you', style: AppTextStyles.textHeader3),
+                  TextButton(
+                    onPressed: () {},
+                    child: Text('See all', style: AppTextStyles.textButton),
+                  ),
+                ],
+              ),
+              AppGap.h16,
+              const SizedBox(
+                height: 140,
+                child: Center(child: Text('Không thể tải dữ liệu')),
               ),
             ],
           ),
-          AppGap.h16,
-          SizedBox(
-            height: 140,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: items.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 12),
-              itemBuilder: (context, index) => _CourseCard(item: items[index]),
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
 
-class _CourseItem {
-  final String title;
-  final String author;
-  final String duration;
-  final double rating;
-  final String asset;
-  final Color color;
-
-  const _CourseItem({
-    required this.title,
-    required this.author,
-    required this.duration,
-    required this.rating,
-    required this.asset,
-    required this.color,
-  });
-}
-
 class _CourseCard extends StatelessWidget {
-  final _CourseItem item;
-  const _CourseCard({required this.item});
+  final DataCourse course;
+  const _CourseCard({required this.course});
 
   @override
   Widget build(BuildContext context) {
@@ -113,14 +166,28 @@ class _CourseCard extends StatelessWidget {
             width: 90,
             height: double.infinity,
             decoration: BoxDecoration(
-              color: item.color,
+              color: _getColorForCourse(course.categoryId ?? ''),
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(16),
                 bottomLeft: Radius.circular(16),
               ),
             ),
             padding: AppPad.a10,
-            child: SvgPicture.asset(item.asset, fit: BoxFit.contain),
+            child:
+                course.thumbnailUrl != null
+                    ? Image.network(
+                      course.thumbnailUrl.toString(),
+                      fit: BoxFit.contain,
+                      errorBuilder:
+                          (context, error, stackTrace) => SvgPicture.asset(
+                            'assets/images/intro_step_1.svg',
+                            fit: BoxFit.contain,
+                          ),
+                    )
+                    : SvgPicture.asset(
+                      'assets/images/intro_step_1.svg',
+                      fit: BoxFit.contain,
+                    ),
           ),
           Expanded(
             child: Padding(
@@ -130,7 +197,7 @@ class _CourseCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    item.title,
+                    course.title ?? 'Untitled Course',
                     style: AppTextStyles.textMedium,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -141,7 +208,7 @@ class _CourseCard extends StatelessWidget {
                       Icon(Icons.star, color: AppColors.colorFF7043, size: 16),
                       const SizedBox(width: 4),
                       Text(
-                        item.rating.toStringAsFixed(1),
+                        '4.5', // Default rating
                         style: AppTextStyles.text,
                       ),
                       const SizedBox(width: 10),
@@ -152,7 +219,7 @@ class _CourseCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        item.duration,
+                        course.courseDuration?.toString() ?? '0h 0m',
                         style: AppTextStyles.text.copyWith(
                           color: AppColors.coolGray,
                         ),
@@ -161,7 +228,7 @@ class _CourseCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    item.author,
+                    course.teacher?.toString() ?? 'Unknown Teacher',
                     style: AppTextStyles.text.copyWith(
                       color: AppColors.coolGray,
                     ),
@@ -175,5 +242,19 @@ class _CourseCard extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Color _getColorForCourse(String categoryId) {
+    // Map categoryId to different colors
+    switch (categoryId) {
+      case '1':
+        return const Color(0xFFEFF4FF);
+      case '2':
+        return const Color(0xFFF6F9FF);
+      case '3':
+        return const Color(0xFFF4FBFF);
+      default:
+        return const Color(0xFFEFF4FF);
+    }
   }
 }
