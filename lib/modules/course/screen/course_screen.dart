@@ -1,26 +1,22 @@
+import 'package:disposable_provider/disposable_provider.dart';
 import 'package:ed_tech/init.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:ed_tech/modules/course/widgets/course_card_widget.dart';
 import 'package:ed_tech/modules/course/widgets/course_category_tabs_widget.dart';
 import 'package:ed_tech/modules/course/widgets/course_list_widget.dart';
+import 'package:ed_tech/modules/course/bloc/course_controller.dart';
 import 'package:ed_tech/core/widgets/search_filter_bottom_sheet.dart';
 
 class CourseScreen extends StatefulWidget {
   const CourseScreen({super.key});
   static const String routeName = '/CourseScreen';
+
   @override
   State<CourseScreen> createState() => _CourseScreenState();
 }
 
 class _CourseScreenState extends State<CourseScreen> {
-  final TextEditingController _searchController = TextEditingController();
-
-  List<String> _selectedCategories = ['Design', 'Coding'];
-  List<String> _selectedDurations = ['3-8 Hours'];
-  double _selectedMinPrice = 90;
-  double _selectedMaxPrice = 200;
-
-  final List<String> _categories = [
+  static const List<String> _categories = [
     'Design',
     'Coding',
     'Painting',
@@ -28,52 +24,44 @@ class _CourseScreenState extends State<CourseScreen> {
     'Visual identity',
     'Mathematics',
   ];
-  final List<String> _durations = [
+  static const List<String> _durations = [
     '3-8 Hours',
     '8-14 Hours',
     '14-20 Hours',
     '20-24 Hours',
     '24-30 Hours',
   ];
-  final double _minPrice = 0;
-  final double _maxPrice = 500;
+  static const double _minPrice = 0;
+  static const double _maxPrice = 500;
 
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
+  void _showFilterBottomSheet(BuildContext context) {
+    final CourseController controller = DisposableProvider.of<CourseController>(
+      context,
+    );
 
-  void _showFilterBottomSheet() {
     context.showSearchFilterBottomSheet(
       categories: _categories,
       durations: _durations,
       minPrice: _minPrice,
       maxPrice: _maxPrice,
-      selectedCategories: _selectedCategories,
-      selectedDurations: _selectedDurations,
-      selectedMinPrice: _selectedMinPrice,
-      selectedMaxPrice: _selectedMaxPrice,
+      selectedCategories: controller.selectedCategories.value,
+      selectedDurations: controller.selectedDurations.value,
+      selectedMinPrice: controller.selectedMinPrice.value,
+      selectedMaxPrice: controller.selectedMaxPrice.value,
       onApplyFilter: (categories, durations, minPrice, maxPrice) {
-        setState(() {
-          _selectedCategories = categories;
-          _selectedDurations = durations;
-          _selectedMinPrice = minPrice;
-          _selectedMaxPrice = maxPrice;
-        });
+        controller.updateFilter(
+          categories: categories,
+          durations: durations,
+          minPrice: minPrice,
+          maxPrice: maxPrice,
+        );
 
         print(
           'Applied filter: Categories: $categories, Durations: $durations, Price: \$${minPrice.toInt()} - \$${maxPrice.toInt()}',
         );
       },
       onClearFilter: () {
-        setState(() {
-          _selectedCategories.clear();
-          _selectedDurations.clear();
-          _selectedMinPrice = _minPrice;
-          _selectedMaxPrice = _maxPrice;
-        });
-
+        controller.clearFilter();
         print('Filter cleared');
       },
     );
@@ -81,6 +69,10 @@ class _CourseScreenState extends State<CourseScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final CourseController controller = DisposableProvider.of<CourseController>(
+      context,
+    );
+
     return FunctionScreenTemplate(
       isShowAppBar: false,
       isShowBottomButton: false,
@@ -94,13 +86,19 @@ class _CourseScreenState extends State<CourseScreen> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text('Course', style: AppTextStyles.textHeader2),
-                  CircleAvatar(radius: 22, child: SvgPicture.asset(IconPath.iconAvatar)),
+                  CircleAvatar(
+                    radius: 22,
+                    child: SvgPicture.asset(IconPath.iconAvatar),
+                  ),
                 ],
               ),
             ),
             Padding(
               padding: AppPad.h24.add(AppPad.v12),
-              child: _SearchBar(controller: _searchController, onFilterTap: _showFilterBottomSheet),
+              child: _SearchBar(
+                controller: controller,
+                onFilterTap: () => _showFilterBottomSheet(context),
+              ),
             ),
             const SizedBox(height: 20),
             const CourseCardsCarousel(),
@@ -117,7 +115,7 @@ class _CourseScreenState extends State<CourseScreen> {
 
 class _SearchBar extends StatelessWidget {
   const _SearchBar({required this.controller, required this.onFilterTap});
-  final TextEditingController controller;
+  final CourseController controller;
   final VoidCallback onFilterTap;
 
   @override
@@ -133,14 +131,21 @@ class _SearchBar extends StatelessWidget {
           const Icon(Icons.search, color: AppColors.colorB8B8D2),
           const SizedBox(width: 8),
           Expanded(
-            child: TextField(
-              controller: controller,
-              decoration: InputDecoration(
-                isDense: true,
-                hintText: 'Find Course',
-                hintStyle: AppTextStyles.inputHintText.copyWith(color: AppColors.colorB8B8D2),
-                border: InputBorder.none,
-              ),
+            child: ValueListenableBuilder<String>(
+              valueListenable: controller.searchQuery,
+              builder: (context, searchQuery, child) {
+                return TextField(
+                  onChanged: controller.updateSearchQuery,
+                  decoration: InputDecoration(
+                    isDense: true,
+                    hintText: 'Find Course',
+                    hintStyle: AppTextStyles.inputHintText.copyWith(
+                      color: AppColors.colorB8B8D2,
+                    ),
+                    border: InputBorder.none,
+                  ),
+                );
+              },
             ),
           ),
           const SizedBox(width: 8),

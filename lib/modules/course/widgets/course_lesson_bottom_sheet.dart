@@ -1,15 +1,20 @@
-import 'package:flutter/material.dart';
 import 'package:ed_tech/init.dart';
 import 'package:ed_tech/modules/course/screen/course_detail_screen.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class CourseLessonBottomSheet extends StatefulWidget {
   final String courseTitle;
   final List<LessonData> lessons;
 
-  const CourseLessonBottomSheet({super.key, required this.courseTitle, required this.lessons});
+  const CourseLessonBottomSheet({
+    super.key,
+    required this.courseTitle,
+    required this.lessons,
+  });
 
   @override
-  State<CourseLessonBottomSheet> createState() => _CourseLessonBottomSheetState();
+  State<CourseLessonBottomSheet> createState() =>
+      _CourseLessonBottomSheetState();
 }
 
 class _CourseLessonBottomSheetState extends State<CourseLessonBottomSheet> {
@@ -48,7 +53,9 @@ class _CourseLessonBottomSheetState extends State<CourseLessonBottomSheet> {
                     Expanded(
                       child: Text(
                         widget.courseTitle,
-                        style: AppTextStyles.textHeader3.copyWith(fontWeight: FontWeight.bold),
+                        style: AppTextStyles.textHeader3.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -62,7 +69,11 @@ class _CourseLessonBottomSheetState extends State<CourseLessonBottomSheet> {
                           color: AppColors.lightGray,
                           borderRadius: BorderRadius.circular(16),
                         ),
-                        child: const Icon(Icons.close, color: AppColors.text, size: 18),
+                        child: const Icon(
+                          Icons.close,
+                          color: AppColors.text,
+                          size: 18,
+                        ),
                       ),
                     ),
                   ],
@@ -95,7 +106,10 @@ class _CourseLessonBottomSheetState extends State<CourseLessonBottomSheet> {
         color: AppColors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: lesson.isCompleted ? AppColors.primary.withOpacity(0.3) : AppColors.lightGray,
+          color:
+              lesson.isCompleted
+                  ? AppColors.primary.withOpacity(0.3)
+                  : AppColors.lightGray,
           width: 1,
         ),
         boxShadow: [
@@ -112,13 +126,20 @@ class _CourseLessonBottomSheetState extends State<CourseLessonBottomSheet> {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: lesson.isCompleted ? AppColors.primary.withOpacity(0.1) : AppColors.lightGray,
+              color:
+                  lesson.isCompleted
+                      ? AppColors.primary.withOpacity(0.1)
+                      : AppColors.lightGray,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Center(
               child:
                   lesson.isCompleted
-                      ? const Icon(Icons.check, color: AppColors.primary, size: 20)
+                      ? const Icon(
+                        Icons.check,
+                        color: AppColors.primary,
+                        size: 20,
+                      )
                       : Text(
                         lessonNumber.toString().padLeft(2, '0'),
                         style: AppTextStyles.textContent1.copyWith(
@@ -139,7 +160,10 @@ class _CourseLessonBottomSheetState extends State<CourseLessonBottomSheet> {
                   lesson.title,
                   style: AppTextStyles.textContent1.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: lesson.isLocked ? AppColors.color8F959E : AppColors.text,
+                    color:
+                        lesson.isLocked
+                            ? AppColors.color8F959E
+                            : AppColors.text,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -147,12 +171,17 @@ class _CourseLessonBottomSheetState extends State<CourseLessonBottomSheet> {
                   children: [
                     Text(
                       lesson.duration,
-                      style: AppTextStyles.textContent3.copyWith(color: AppColors.color8F959E),
+                      style: AppTextStyles.textContent3.copyWith(
+                        color: AppColors.color8F959E,
+                      ),
                     ),
                     if (lesson.isCompleted) ...[
                       const SizedBox(width: 8),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
                         decoration: BoxDecoration(
                           color: AppColors.primary.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(8),
@@ -178,7 +207,8 @@ class _CourseLessonBottomSheetState extends State<CourseLessonBottomSheet> {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: lesson.isLocked ? AppColors.lightGray : AppColors.primary,
+                color:
+                    lesson.isLocked ? AppColors.lightGray : AppColors.primary,
                 borderRadius: BorderRadius.circular(24),
               ),
               child: Icon(
@@ -198,18 +228,111 @@ class _CourseLessonBottomSheetState extends State<CourseLessonBottomSheet> {
   }
 
   void _playLesson(LessonData lesson) {
-    print('Playing lesson: ${lesson.title}');
+    print('🎬 Playing lesson: ${lesson.title}');
+    print('🎬 Lesson videoUrl: ${lesson.videoUrl}');
 
-    showDialog(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            title: Text(lesson.title),
-            content: Text('Duration: ${lesson.duration}'),
-            actions: [
-              TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Close')),
-            ],
+    
+    if (lesson.videoUrl != null && lesson.videoUrl!.isNotEmpty) {
+      print('🎬 Opening video: ${lesson.videoUrl}');
+      _playYouTubeVideo(context, lesson.videoUrl!);
+    } else {
+      
+      showDialog(
+        context: context,
+        builder:
+            (context) => AlertDialog(
+              title: Text(lesson.title),
+              content: const Text('Video không khả dụng'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Đóng'),
+                ),
+              ],
+            ),
+      );
+    }
+  }
+
+  
+  void _playYouTubeVideo(BuildContext context, String videoUrl) {
+    
+    String videoId = '';
+    if (videoUrl.contains('youtube.com/watch?v=')) {
+      videoId = videoUrl.split('v=')[1].split('&')[0];
+    } else if (videoUrl.contains('youtu.be/')) {
+      videoId = videoUrl.split('youtu.be/')[1].split('?')[0];
+    }
+
+    if (videoId.isNotEmpty) {
+      
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => _YouTubePlayerScreen(videoId: videoId),
+        ),
+      );
+    }
+  }
+}
+
+class _YouTubePlayerScreen extends StatefulWidget {
+  final String videoId;
+
+  const _YouTubePlayerScreen({required this.videoId});
+
+  @override
+  State<_YouTubePlayerScreen> createState() => _YouTubePlayerScreenState();
+}
+
+class _YouTubePlayerScreenState extends State<_YouTubePlayerScreen> {
+  late YoutubePlayerController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = YoutubePlayerController(
+      initialVideoId: widget.videoId,
+      flags: const YoutubePlayerFlags(
+        autoPlay: true,
+        mute: false,
+        isLive: false,
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        title: Text(
+          'Video Player',
+          style: AppTextStyles.textHeader3.copyWith(color: Colors.white),
+        ),
+      ),
+      body: Center(
+        child: YoutubePlayer(
+          controller: _controller,
+          showVideoProgressIndicator: true,
+          progressIndicatorColor: AppColors.primary,
+          progressColors: const ProgressBarColors(
+            playedColor: AppColors.primary,
+            handleColor: AppColors.primary,
           ),
+        ),
+      ),
     );
   }
 }

@@ -43,9 +43,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
     RepositoryProvider(
       create: (context) => HomeRepo(apiClient: ApiClient()),
       child: BlocProvider(
-        create:
-            (context) => HomeCubit(repo: context.read<HomeRepo>()),
-        child: DisposableProvider(create: (_) => HomeController(), child: HomeScreen()),
+        create: (context) => HomeCubit(repo: context.read<HomeRepo>()),
+        child: DisposableProvider(
+          create: (_) => HomeController(),
+          child: HomeScreen(),
+        ),
       ),
     ),
     DisposableProvider(

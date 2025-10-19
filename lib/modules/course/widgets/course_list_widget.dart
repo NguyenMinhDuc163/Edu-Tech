@@ -33,7 +33,11 @@ class CourseListItem extends StatelessWidget {
           color: AppColors.white,
           borderRadius: BorderRadius.circular(16),
           boxShadow: const [
-            BoxShadow(offset: Offset(0, 2), blurRadius: 8, color: Color.fromRGBO(0, 0, 0, 0.1)),
+            BoxShadow(
+              offset: Offset(0, 2),
+              blurRadius: 8,
+              color: Color.fromRGBO(0, 0, 0, 0.1),
+            ),
           ],
         ),
         child: Row(
@@ -53,11 +57,19 @@ class CourseListItem extends StatelessWidget {
                           imageUrl!,
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) {
-                            return const Icon(Icons.image, color: AppColors.coolGray, size: 32);
+                            return const Icon(
+                              Icons.image,
+                              color: AppColors.coolGray,
+                              size: 32,
+                            );
                           },
                         ),
                       )
-                      : const Icon(Icons.image, color: AppColors.coolGray, size: 32),
+                      : const Icon(
+                        Icons.image,
+                        color: AppColors.coolGray,
+                        size: 32,
+                      ),
             ),
             const SizedBox(width: 16),
 
@@ -67,19 +79,27 @@ class CourseListItem extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: AppTextStyles.textContent1.copyWith(fontWeight: FontWeight.bold),
+                    style: AppTextStyles.textContent1.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      const Icon(Icons.person, size: 16, color: AppColors.coolGray),
+                      const Icon(
+                        Icons.person,
+                        size: 16,
+                        color: AppColors.coolGray,
+                      ),
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
                           instructor,
-                          style: AppTextStyles.text.copyWith(color: AppColors.coolGray),
+                          style: AppTextStyles.text.copyWith(
+                            color: AppColors.coolGray,
+                          ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -91,11 +111,16 @@ class CourseListItem extends StatelessWidget {
                     children: [
                       Text(
                         price,
-                        style: AppTextStyles.textHeader3.copyWith(color: AppColors.primary),
+                        style: AppTextStyles.textHeader3.copyWith(
+                          color: AppColors.primary,
+                        ),
                       ),
                       const SizedBox(width: 12),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: AppColors.colorFFEBF0,
                           borderRadius: BorderRadius.circular(8),
@@ -164,19 +189,18 @@ class CourseListWidget extends StatelessWidget {
   }
 
   void _navigateToCourseDetail(BuildContext context, CourseData course) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder:
-            (context) => CourseDetailScreen(
-              courseId: course.title.toLowerCase().replaceAll(' ', '_'),
-              title: course.title,
-              instructor: course.instructor,
-              price: course.price,
-              duration: course.duration,
-              description:
-                  'Learn ${course.title} with ${course.instructor}. This comprehensive course covers all the essential topics you need to master.',
-            ),
-      ),
+    Navigator.pushNamed(
+      context,
+      CourseDetailScreen.routeName,
+      arguments: {
+        'courseId': course.title.toLowerCase().replaceAll(' ', '_'),
+        'title': course.title,
+        'instructor': course.instructor,
+        'price': course.price,
+        'duration': course.duration,
+        'description':
+            'Learn ${course.title} with ${course.instructor}. This comprehensive course covers all the essential topics you need to master.',
+      },
     );
   }
 }

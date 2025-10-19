@@ -1,10 +1,71 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ed_tech/modules/payment/screen/payment_method_screen.dart';
 import 'package:ed_tech/modules/reviews/screen/review_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:ed_tech/init.dart';
 import 'package:ed_tech/modules/course/widgets/course_lesson_bottom_sheet.dart';
+import 'package:ed_tech/modules/course/bloc/course_cubit.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
-class CourseDetailScreen extends StatefulWidget {
+class CourseDetailScreen extends StatelessWidget {
+  static const String routeName = '/CourseDetailScreen';
+
+  @override
+  Widget build(BuildContext context) {
+    final Map<String, dynamic>? args =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+
+    if (args == null) {
+      return Scaffold(body: Center(child: Text('Không có thông tin khóa học')));
+    }
+
+    final String courseId = args['courseId'] ?? '';
+    final String title = args['title'] ?? 'Untitled Course';
+    final String instructor = args['instructor'] ?? 'Unknown Teacher';
+    final String price = args['price'] ?? '0';
+    final String duration = args['duration'] ?? '0h 0m';
+    final String? imageUrl = args['imageUrl'];
+    final String? description = args['description'];
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<CourseCubit>().getCourseDetail(courseId);
+    });
+
+    return BlocBuilder<CourseCubit, CourseState>(
+      builder: (context, state) {
+        if (state is CourseDetailProgress) {
+          return Scaffold(body: Center(child: CircularProgressIndicator()));
+        }
+
+        if (state is CourseDetailSuccess) {
+          final courseData = state.courseDetail;
+          return _CourseDetailContent(
+            courseId: courseId,
+            title: courseData.title ?? title,
+            instructor: instructor,
+            price: courseData.price ?? price,
+            duration: duration,
+            imageUrl: imageUrl,
+            description: courseData.description ?? description,
+            courseDetail: courseData,
+          );
+        }
+
+        return _CourseDetailContent(
+          courseId: courseId,
+          title: title,
+          instructor: instructor,
+          price: price,
+          duration: duration,
+          imageUrl: imageUrl,
+          description: description,
+        );
+      },
+    );
+  }
+}
+
+class _CourseDetailContent extends StatelessWidget {
   final String courseId;
   final String title;
   final String instructor;
@@ -12,9 +73,9 @@ class CourseDetailScreen extends StatefulWidget {
   final String duration;
   final String? imageUrl;
   final String? description;
+  final dynamic courseDetail;
 
-  const CourseDetailScreen({
-    super.key,
+  const _CourseDetailContent({
     required this.courseId,
     required this.title,
     required this.instructor,
@@ -22,23 +83,20 @@ class CourseDetailScreen extends StatefulWidget {
     required this.duration,
     this.imageUrl,
     this.description,
+    this.courseDetail,
   });
 
-  static const String routeName = '/CourseDetailScreen';
+  void _showLessonBottomSheet(BuildContext context) {
+    List<LessonData> lessons =
+        courseDetail?.sections != null
+            ? _getLessonsFromApi(courseDetail.sections)
+            : _getSampleLessons();
 
-  @override
-  State<CourseDetailScreen> createState() => _CourseDetailScreenState();
-}
-
-class _CourseDetailScreenState extends State<CourseDetailScreen> {
-  void _showLessonBottomSheet() {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder:
-          (context) =>
-              CourseLessonBottomSheet(courseTitle: widget.title, lessons: _getSampleLessons()),
+      builder: (context) => CourseLessonBottomSheet(courseTitle: title, lessons: lessons),
     );
   }
 
@@ -82,17 +140,116 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
     ];
   }
 
+  List<LessonData> _getLessonsFromApi(List sections) {
+    List<LessonData> lessons = [];
+    for (var section in sections) {
+      for (var content in section.contents) {
+        String duration = '0:00 mins';
+        String? videoUrl;
+
+        for (var file in content.files) {
+          if (file.fileType == 'video' || file.url?.contains('youtube') == true) {
+            videoUrl = file.url;
+            break;
+          }
+        }
+
+        lessons.add(
+          LessonData(
+            id: content.contentId ?? '',
+            title: content.title ?? 'Untitled Lesson',
+            duration: duration,
+            isCompleted: false,
+            isLocked: !(content.isPreview ?? false),
+            videoUrl: videoUrl,
+          ),
+        );
+      }
+    }
+    return lessons;
+  }
+
+  String? _getFirstVideoUrl() {
+    if (courseDetail?.sections == null) return null;
+
+    for (var section in courseDetail.sections) {
+      for (var content in section.contents) {
+        for (var file in content.files) {
+          if (file.fileType == 'video' || file.url?.contains('youtube') == true) {
+            return file.url;
+          }
+        }
+      }
+    }
+    return null;
+  }
+
+  String _getYouTubeThumbnail(String videoUrl) {
+    String videoId = '';
+    if (videoUrl.contains('youtube.com/watch?v=')) {
+      videoId = videoUrl.split('v=')[1].split('&')[0];
+    } else if (videoUrl.contains('youtu.be/')) {
+      videoId = videoUrl.split('youtu.be/')[1].split('?')[0];
+    }
+
+    return 'https://img.youtube.com/vi/$videoId/maxresdefault.jpg';
+  }
+
+  void _playYouTubeVideo(BuildContext context, String videoUrl) {
+    String videoId = '';
+    if (videoUrl.contains('youtube.com/watch?v=')) {
+      videoId = videoUrl.split('v=')[1].split('&')[0];
+    } else if (videoUrl.contains('youtu.be/')) {
+      videoId = videoUrl.split('youtu.be/')[1].split('?')[0];
+    }
+
+    if (videoId.isNotEmpty) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => _YouTubePlayerScreen(videoId: videoId)),
+      );
+    }
+  }
+
+  void _playLessonVideo(LessonData lesson, BuildContext context) {
+    print('🎬 Playing lesson from preview: ${lesson.title}');
+    print('🎬 Lesson videoUrl: ${lesson.videoUrl}');
+
+    if (lesson.videoUrl != null && lesson.videoUrl!.isNotEmpty) {
+      print('🎬 Opening video: ${lesson.videoUrl}');
+      _playYouTubeVideo(context, lesson.videoUrl!);
+    } else {
+      showDialog(
+        context: context,
+        builder:
+            (context) => AlertDialog(
+              title: Text(lesson.title),
+              content: const Text('Video không khả dụng'),
+              actions: [
+                TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Đóng')),
+              ],
+            ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.white,
       body: Stack(
-        children: [_buildVideoPlayerSection(), _buildBottomSheet(), _buildBottomActionButtons()],
+        children: [
+          _buildVideoPlayerSection(context),
+          _buildBottomSheet(context),
+          _buildBottomActionButtons(context),
+        ],
       ),
     );
   }
 
-  Widget _buildVideoPlayerSection() {
+  Widget _buildVideoPlayerSection(BuildContext context) {
+    String? videoUrl = _getFirstVideoUrl();
+
     return Container(
       height: MediaQuery.of(context).size.height * 0.4,
       decoration: const BoxDecoration(
@@ -122,31 +279,41 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
           ),
 
           Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  width: 200,
-                  height: 200,
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(100),
+            child: GestureDetector(
+              onTap: videoUrl != null ? () => _playYouTubeVideo(context, videoUrl) : null,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 200,
+                    height: 200,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(100),
+                    ),
+                    child:
+                        videoUrl != null
+                            ? Stack(
+                              children: [
+                                const Center(
+                                  child: Icon(
+                                    Icons.play_circle_fill,
+                                    size: 80,
+                                    color: AppColors.primary,
+                                  ),
+                                ),
+                              ],
+                            )
+                            : const Icon(
+                              Icons.play_circle_outline,
+                              size: 80,
+                              color: AppColors.primary,
+                            ),
                   ),
-                  child: const Icon(Icons.play_circle_outline, size: 80, color: AppColors.primary),
-                ),
 
-                const SizedBox(height: 20),
-
-                Container(
-                  width: 60,
-                  height: 60,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.9),
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  child: const Icon(Icons.pause, color: AppColors.primary, size: 30),
-                ),
-              ],
+                  const SizedBox(height: 20),
+                ],
+              ),
             ),
           ),
 
@@ -162,14 +329,14 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
                     Text(
                       '4:10',
                       style: AppTextStyles.textContent3.copyWith(
-                        color: Colors.white,
+                        color: Colors.black,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
                     Text(
                       '6:10',
                       style: AppTextStyles.textContent3.copyWith(
-                        color: Colors.white,
+                        color: Colors.black,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -215,7 +382,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
     );
   }
 
-  Widget _buildBottomSheet() {
+  Widget _buildBottomSheet(BuildContext context) {
     return DraggableScrollableSheet(
       initialChildSize: 0.6,
       minChildSize: 0.6,
@@ -255,7 +422,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
 
                 _buildAboutSection(),
 
-                _buildLessonsPreviewSection(),
+                _buildLessonsPreviewSection(context),
 
                 const SizedBox(height: 100),
               ],
@@ -266,7 +433,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
     );
   }
 
-  Widget _buildBottomActionButtons() {
+  Widget _buildBottomActionButtons(BuildContext context) {
     return Positioned(
       bottom: 0,
       left: 0,
@@ -330,12 +497,17 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            widget.title,
-            style: AppTextStyles.textHeader2.copyWith(fontWeight: FontWeight.bold),
+          Expanded(
+            child: Text(
+              title,
+              style: AppTextStyles.textHeader2.copyWith(fontWeight: FontWeight.bold),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
+          const SizedBox(width: 16),
           Text(
-            widget.price,
+            price,
             style: AppTextStyles.textHeader2.copyWith(
               color: AppColors.primary,
               fontWeight: FontWeight.bold,
@@ -358,7 +530,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
           ),
           const SizedBox(height: 12),
           Text(
-            widget.description ??
+            description ??
                 'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.',
             style: AppTextStyles.textContent2.copyWith(color: AppColors.color8F959E, height: 1.5),
           ),
@@ -369,7 +541,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
     );
   }
 
-  Widget _buildLessonsPreviewSection() {
+  Widget _buildLessonsPreviewSection(BuildContext context) {
     return Padding(
       padding: AppPad.h24.add(const EdgeInsets.only(top: 20)),
       child: Column(
@@ -378,12 +550,14 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
           Text('Lessons', style: AppTextStyles.textHeader3.copyWith(fontWeight: FontWeight.bold)),
           const SizedBox(height: 16),
 
-          ..._getSampleLessons().take(3).map((lesson) => _buildLessonItem(lesson)),
+          ..._getLessonsFromApi(
+            courseDetail?.sections ?? [],
+          ).take(3).map((lesson) => _buildLessonItem(lesson, context)),
 
           const SizedBox(height: 16),
 
           GestureDetector(
-            onTap: _showLessonBottomSheet,
+            onTap: () => _showLessonBottomSheet(context),
             child: Container(
               width: double.infinity,
               padding: AppPad.v12,
@@ -403,7 +577,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
     );
   }
 
-  Widget _buildLessonItem(LessonData lesson) {
+  Widget _buildLessonItem(LessonData lesson, BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       child: Row(
@@ -445,17 +619,20 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
             ),
           ),
 
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: lesson.isLocked ? AppColors.lightGray : AppColors.primary,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Icon(
-              lesson.isLocked ? Icons.lock : Icons.play_arrow,
-              color: AppColors.white,
-              size: 20,
+          GestureDetector(
+            onTap: lesson.isLocked ? null : () => _playLessonVideo(lesson, context),
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: lesson.isLocked ? AppColors.lightGray : AppColors.primary,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Icon(
+                lesson.isLocked ? Icons.lock : Icons.play_arrow,
+                color: AppColors.white,
+                size: 20,
+              ),
             ),
           ),
         ],
@@ -470,6 +647,7 @@ class LessonData {
   final String duration;
   final bool isCompleted;
   final bool isLocked;
+  final String? videoUrl;
 
   const LessonData({
     required this.id,
@@ -477,5 +655,60 @@ class LessonData {
     required this.duration,
     required this.isCompleted,
     required this.isLocked,
+    this.videoUrl,
   });
+}
+
+class _YouTubePlayerScreen extends StatefulWidget {
+  final String videoId;
+
+  const _YouTubePlayerScreen({required this.videoId});
+
+  @override
+  State<_YouTubePlayerScreen> createState() => _YouTubePlayerScreenState();
+}
+
+class _YouTubePlayerScreenState extends State<_YouTubePlayerScreen> {
+  late YoutubePlayerController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = YoutubePlayerController(
+      initialVideoId: widget.videoId,
+      flags: const YoutubePlayerFlags(autoPlay: true, mute: false, isLive: false),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        title: Text('Video Player', style: AppTextStyles.textHeader3.copyWith(color: Colors.white)),
+      ),
+      body: Center(
+        child: YoutubePlayer(
+          controller: _controller,
+          showVideoProgressIndicator: true,
+          progressIndicatorColor: AppColors.primary,
+          progressColors: const ProgressBarColors(
+            playedColor: AppColors.primary,
+            handleColor: AppColors.primary,
+          ),
+        ),
+      ),
+    );
+  }
 }

@@ -4,10 +4,27 @@ import 'package:ed_tech/init.dart';
 import 'package:ed_tech/modules/home/bloc/home_cubit.dart';
 import 'package:ed_tech/modules/home/bloc/home_state.dart';
 import 'package:ed_tech/modules/home/model/course_response.dart';
+import 'package:ed_tech/modules/course/screen/course_detail_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class CourseSuggestionsWidget extends StatelessWidget {
   const CourseSuggestionsWidget({super.key});
+
+  void _navigateToCourseDetail(BuildContext context, DataCourse course) {
+    Navigator.pushNamed(
+      context,
+      CourseDetailScreen.routeName,
+      arguments: {
+        'courseId': course.courseId ?? '',
+        'title': course.title ?? 'Untitled Course',
+        'instructor': course.teacher?.toString() ?? 'Unknown Teacher',
+        'price': course.price ?? '0',
+        'duration': course.courseDuration?.toString() ?? '0h 0m',
+        'imageUrl': course.thumbnailUrl,
+        'description': course.description,
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -99,7 +116,10 @@ class CourseSuggestionsWidget extends StatelessWidget {
                     itemCount: courses.length,
                     separatorBuilder: (_, __) => const SizedBox(width: 12),
                     itemBuilder:
-                        (context, index) => _CourseCard(course: courses[index]),
+                        (context, index) => _CourseCard(
+                          course: courses[index],
+                          onTap: () => _navigateToCourseDetail(context, courses[index]),
+                        ),
                   ),
                 ),
               ],
@@ -138,12 +158,19 @@ class CourseSuggestionsWidget extends StatelessWidget {
 
 class _CourseCard extends StatelessWidget {
   final DataCourse course;
-  const _CourseCard({required this.course});
+  final VoidCallback onTap;
+  
+  const _CourseCard({
+    required this.course,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 260,
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 260,
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(16),
@@ -240,7 +267,7 @@ class _CourseCard extends StatelessWidget {
           ),
         ],
       ),
-    );
+      ));
   }
 
   Color _getColorForCourse(String categoryId) {
