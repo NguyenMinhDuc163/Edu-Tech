@@ -37,17 +37,14 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Positioned.fill(child: Container(color: AppColors.lavenderColor)),
-        // Center(
-        //   child: Column(
-        //     spacing: 10,
-        //     mainAxisAlignment: MainAxisAlignment.center,
-        //     children: [
-        //       // Image.asset(ImagePath.imgSplash),
-        //       // Image.asset(ImagePath.imgTitleSplash),
-        //     ],
-        //   ),
-        // ),
+        Positioned.fill(child: Container(color: AppColors.skyBlue)),
+        Center(
+          child: Image.asset(
+            IconPath.appIcon,
+            width: 150,
+            height: 150,
+          ),
+        ),
       ],
     );
   }

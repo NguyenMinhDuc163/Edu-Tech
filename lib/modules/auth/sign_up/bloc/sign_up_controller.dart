@@ -52,7 +52,7 @@ class SignUpController extends Disposable {
       showToastTop(message: "sign_up.required_fields".tr());
       return false;
     }
-    if (passwordController.text.length < 8) {
+    if (passwordController.text.length < 6) {
       showToastTop(message: "sign_up.password_length".tr());
       return false;
     }

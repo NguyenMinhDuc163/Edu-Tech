@@ -65,7 +65,7 @@ class _SignUpContent extends StatelessWidget {
                       return text.length > 4;
 
                     },
-                    onChanged: (text) => context.read<SignUpCubit>().onUsernameChanged(text),
+                    // onChanged: (text) => context.read<SignUpCubit>().onUsernameChanged(text),
                   );
                 },
               ),
@@ -102,7 +102,7 @@ class _SignUpContent extends StatelessWidget {
                       // return false;
                      return text.length > 4;
                     },
-                    onChanged: (text) => context.read<SignUpCubit>().onEmailChanged(text),
+                    // onChanged: (text) => context.read<SignUpCubit>().onEmailChanged(text),
                   );
                 },
               ),
