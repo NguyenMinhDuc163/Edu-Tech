@@ -69,7 +69,8 @@ class TokenInterceptor extends InterceptorsWrapper {
               return;
             }
 
-            if (statusCode == StatusCode.unauthorized) {
+            if (statusCode == StatusCode.unauthorized ||
+                statusCode == StatusCode.forbidden) {
               AppAuthenticationBinding.instance!.notifyRefershTokenExpired();
               return;
             }
@@ -178,7 +179,8 @@ class TokenInterceptor extends InterceptorsWrapper {
       return;
     }
 
-    if (statusCode == StatusCode.unauthorized &&
+    if ((statusCode == StatusCode.unauthorized ||
+            statusCode == StatusCode.forbidden) &&
         _times <= AppConst.refetchApiThreshold) {
       if (_refreshTokenCompleter != null) {
         await _refreshTokenCompleter?.future.catchError((err) {

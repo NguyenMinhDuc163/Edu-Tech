@@ -14,6 +14,7 @@ import '../core/constants/app_constants.dart';
 import '../core/error_handling/exceptions.dart';
 import '../utils/helpers/system_utils.dart';
 import 'interceptors/api_token_interceptor.dart';
+import 'interceptors/token_interceptor.dart';
 import 'models/request_method.dart';
 import 'models/request_response.dart';
 import 'models/status_code.dart';
@@ -84,6 +85,7 @@ class ApiClient {
         ..interceptors.addAll([
           // LogInterceptor(),
           CurlLoggerDioInterceptor(printOnSuccess: true, convertFormData: true),
+          TokenInterceptor(),
           ApiTokenInterceptor(),
         ]) {
     (_dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient = () {

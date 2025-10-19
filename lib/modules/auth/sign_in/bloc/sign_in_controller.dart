@@ -1,5 +1,6 @@
 import 'package:disposable_provider/disposable_provider.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ed_tech/core/widgets/toast.dart';
@@ -8,8 +9,8 @@ import 'package:ed_tech/modules/auth/sign_in/bloc/sign_in_cubit.dart';
 import 'package:ed_tech/modules/auth/sign_in/bloc/sign_in_state.dart';
 
 class SignInController extends Disposable {
-  TextEditingController usernameController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
+  TextEditingController usernameController = TextEditingController(text: kDebugMode ? "student" : "");
+  TextEditingController passwordController = TextEditingController(text: kDebugMode ? '111111' : "");
   ValueNotifier<bool> isSwitched = ValueNotifier(false);
 
   SignInController({Map<String, String>? prefillData}) {

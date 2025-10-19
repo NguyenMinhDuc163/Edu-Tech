@@ -1,10 +1,10 @@
+import 'package:ed_tech/common/widgets/images/cached_network_shaped_image.dart';
 import 'package:ed_tech/core/widgets/app_gap.dart';
 import 'package:ed_tech/init.dart';
 import 'package:ed_tech/modules/home/bloc/home_cubit.dart';
 import 'package:ed_tech/modules/home/bloc/home_state.dart';
 import 'package:ed_tech/modules/home/model/course_response.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class CourseSuggestionsWidget extends StatelessWidget {
   const CourseSuggestionsWidget({super.key});
@@ -173,21 +173,20 @@ class _CourseCard extends StatelessWidget {
               ),
             ),
             padding: AppPad.a10,
-            child:
-                course.thumbnailUrl != null
-                    ? Image.network(
-                      course.thumbnailUrl.toString(),
-                      fit: BoxFit.contain,
-                      errorBuilder:
-                          (context, error, stackTrace) => SvgPicture.asset(
-                            'assets/images/intro_step_1.svg',
-                            fit: BoxFit.contain,
-                          ),
-                    )
-                    : SvgPicture.asset(
-                      'assets/images/intro_step_1.svg',
-                      fit: BoxFit.contain,
-                    ),
+            child: ResponsiveCachedNetworkRectangleImage(
+              width: 70,
+              height: 70,
+              imageUrl: course.thumbnailUrl,
+              fit: BoxFit.contain,
+              errorWidget: Container(
+                color: Colors.grey[200],
+                child: const Icon(
+                  Icons.error_outline,
+                  color: Colors.grey,
+                  size: 30,
+                ),
+              ),
+            ),
           ),
           Expanded(
             child: Padding(
