@@ -60,7 +60,7 @@ class SignInRepo {
       // final FirebaseAuth auth = FirebaseAuth.instance;
       // await auth.signOut();
 
-      final authService = AuthService.instance;
+      authService.logoutOnServer();
       authService.invalid();
 
     } catch (e) {

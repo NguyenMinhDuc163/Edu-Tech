@@ -4,7 +4,6 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:ed_tech/utils/helpers/json_ext.dart';
 import 'package:sp_util/sp_util.dart';
 
 import '../../common/app_status.dart';
@@ -160,17 +159,27 @@ final class AuthService {
       final res = await ApiClient().fetch(
         ApiPath.refreshToken,
         RequestMethod.post,
-        rawData: {'refresh-token': _refreshToken},
+        rawData: {'refresh_token': _refreshToken},
+        options: Options(
+          contentType: Headers.jsonContentType,
+          headers: {'Cookie': 'refresh_token=${_refreshToken ?? ''}'},
+        ),
       );
 
-      if (res.hasError || !res.hasData) {
-        notifyAuthenticationFailed();
-        throw res.error!.messages;
+      // Schema backend cung cấp: { status, message, data: { access_token } }
+      Map<String, dynamic> payload = res.hasData ? res.data : res.json;
+      if (payload['data'] is Map<String, dynamic>) {
+        payload = Map<String, dynamic>.from(payload['data']);
       }
 
-      saveAccessToken(res.data.lookup('access_token'));
-      saveExpiresTime(res.data.lookup('expires_in'));
-      saveRefreshToken(res.data.lookup('refresh_token'));
+      final String? newAccessToken = payload['access_token'] as String?;
+
+      if (newAccessToken == null) {
+        notifyAuthenticationFailed();
+        throw 'Refresh token response invalid: missing access_token';
+      }
+
+      await saveAccessToken(newAccessToken);
       _isRefreshTokenInvalid = false;
     } catch (e) {
       _isRefreshTokenInvalid = true;
@@ -240,5 +249,23 @@ final class AuthService {
     await SpUtil.reload();
     await _secureStorage.reload();
     await _loadToken();
+  }
+
+  Future<void> logoutOnServer() async {
+    try {
+      await ApiClient().fetch(
+        ApiPath.logout,
+        RequestMethod.post,
+        rawData: {'refresh_token': _refreshToken},
+        options: Options(
+          contentType: Headers.jsonContentType,
+          headers: {'Cookie': 'refresh_token=${_refreshToken ?? ''}'},
+        ),
+      );
+    } catch (_) {
+      // Ignore server errors on logout, proceed to clear local tokens
+    } finally {
+      await invalid();
+    }
   }
 }
