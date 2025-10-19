@@ -1,5 +1,7 @@
 import 'package:disposable_provider/disposable_provider.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:ed_tech/core/values/login_type.dart';
+import 'package:ed_tech/modules/home/screen/home_screen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -27,7 +29,7 @@ class SignInController extends Disposable {
 
   handleListener(BuildContext context, SignInState state) {
     if (state is SignInSuccess) {
-      Navigator.pushNamed(context, OnboardingScreen.routeName);
+      Navigator.pushNamed(context, HomeScreen.routeName);
     }
 
     if (state is SignInFailure) {
@@ -43,6 +45,10 @@ class SignInController extends Disposable {
       username: usernameController.text,
       password: passwordController.text,
     );
+  }
+
+  onLogin(BuildContext context, LoginType type) {
+    context.read<SignInCubit>().onLoginSocial();
   }
 
   @override

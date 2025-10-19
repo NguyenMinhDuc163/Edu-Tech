@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ed_tech/core/error_handling/app_error_state.dart';
 import 'package:ed_tech/core/values/login_type.dart';
@@ -9,26 +10,43 @@ class SignInCubit extends Cubit<SignInState> {
   final SignInRepo repo;
   final SocialLogin socialLogin;
 
-  SignInCubit({required this.repo, required this.socialLogin}) : super(SignInInitial()) {
-    // lay tu repo => co token => emit AuthGenToken
-    // tach dang nhap dang ky
-    // Viet interceptor de tu + vào url
-    // throw messgae khi call api lõi
-    // xu ly luu token o repo
-    // them messgae neu loi
-    // TODO dang xuat
-    // TODO tim hieu thu vien flutter secure_storage
+  SignInCubit({required this.repo, required this.socialLogin})
+    : super(SignInInitial()) {
     _checkExistingToken();
   }
 
   Future<void> _checkExistingToken() async {
-    final String? token = repo.authService.accessToken;
-    if (token != null) {
+    final auth = repo.authService;
+
+    Object? refreshError;
+    final completer = Completer<void>();
+
+    await auth.refreshTokenIfNeeded(
+      onPerform: () {},
+      onComplete: () => completer.complete(),
+      onCompleteError: (e) {
+        refreshError = e;
+        completer.complete();
+      },
+    );
+    await completer.future;
+
+    final bool canGoHome =
+        auth.accessToken != null &&
+        auth.isAccessTokenExpired == false &&
+        refreshError == null;
+
+    if (canGoHome) {
       emit(SignInAuthenticated());
+    } else {
+      emit(SignInInitial());
     }
   }
 
-  Future onLoginStarted({required String username, required String password}) async {
+  Future onLoginStarted({
+    required String username,
+    required String password,
+  }) async {
     emit(SignInInProgress());
     try {
       await repo.login(username: username, password: password);

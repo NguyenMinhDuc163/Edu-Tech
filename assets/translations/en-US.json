@@ -24,7 +24,8 @@
     "get_started": "Let’s Get Started",
     "already_have_account": "Already have an account? ",
     "signin": "Signin",
-    "create_account": "Create an Account"
+    "create_account": "Create an Account",
+    "no_account_question": "Don’t have an account?"
   },
   "sign_up": {
     "title": "Sign Up",
@@ -52,7 +53,8 @@
     "connect_account_confirmation": "By connecting your account confirm that you agree with our",
     "terms_and_conditions": "Term and Condition",
     "login_success": "Login successful",
-    "login_failure": "Login failed"
+    "login_failure": "Login failed",
+    "or_login_with": "Or login with"
   },
   "forgot_password": {
     "title": "Forgot Password",

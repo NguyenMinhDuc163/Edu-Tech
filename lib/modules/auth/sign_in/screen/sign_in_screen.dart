@@ -1,5 +1,8 @@
 import 'package:disposable_provider/disposable_provider.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:ed_tech/core/values/login_type.dart';
+import 'package:ed_tech/core/widgets/template/button_widget.dart';
+import 'package:ed_tech/modules/auth/login/widget/title_widget.dart';
 import 'package:ed_tech/modules/auth/sign_up/screen/sign_up_screen.dart';
 import 'package:ed_tech/modules/dashboard/screen/dashboard_screen.dart';
 import 'package:ed_tech/modules/home/screen/home_screen.dart';
@@ -22,9 +25,7 @@ class SignInScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final SignInController controller = DisposableProvider.of<SignInController>(
-      context,
-    );
+    final SignInController controller = DisposableProvider.of<SignInController>(context);
     return BlocListener<SignInCubit, SignInState>(
       listener: controller.handleListener,
       child: _SignInContent(controller: controller),
@@ -45,42 +46,46 @@ class _SignInContent extends StatelessWidget {
       padding: AppPad.h22v10,
       child: SingleChildScrollView(
         child: Column(
-          spacing: height_30,
           children: [
+            AppGap.h50,
             Text("login.welcome".tr(), style: AppTextStyles.textHeader1),
             Text(
               "login.enter_data_to_continue".tr(),
-              style: AppTextStyles.textContent1.copyWith(
-                color: AppColors.coolGray,
-              ),
+              style: AppTextStyles.textContent1.copyWith(color: AppColors.coolGray),
             ),
-            AppGap.h100,
+            AppGap.h50,
             TextInputCustom(
               label: 'sign_up.username'.tr(),
               controller: controller.usernameController,
               hintText: "sign_up.enter_username".tr(),
+              borderRadius: BorderRadius.circular(12),
               validator: (text) {
                 return text.length >= 4;
               },
             ),
+            AppGap.h30,
             TextInputCustom(
               label: 'sign_up.password'.tr(),
               controller: controller.passwordController,
               hintText: "sign_up.enter_password".tr(),
+              borderRadius: BorderRadius.circular(12),
+              isLineBottom: false,
+              isPassword: true,
               suffixIcon: Text(
                 "sign_up.strong".tr(),
-                style: AppTextStyles.textContent3.copyWith(
-                  color: AppColors.limeGreen,
-                ),
+                style: AppTextStyles.textContent3.copyWith(color: AppColors.limeGreen),
               ),
               validator: (text) {
                 return text.length >= 8;
               },
             ),
-
+            AppGap.h30,
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
+                Checkbox(value: true, onChanged: null),
+                Text("sign_up.remember_me".tr(), style: AppTextStyles.textContent2),
+                Spacer(),
                 GestureDetector(
                   onTap:
                       () => Navigator.pushNamed(
@@ -93,38 +98,51 @@ class _SignInContent extends StatelessWidget {
                     style: AppTextStyles.textContent1.copyWith(color: Colors.red),
                   ),
                 ),
-                GestureDetector(
-                  onTap:
-                      () => Navigator.pushNamed(
-                    context,
-                    SignUpScreen.routeName,
-                    // ResetPasswordScreen.routeName,
-                  ),
-                  child: Text(
-                    "sign_up.title".tr(),
-                    style: AppTextStyles.textHeader3.copyWith(color: Colors.black, fontSize: 14),
-                  ),
-                ),
               ],
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "sign_up.remember_me".tr(),
-                  style: AppTextStyles.textContent2,
-                ),
-                SwitchBottomWidget(
-                  onChanged: (value) {
-                  },
-                ),
-              ],
+            AppGap.h20,
+            ButtonWidget(
+              title: "login.title".tr(),
+              backgroundColor: AppColors.primary,
+              padding: AppPad.v14,
+              boderRadius: BorderRadius.all(AppRadius.c16),
+              onPressed: () {
+                controller.onSignIn(context);
+              },
             ),
-            AppGap.h100,
+            AppGap.h10,
             TextSpanWidget(
-              normalText: "${'login.connect_account_confirmation'.tr()} ",
-              clickableText: 'login.terms_and_conditions'.tr(),
-              onTap: () => Navigator.pushNamed(context, SignInScreen.routeName),
+              normalText: "${'login_screen.no_account_question'.tr()} ",
+              clickableText: 'sign_up.title'.tr(),
+              onTap: () => Navigator.pushNamed(context, SignUpScreen.routeName),
+              clickableTextStyle: TextStyle(color: AppColors.electricBlue),
+            ),
+            
+            Row(
+              children: [
+                Expanded(child: Divider(color: AppColors.divider)),
+                Padding(
+                  padding: AppPad.h20v10,
+                  child: Text(
+                    "login.or_login_with".tr(),
+                    style: AppTextStyles.textContent2.copyWith(color: AppColors.coolGray),
+                  ),
+                ),
+                Expanded(child: Divider(color: AppColors.divider)),
+              ],
+            ),
+            AppGap.h10,
+            ButtonWidget(
+              titleWidget: TitleWidget(
+                title: "Google",
+                iconPath: IconPath.iconGoogle,
+              ),
+              onPressed: () {
+                // controller.onLogin(context, LoginType.google);
+              },
+              backgroundColor: AppColors.crimson,
+              padding: AppPad.v14,
+              boderRadius: BorderRadius.all(AppRadius.c16),
             ),
           ],
         ),
@@ -134,10 +152,8 @@ class _SignInContent extends StatelessWidget {
     return Stack(
       children: [
         FunctionScreenTemplate(
-          titleButtonBottom: 'login.title'.tr(),
-          onClickBottomButton: () {
-            controller.onSignIn(context);
-          },
+          isShowBottomButton: false,
+          isShowAppBar: false,
           screen: contentWidget,
         ),
         if (state is SignInInProgress)

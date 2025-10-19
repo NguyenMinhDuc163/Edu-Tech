@@ -1,4 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:ed_tech/core/widgets/template/button_widget.dart';
+import 'package:ed_tech/modules/auth/sign_in/screen/sign_in_screen.dart';
+import 'package:ed_tech/modules/auth/widgets/text_span_widget.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ed_tech/core/widgets/app_gap.dart';
 import 'package:ed_tech/core/widgets/switch_botton_widget.dart';
@@ -37,11 +40,11 @@ class _SignUpContent extends StatelessWidget {
         padding: AppPad.h22v10,
         child: SingleChildScrollView(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            spacing: height_30,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            spacing: 20,
             children: [
               Text('sign_up.title'.tr(), style: AppTextStyles.textHeader1),
-              AppGap.h100,
+              AppGap.h10,
               BlocBuilder<SignUpCubit, SignUpState>(
                 buildWhen: (previous, current) {
                   return current is CheckUsernameInProgress ||
@@ -53,6 +56,7 @@ class _SignUpContent extends StatelessWidget {
                     label: 'sign_up.username'.tr(),
                     controller: controller.usernameController,
                     hintText: "sign_up.enter_username".tr(),
+                    borderRadius: BorderRadius.circular(12),
                     validator: (text) {
                       // if (state is CheckUsernameSuccess) {
                       //   return state.isAvailable;
@@ -69,6 +73,8 @@ class _SignUpContent extends StatelessWidget {
                 label: 'sign_up.password'.tr(),
                 controller: controller.passwordController,
                 hintText: "sign_up.enter_password".tr(),
+                borderRadius: BorderRadius.circular(12),
+                isPassword: true,
                 suffixIcon: Text(
                   "sign_up.strong".tr(),
                   style: AppTextStyles.textContent3.copyWith(color: AppColors.limeGreen),
@@ -88,6 +94,7 @@ class _SignUpContent extends StatelessWidget {
                     label: 'Email',
                     controller: controller.emailController,
                     hintText: "sign_up.enter_email".tr(),
+                    borderRadius: BorderRadius.circular(12),
                     validator: (text) {
                       // if (state is CheckEmailSuccess) {
                       //   return state.isAvailable;
@@ -106,6 +113,23 @@ class _SignUpContent extends StatelessWidget {
                   SwitchBottomWidget(onChanged: (value) {}),
                 ],
               ),
+
+              ButtonWidget(
+                title: "sign_up.title".tr(),
+                backgroundColor: AppColors.primary,
+                padding: AppPad.v14,
+                boderRadius: BorderRadius.all(AppRadius.c16),
+                onPressed: () {
+                  controller.onSignUp(context);
+                },
+              ),
+
+              TextSpanWidget(
+                normalText: "${'login.connect_account_confirmation'.tr()} ",
+                clickableText: 'login.terms_and_conditions'.tr(),
+                onTap: () => Navigator.pushNamed(context, SignInScreen.routeName),
+                clickableTextStyle: TextStyle(color: AppColors.electricBlue),
+              ),
               AppGap.h100,
             ],
           ),
@@ -116,10 +140,7 @@ class _SignUpContent extends StatelessWidget {
     return Stack(
       children: [
         FunctionScreenTemplate(
-          titleButtonBottom: 'sign_up.title'.tr(),
-          onClickBottomButton: () {
-            controller.onSignUp(context);
-          },
+          isShowBottomButton: false,
           screen: contentWidget,
         ),
         if (state is SignUpInProgress)

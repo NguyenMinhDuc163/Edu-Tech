@@ -90,7 +90,7 @@ class _TextInputCustomState extends State<TextInputCustom> {
         TextFormField(
           controller: widget.controller,
           obscureText: widget.isPassword ? obscureText : false,
-          maxLines: widget.maxLines,
+          maxLines: widget.isPassword ? 1 : widget.maxLines,
           onTapOutside:
               (widget.onTapOutside != null)
                   ? (_) => widget.onTapOutside?.call()
@@ -113,16 +113,16 @@ class _TextInputCustomState extends State<TextInputCustom> {
                     ),
             filled: widget.fillColor,
             fillColor: AppColors.lightGray,
-            suffix: _buildSuffixIcon(),
-            focusedBorder: UnderlineInputBorder(
+            suffixIcon: _buildSuffixIcon(),
+            focusedBorder: OutlineInputBorder(
               borderSide: BorderSide(
-                color: isValid ? AppColors.limeGreen : AppColors.silverGray,
+                color: isValid ? AppColors.limeGreen : AppColors.colorB8B8D2,
                 width: 1,
               ),
               borderRadius: widget.borderRadius ?? BorderRadius.zero,
             ),
-            enabledBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: AppColors.silverGray, width: 1),
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: AppColors.colorB8B8D2, width: 1),
               borderRadius: widget.borderRadius ?? BorderRadius.zero,
             ),
           ),
@@ -137,17 +137,20 @@ class _TextInputCustomState extends State<TextInputCustom> {
         icon: Icon(
           obscureText ? Icons.visibility_off : Icons.visibility,
           color: Colors.grey,
+          size: 20,
         ),
         onPressed: () {
           setState(() {
             obscureText = !obscureText;
           });
         },
+        constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+        padding: EdgeInsets.zero,
       );
     } else if (isValid && widget.suffixIcon != null) {
       return widget.suffixIcon;
     } else if (isValid) {
-      return const Icon(Icons.done, color: Colors.green);
+      return const Icon(Icons.done, color: Colors.green, size: 20);
     }
 
     return null;

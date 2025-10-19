@@ -1,10 +1,10 @@
+import 'package:ed_tech/modules/auth/initial/screen/onboarding_screen.dart';
 import 'package:ed_tech/modules/auth/sign_in/screen/sign_in_screen.dart';
 import 'package:ed_tech/modules/dashboard/screen/dashboard_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ed_tech/init.dart';
-import 'package:ed_tech/modules/auth/login/screen/login_screen.dart';
 import 'package:ed_tech/modules/auth/sign_in/repository/sign_in_repo.dart';
-import 'package:ed_tech/modules/home/screen/home_screen.dart';
+import 'package:ed_tech/common/app_status.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -22,16 +22,15 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   void redirectIntroScreen() async {
-    String? token = context.read<SignInRepo>().authService.accessToken;
-    await Future.delayed(const Duration(seconds: 1));
+    await AppStatus.ensureInitialized();
+
     if (!mounted) return;
-    if(token != null) {
-      Navigator.of(context).pushNamed(DashboardScreen.routeName);
-    }else{
+
+    if (AppStatus.isFirstTimeAppLaunch) {
+      Navigator.pushNamed(context, OnboardingScreen.routeName);
+    } else {
       Navigator.of(context).pushNamed(SignInScreen.routeName);
-
     }
-
   }
 
   @override

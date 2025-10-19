@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:ed_tech/modules/auth/initial/screen/onboarding_screen.dart';
+import 'package:ed_tech/modules/dashboard/screen/dashboard_screen.dart';
 import 'package:ed_tech/modules/home/screen/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -35,7 +36,7 @@ class App extends StatelessWidget {
               listener: (context, state) {
                 if (state is SignInAuthenticated) {
                   NavigationService.navigatorKey.currentState
-                      ?.pushReplacementNamed(HomeScreen.routeName);
+                      ?.pushReplacementNamed(DashboardScreen.routeName);
                 } else if (state is SignInInitial) {
                   NavigationService.navigatorKey.currentState
                       ?.pushReplacementNamed(SplashScreen.routeName);

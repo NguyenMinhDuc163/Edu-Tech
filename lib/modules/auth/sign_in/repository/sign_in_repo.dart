@@ -1,3 +1,4 @@
+import 'package:ed_tech/common/app_event_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:ed_tech/core/constants/api_path.dart';
@@ -62,7 +63,7 @@ class SignInRepo {
 
       authService.logoutOnServer();
       authService.invalid();
-
+      AppEventService.didUserCompleteFirstExperience;
     } catch (e) {
       throw Exception('Lỗi đăng xuất: $e');
     }

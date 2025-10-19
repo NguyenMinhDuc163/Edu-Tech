@@ -1,10 +1,10 @@
 import 'package:ed_tech/init.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:ed_tech/common/widgets/images/custom_asset_svg_picture.dart';
-import 'package:ed_tech/modules/auth/login/screen/login_screen.dart';
 import 'package:ed_tech/modules/auth/sign_in/screen/sign_in_screen.dart';
 import 'package:ed_tech/modules/auth/sign_up/screen/sign_up_screen.dart';
 import 'package:ed_tech/modules/dashboard/screen/dashboard_screen.dart';
+import 'package:ed_tech/common/app_event_service.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -37,7 +37,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   ];
 
   void _onSkip() {
-    Navigator.pushReplacementNamed(context, DashboardScreen.routeName);
+    AppEventService.notifyUserStartExperience();
+    Navigator.pushReplacementNamed(context, SignInScreen.routeName);
+  }
+
+  void _onNavigateToSignIn({String type = "SI"}) {
+    AppEventService.notifyUserStartExperience();
+    if(type == 'SI'){
+      Navigator.pushNamed(context, SignInScreen.routeName);
+    }else{
+      Navigator.pushNamed(context, SignUpScreen.routeName);
+    }
   }
 
   @override
@@ -83,11 +93,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         side: BorderSide(color: AppColors.primary),
                         foregroundColor: AppColors.primary,
                       ),
-                      onPressed:
-                          () => Navigator.pushNamed(
-                            context,
-                            SignInScreen.routeName,
-                          ),
+                      onPressed: () => _onNavigateToSignIn(type: "SI"),
                       child: Text('onboarding.log_in'.tr()),
                     ),
                   ),
@@ -98,11 +104,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         backgroundColor: AppColors.primary,
                         foregroundColor: AppColors.white,
                       ),
-                      onPressed:
-                          () => Navigator.pushNamed(
-                            context,
-                            SignInScreen.routeName,
-                          ),
+                      onPressed: () => _onNavigateToSignIn(type: "SU"),
                       child: Text('onboarding.sign_up'.tr()),
                     ),
                   ),
