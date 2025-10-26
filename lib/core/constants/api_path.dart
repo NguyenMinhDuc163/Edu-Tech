@@ -24,6 +24,9 @@ class ApiPath {
   static const String checkUserName = '/auth/check-username-exist';
   static const String checkMail = '/auth/check-email-exist';
   static const String chatBot = '/chat';
+  static const String listQuiz = '/student/quiz/list';
+  static const String quizDetail = '/student/quiz/detail';
+  static const String submitQuiz = '/student/quiz/submit';
 }
 
 // TODO trong intercepter => ds api can truyen id

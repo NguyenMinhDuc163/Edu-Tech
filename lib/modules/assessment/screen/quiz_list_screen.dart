@@ -3,85 +3,95 @@ import 'package:ed_tech/core/theme/app_colors.dart';
 import 'package:ed_tech/core/theme/app_text_styles.dart';
 import 'package:ed_tech/core/theme/app_pad.dart';
 import 'package:ed_tech/modules/assessment/screen/quiz_detail_screen.dart';
+import 'package:ed_tech/modules/assessment/bloc/list_quiz_controller.dart';
+import 'package:ed_tech/modules/assessment/bloc/list_quiz_cubit.dart';
+import 'package:ed_tech/modules/assessment/models/quiz_model.dart';
+import 'package:ed_tech/modules/assessment/models/list_quiz_model.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../models/quiz_model.dart';
 import '../widgets/quiz_card_widget.dart';
 
 class QuizListScreen extends StatefulWidget {
   const QuizListScreen({super.key});
+
   static const String routeName = '/quizListScreen';
+
   @override
   State<QuizListScreen> createState() => _QuizListScreenState();
 }
 
 class _QuizListScreenState extends State<QuizListScreen> {
-  final List<QuizModel> recentQuizzes = [
-    const QuizModel(
-      id: '1',
-      title: 'Đề Toán',
-      type: 'Đề thi',
-      timeLimit: 0,
-      questionCount: 4,
-      status: QuizStatus.notTaken,
-      subject: 'Toán',
-    ),
-  ];
+  @override
+  void initState() {
+    super.initState();
 
-  final List<QuizModel> completedQuizzes = [
-    QuizModel(
-      id: '2',
-      title: 'Đề Văn',
-      type: 'Đề thi',
-      timeLimit: 0,
-      questionCount: 4,
-      status: QuizStatus.completed,
-      score: 0,
-      attempts: 1,
-      completedAt: DateTime.now().subtract(const Duration(minutes: 4)),
-      subject: 'Văn',
-    ),
-    QuizModel(
-      id: '3',
-      title: 'Đề Anh',
-      type: 'Đề thi',
-      timeLimit: 0,
-      questionCount: 4,
-      status: QuizStatus.completed,
-      score: 9,
-      attempts: 3,
-      completedAt: DateTime.now().subtract(const Duration(minutes: 6)),
-      subject: 'Anh',
-    ),
-  ];
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<ListQuizCubit>().getListQuiz();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return FunctionScreenTemplate(
-      actionsWidget: [
-        SvgPicture.asset(IconPath.iconRanking, width: 25, height: 25, color: AppColors.black50),
-      ],
-      isShowBottomButton: false,
-      screen: SingleChildScrollView(
-        padding: AppPad.a16,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (recentQuizzes.isNotEmpty) ...[
-              _buildSectionHeader('Gần đây'),
-              ...recentQuizzes.map(
-                (quiz) => QuizCardWidget(quiz: quiz, onTap: () => _onQuizTap(quiz)),
-              ),
-              const SizedBox(height: 20),
-            ],
+    return BlocListener<ListQuizCubit, ListQuizState>(
+      listener: (context, state) {
+        final controller = context.read<ListQuizController>();
 
-            if (completedQuizzes.isNotEmpty) ...[
-              _buildSectionHeader('Đã hoàn thành(${completedQuizzes.length})'),
-              ...completedQuizzes.map(
-                (quiz) => QuizCardWidget(quiz: quiz, onTap: () => _onQuizTap(quiz)),
-              ),
-            ],
-          ],
+        if (state is ListQuizInProgress) {
+          controller.setLoading(true);
+          controller.clearError();
+        } else if (state is ListQuizSuccess) {
+          controller.setLoading(false);
+
+          final quizzes =
+              state.data.data.map((datum) {
+                return QuizModel.fromDatum(datum);
+              }).toList();
+
+          controller.setQuizzes(quizzes);
+        } else if (state is ListQuizError || state is ListQuizFailure) {
+          controller.setLoading(false);
+          final errorMessage =
+              state is ListQuizError ? state.message : (state as ListQuizFailure).message;
+          controller.setError(errorMessage);
+        }
+      },
+      child: FunctionScreenTemplate(
+        actionsWidget: [
+          SvgPicture.asset(IconPath.iconRanking, width: 25, height: 25, color: AppColors.black50),
+        ],
+        isShowBottomButton: false,
+        screen: ValueListenableBuilder<bool>(
+          valueListenable: context.read<ListQuizController>().isLoading,
+          builder: (context, isLoading, child) {
+            if (isLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            return ValueListenableBuilder<List<QuizModel>>(
+              valueListenable: context.read<ListQuizController>().quizzes,
+              builder: (context, quizzes, child) {
+                if (quizzes.isEmpty) {
+                  return Center(
+                    child: Text('Chưa có bài kiểm tra nào', style: AppTextStyles.textStyleDefault),
+                  );
+                }
+
+                return SingleChildScrollView(
+                  padding: AppPad.a16,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildSectionHeader('Tất cả bài kiểm tra (${quizzes.length})'),
+                      ...quizzes.map(
+                        (quiz) => QuizCardWidget(quiz: quiz, onTap: () => _onQuizTap(quiz)),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
+          },
         ),
       ),
     );
@@ -101,6 +111,6 @@ class _QuizListScreenState extends State<QuizListScreen> {
   }
 
   void _onQuizTap(QuizModel quiz) {
-    Navigator.pushNamed(context, QuizDetailScreen.routeName);
+    Navigator.pushNamed(context, QuizDetailScreen.routeName, arguments: {'quiz': quiz});
   }
 }

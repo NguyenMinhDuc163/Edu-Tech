@@ -7,9 +7,12 @@ import '../models/quiz_result_model.dart';
 import '../widgets/quiz_result_overview.dart';
 import '../widgets/quiz_statistics_table.dart';
 import '../widgets/quiz_detailed_answers.dart';
+import 'quiz_result_detail_screen.dart';
+import 'package:flutter/material.dart';
 
 class QuizResultScreen extends StatefulWidget {
   const QuizResultScreen({super.key});
+
   static const String routeName = '/quiz-result';
 
   @override
@@ -17,7 +20,7 @@ class QuizResultScreen extends StatefulWidget {
 }
 
 class _QuizResultScreenState extends State<QuizResultScreen> {
-  late QuizResultModel result;
+  QuizResultModel? result;
 
   @override
   void initState() {
@@ -26,7 +29,6 @@ class _QuizResultScreenState extends State<QuizResultScreen> {
   }
 
   void _initializeResult() {
-    
     final questionResults = [
       QuestionResultModel(
         id: '1',
@@ -50,8 +52,7 @@ class _QuizResultScreenState extends State<QuizResultScreen> {
         isCorrect: true,
         userAnswer: 'Dart',
         correctAnswer: 'Dart',
-        explanation:
-            'Dart is the programming language used for Flutter development.',
+        explanation: 'Dart is the programming language used for Flutter development.',
       ),
       QuestionResultModel(
         id: '3',
@@ -69,18 +70,15 @@ class _QuizResultScreenState extends State<QuizResultScreen> {
       QuestionResultModel(
         id: '4',
         questionNumber: 4,
-        questionText:
-            'Explain the difference between StatelessWidget and StatefulWidget.',
+        questionText: 'Explain the difference between StatelessWidget and StatefulWidget.',
         questionType: QuestionType.essay,
         score: 2.4,
         maxScore: 2.5,
         isCorrect: true,
-        userAnswer:
-            'StatelessWidget is immutable while StatefulWidget can change its state.',
+        userAnswer: 'StatelessWidget is immutable while StatefulWidget can change its state.',
         correctAnswer:
             'StatelessWidget is immutable and cannot change its properties after creation, while StatefulWidget can change its state and rebuild when setState() is called.',
-        explanation:
-            'Good understanding of the basic concepts, but could be more detailed.',
+        explanation: 'Good understanding of the basic concepts, but could be more detailed.',
       ),
     ];
 
@@ -101,6 +99,10 @@ class _QuizResultScreenState extends State<QuizResultScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (result == null) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -123,28 +125,21 @@ class _QuizResultScreenState extends State<QuizResultScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            
-            QuizResultOverview(
-              result: result,
-              onViewDetails: () => _viewDetailedWork(),
-            ),
+            QuizResultOverview(result: result!, onViewDetails: () => _viewDetailedWork()),
 
             const SizedBox(height: 16),
 
-            
-            QuizStatisticsTable(result: result),
+            QuizStatisticsTable(result: result!),
 
             const SizedBox(height: 16),
 
-            
             QuizDetailedAnswers(
-              result: result,
+              result: result!,
               onQuestionTap: (question) => _viewQuestionDetail(question),
             ),
 
             const SizedBox(height: 20),
 
-            
             Padding(
               padding: AppPad.h16v20,
               child: Row(
@@ -157,15 +152,11 @@ class _QuizResultScreenState extends State<QuizResultScreen> {
                         foregroundColor: AppColors.color8F959E,
                         elevation: 0,
                         padding: AppPad.v12,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                       ),
                       child: Text(
                         'Làm lại',
-                        style: AppTextStyles.textContent2.copyWith(
-                          fontWeight: FontWeight.w500,
-                        ),
+                        style: AppTextStyles.textContent2.copyWith(fontWeight: FontWeight.w500),
                       ),
                     ),
                   ),
@@ -180,9 +171,7 @@ class _QuizResultScreenState extends State<QuizResultScreen> {
                         foregroundColor: AppColors.white,
                         elevation: 0,
                         padding: AppPad.v12,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                       ),
                       child: Text(
                         'Về trang chủ',
@@ -203,17 +192,10 @@ class _QuizResultScreenState extends State<QuizResultScreen> {
   }
 
   void _viewDetailedWork() {
-    
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Xem bài làm chi tiết'),
-        backgroundColor: AppColors.primary,
-      ),
-    );
+    Navigator.pushNamed(context, QuizResultDetailScreen.routeName, arguments: {'result': result});
   }
 
   void _viewQuestionDetail(QuestionResultModel question) {
-    
     showDialog(
       context: context,
       builder:
@@ -231,39 +213,29 @@ class _QuizResultScreenState extends State<QuizResultScreen> {
                 if (question.userAnswer != null) ...[
                   Text(
                     'Câu trả lời của bạn:',
-                    style: AppTextStyles.textContent3.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: AppTextStyles.textContent3.copyWith(fontWeight: FontWeight.w600),
                   ),
                   Text(
                     question.userAnswer!,
-                    style: AppTextStyles.textContent3.copyWith(
-                      color: AppColors.primary,
-                    ),
+                    style: AppTextStyles.textContent3.copyWith(color: AppColors.primary),
                   ),
                   const SizedBox(height: 8),
                 ],
                 if (question.correctAnswer != null) ...[
                   Text(
                     'Đáp án đúng:',
-                    style: AppTextStyles.textContent3.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: AppTextStyles.textContent3.copyWith(fontWeight: FontWeight.w600),
                   ),
                   Text(
                     question.correctAnswer!,
-                    style: AppTextStyles.textContent3.copyWith(
-                      color: AppColors.success,
-                    ),
+                    style: AppTextStyles.textContent3.copyWith(color: AppColors.success),
                   ),
                   const SizedBox(height: 8),
                 ],
                 if (question.explanation != null) ...[
                   Text(
                     'Giải thích:',
-                    style: AppTextStyles.textContent3.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: AppTextStyles.textContent3.copyWith(fontWeight: FontWeight.w600),
                   ),
                   Text(
                     question.explanation!,
@@ -286,32 +258,19 @@ class _QuizResultScreenState extends State<QuizResultScreen> {
   }
 
   void _shareResult() {
-    
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Chia sẻ kết quả bài thi'),
-        backgroundColor: AppColors.success,
-      ),
+      SnackBar(content: Text('Chia sẻ kết quả bài thi'), backgroundColor: AppColors.success),
     );
   }
 
   void _retakeQuiz() {
-    
     Navigator.pop(context);
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Bắt đầu làm lại bài thi'),
-        backgroundColor: AppColors.primary,
-      ),
+      SnackBar(content: Text('Bắt đầu làm lại bài thi'), backgroundColor: AppColors.primary),
     );
   }
 
   void _goToHome() {
-    
-    Navigator.pushNamedAndRemoveUntil(
-      context,
-      DashboardScreen.routeName, 
-      (route) => false, 
-    );
+    Navigator.pushNamedAndRemoveUntil(context, DashboardScreen.routeName, (route) => false);
   }
 }

@@ -2,12 +2,12 @@ import 'package:ed_tech/init.dart';
 import 'package:ed_tech/core/theme/app_colors.dart';
 import 'package:ed_tech/core/theme/app_text_styles.dart';
 import 'package:ed_tech/core/theme/app_pad.dart';
-import 'package:ed_tech/modules/assessment/screen/quiz_result_screen.dart';
 import 'package:ed_tech/modules/assessment/screen/quiz_taking_screen.dart';
-import '../models/quiz_model.dart';
-import '../models/quiz_attempt_model.dart';
+import 'package:ed_tech/modules/assessment/bloc/quiz_detail_controller.dart';
+import 'package:ed_tech/modules/assessment/models/quiz_model.dart';
+import 'package:flutter/material.dart';
+import 'package:disposable_provider/disposable_provider.dart';
 import '../widgets/quiz_info_section.dart';
-import '../widgets/quiz_attempt_card.dart';
 
 class QuizDetailScreen extends StatefulWidget {
   const QuizDetailScreen({super.key});
@@ -18,90 +18,78 @@ class QuizDetailScreen extends StatefulWidget {
 }
 
 class _QuizDetailScreenState extends State<QuizDetailScreen> {
-  
-  late QuizModel quiz;
-  late QuizAttemptModel lastAttempt;
+  late final QuizDetailController controller;
+  bool _isInitialized = false;
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!mounted || _isInitialized) return;
+
+    controller = DisposableProvider.of<QuizDetailController>(context);
+    _isInitialized = true;
     _initializeData();
   }
 
   void _initializeData() {
-    
-    quiz = const QuizModel(
-      id: '3',
-      title: 'Đề Anh',
-      type: 'Đề thi',
-      timeLimit: 40,
-      questionCount: 4,
-      status: QuizStatus.completed,
-      subject: 'Anh',
-    );
+    final args = ModalRoute.of(context)?.settings.arguments;
 
-    
-    lastAttempt = QuizAttemptModel(
-      id: '1',
-      quizId: '3',
-      totalScore: 9.9,
-      correctAnswers: 3,
-      totalQuestions: 4,
-      timeTaken: 1,
-      completedAt: DateTime(2025, 9, 3, 15, 12),
-      questionAttempts: [],
-    );
+    if (args != null && args is Map<String, dynamic>) {
+      final quiz = args['quiz'] as QuizModel?;
+
+      if (quiz != null) {
+        controller.setQuiz(quiz);
+      }
+    }
+
+    if (controller.quiz == null) {
+      controller.setQuiz(
+        const QuizModel(
+          id: '3',
+          title: 'Bài kiểm tra trắc nghiệm JavaScript',
+          type: 'ASSIGNMENT',
+          timeLimit: 40,
+          questionCount: 4,
+          status: QuizStatus.completed,
+          subject: 'JavaScript',
+        ),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return FunctionScreenTemplate(
-      isShowBottomButton: false,
-      screen: SingleChildScrollView(
-        padding: AppPad.a16,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            
-            QuizInfoSection(quiz: quiz, onStartQuiz: _onStartQuiz),
+    return ValueListenableBuilder<QuizModel?>(
+      valueListenable: controller.selectedQuiz,
+      builder: (context, quiz, child) {
+        if (quiz == null) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-            const SizedBox(height: 24),
-
-            
-            _buildTestHistorySection(),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTestHistorySection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        
-        Text(
-          'Lịch sử làm bài',
-          style: AppTextStyles.textStyleDefaultBold.copyWith(
-            fontSize: 18,
-            color: AppColors.raisinBlack,
+        return FunctionScreenTemplate(
+          isShowBottomButton: false,
+          screen: SingleChildScrollView(
+            padding: AppPad.a16,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                QuizInfoSection(quiz: quiz, onStartQuiz: _onStartQuiz),
+              ],
+            ),
           ),
-        ),
-
-        const SizedBox(height: 16),
-
-        
-        QuizAttemptCard(attempt: lastAttempt, onViewDetails: _onViewDetails),
-      ],
+        );
+      },
     );
   }
 
   void _onStartQuiz() {
-    Navigator.pushNamed(context, QuizTakingScreen.routeName);
-
-  }
-
-  void _onViewDetails() {
-    Navigator.pushNamed(context, QuizResultScreen.routeName);
+    final quiz = controller.quiz;
+    if (quiz != null) {
+      Navigator.pushNamed(
+        context,
+        QuizTakingScreen.routeName,
+        arguments: {'quiz': quiz},
+      );
+    }
   }
 }

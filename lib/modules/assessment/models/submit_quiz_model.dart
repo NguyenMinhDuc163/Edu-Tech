@@ -7,13 +7,13 @@ class SubmitQuizModel {
 
   final num? status;
   final String? message;
-  final SubmitQuizModelData? data;
+  final Data? data;
 
-  factory SubmitQuizModel.fromJson(Map<String, dynamic> json){
+  factory SubmitQuizModel.fromJson(Map<String, dynamic> json) {
     return SubmitQuizModel(
       status: json["status"],
       message: json["message"],
-      data: json["data"] == null ? null : SubmitQuizModelData.fromJson(json["data"]),
+      data: json["data"] == null ? null : Data.fromJson(json["data"]),
     );
   }
 
@@ -24,48 +24,13 @@ class SubmitQuizModel {
   };
 
   @override
-  String toString(){
+  String toString() {
     return "$status, $message, $data, ";
   }
 }
 
-class SubmitQuizModelData {
-  SubmitQuizModelData({
-    required this.code,
-    required this.message,
-    required this.data,
-    required this.error,
-  });
-
-  final num? code;
-  final String? message;
-  final DataData? data;
-  final dynamic error;
-
-  factory SubmitQuizModelData.fromJson(Map<String, dynamic> json){
-    return SubmitQuizModelData(
-      code: json["code"],
-      message: json["message"],
-      data: json["data"] == null ? null : DataData.fromJson(json["data"]),
-      error: json["error"],
-    );
-  }
-
-  Map<String, dynamic> toJson() => {
-    "code": code,
-    "message": message,
-    "data": data?.toJson(),
-    "error": error,
-  };
-
-  @override
-  String toString(){
-    return "$code, $message, $data, $error, ";
-  }
-}
-
-class DataData {
-  DataData({
+class Data {
+  Data({
     required this.attemptId,
     required this.quizId,
     required this.score,
@@ -89,8 +54,8 @@ class DataData {
   final num? correctAnswers;
   final List<QuestionResult> questionResults;
 
-  factory DataData.fromJson(Map<String, dynamic> json){
-    return DataData(
+  factory Data.fromJson(Map<String, dynamic> json) {
+    return Data(
       attemptId: json["attemptId"],
       quizId: json["quizId"],
       score: json["score"],
@@ -100,7 +65,12 @@ class DataData {
       submittedAt: DateTime.tryParse(json["submittedAt"] ?? ""),
       totalQuestions: json["totalQuestions"],
       correctAnswers: json["correctAnswers"],
-      questionResults: json["questionResults"] == null ? [] : List<QuestionResult>.from(json["questionResults"]!.map((x) => QuestionResult.fromJson(x))),
+      questionResults:
+          json["questionResults"] == null
+              ? []
+              : List<QuestionResult>.from(
+                json["questionResults"]!.map((x) => QuestionResult.fromJson(x)),
+              ),
     );
   }
 
@@ -118,7 +88,7 @@ class DataData {
   };
 
   @override
-  String toString(){
+  String toString() {
     return "$attemptId, $quizId, $score, $isPassed, $passingScore, $timeSpentMinutes, $submittedAt, $totalQuestions, $correctAnswers, $questionResults, ";
   }
 }
@@ -140,11 +110,14 @@ class QuestionResult {
   final bool? isCorrect;
   final String? pointsEarned;
 
-  factory QuestionResult.fromJson(Map<String, dynamic> json){
+  factory QuestionResult.fromJson(Map<String, dynamic> json) {
     return QuestionResult(
       questionId: json["questionId"],
       questionText: json["questionText"],
-      userAnswer: json["userAnswer"] == null ? null : UserAnswer.fromJson(json["userAnswer"]),
+      userAnswer:
+          json["userAnswer"] == null
+              ? null
+              : UserAnswer.fromJson(json["userAnswer"]),
       correctAnswerId: json["correctAnswerId"],
       isCorrect: json["isCorrect"],
       pointsEarned: json["pointsEarned"],
@@ -161,21 +134,18 @@ class QuestionResult {
   };
 
   @override
-  String toString(){
+  String toString() {
     return "$questionId, $questionText, $userAnswer, $correctAnswerId, $isCorrect, $pointsEarned, ";
   }
 }
 
 class UserAnswer {
-  UserAnswer({
-    required this.answerId,
-    required this.textAnswer,
-  });
+  UserAnswer({required this.answerId, required this.textAnswer});
 
-  final dynamic answerId;
+  final String? answerId;
   final dynamic textAnswer;
 
-  factory UserAnswer.fromJson(Map<String, dynamic> json){
+  factory UserAnswer.fromJson(Map<String, dynamic> json) {
     return UserAnswer(
       answerId: json["answerId"],
       textAnswer: json["textAnswer"],
@@ -188,7 +158,7 @@ class UserAnswer {
   };
 
   @override
-  String toString(){
+  String toString() {
     return "$answerId, $textAnswer, ";
   }
 }

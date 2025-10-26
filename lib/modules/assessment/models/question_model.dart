@@ -1,9 +1,12 @@
+import 'package:ed_tech/modules/assessment/models/detail_quiz_model.dart'
+    as detail_model;
+
 class QuestionModel {
   final String id;
   final String questionText;
   final List<AnswerModel> answers;
   final String? explanation;
-  final int timeLimit; 
+  final int timeLimit;
 
   const QuestionModel({
     required this.id,
@@ -37,7 +40,7 @@ class QuizSessionModel {
   final String id;
   final String quizId;
   final List<QuestionModel> questions;
-  final Map<String, String?> userAnswers; 
+  final Map<String, String?> userAnswers;
   final DateTime startTime;
   final int currentQuestionIndex;
 
@@ -56,7 +59,11 @@ class QuizSessionModel {
   int get totalQuestions => questions.length;
   int get answeredQuestions =>
       userAnswers.values.where((answer) => answer != null).length;
-  double get progress => answeredQuestions / totalQuestions;
+  double get progress {
+    if (totalQuestions == 0) return 0.0;
+    final p = answeredQuestions / totalQuestions;
+    return p.clamp(0.0, 1.0);
+  }
 
   QuizSessionModel copyWith({
     String? id,
@@ -73,6 +80,28 @@ class QuizSessionModel {
       userAnswers: userAnswers ?? this.userAnswers,
       startTime: startTime ?? this.startTime,
       currentQuestionIndex: currentQuestionIndex ?? this.currentQuestionIndex,
+    );
+  }
+}
+
+/// Extension để convert từ API model sang UI model
+extension QuestionModelExtension on detail_model.Question {
+  QuestionModel toQuestionModel() {
+    return QuestionModel(
+      id: questionId ?? '',
+      questionText: questionText ?? '',
+      answers:
+          answers
+              .map(
+                (ans) => AnswerModel(
+                  id: ans.answerId ?? '',
+                  text: ans.content ?? '',
+                  isCorrect:
+                      false, // API không trả về đáp án đúng, mặc định false
+                ),
+              )
+              .toList(),
+      timeLimit: (timeLimitSec ?? 0).toInt(),
     );
   }
 }

@@ -7,13 +7,13 @@ class DetailQuizModel {
 
   final num? status;
   final String? message;
-  final DetailQuizModelData? data;
+  final Data? data;
 
   factory DetailQuizModel.fromJson(Map<String, dynamic> json){
     return DetailQuizModel(
       status: json["status"],
       message: json["message"],
-      data: json["data"] == null ? null : DetailQuizModelData.fromJson(json["data"]),
+      data: json["data"] == null ? null : Data.fromJson(json["data"]),
     );
   }
 
@@ -29,43 +29,8 @@ class DetailQuizModel {
   }
 }
 
-class DetailQuizModelData {
-  DetailQuizModelData({
-    required this.code,
-    required this.message,
-    required this.data,
-    required this.error,
-  });
-
-  final num? code;
-  final String? message;
-  final DataData? data;
-  final dynamic error;
-
-  factory DetailQuizModelData.fromJson(Map<String, dynamic> json){
-    return DetailQuizModelData(
-      code: json["code"],
-      message: json["message"],
-      data: json["data"] == null ? null : DataData.fromJson(json["data"]),
-      error: json["error"],
-    );
-  }
-
-  Map<String, dynamic> toJson() => {
-    "code": code,
-    "message": message,
-    "data": data?.toJson(),
-    "error": error,
-  };
-
-  @override
-  String toString(){
-    return "$code, $message, $data, $error, ";
-  }
-}
-
-class DataData {
-  DataData({
+class Data {
+  Data({
     required this.attemptId,
     required this.quizInfo,
     required this.questions,
@@ -75,8 +40,8 @@ class DataData {
   final QuizInfo? quizInfo;
   final List<Question> questions;
 
-  factory DataData.fromJson(Map<String, dynamic> json){
-    return DataData(
+  factory Data.fromJson(Map<String, dynamic> json){
+    return Data(
       attemptId: json["attemptId"],
       quizInfo: json["quizInfo"] == null ? null : QuizInfo.fromJson(json["quizInfo"]),
       questions: json["questions"] == null ? [] : List<Question>.from(json["questions"]!.map((x) => Question.fromJson(x))),

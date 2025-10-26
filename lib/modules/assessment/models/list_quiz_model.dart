@@ -7,60 +7,28 @@ class ListQuizModel {
 
   final num? status;
   final String? message;
-  final Data? data;
+  final List<Datum> data;
 
-  factory ListQuizModel.fromJson(Map<String, dynamic> json){
+  factory ListQuizModel.fromJson(Map<String, dynamic> json) {
     return ListQuizModel(
       status: json["status"],
       message: json["message"],
-      data: json["data"] == null ? null : Data.fromJson(json["data"]),
+      data:
+          json["data"] == null
+              ? []
+              : List<Datum>.from(json["data"]!.map((x) => Datum.fromJson(x))),
     );
   }
 
   Map<String, dynamic> toJson() => {
     "status": status,
     "message": message,
-    "data": data?.toJson(),
+    "data": data.map((x) => x.toJson()).toList(),
   };
 
   @override
-  String toString(){
+  String toString() {
     return "$status, $message, $data, ";
-  }
-}
-
-class Data {
-  Data({
-    required this.code,
-    required this.message,
-    required this.data,
-    required this.error,
-  });
-
-  final num? code;
-  final String? message;
-  final List<Datum> data;
-  final dynamic error;
-
-  factory Data.fromJson(Map<String, dynamic> json){
-    return Data(
-      code: json["code"],
-      message: json["message"],
-      data: json["data"] == null ? [] : List<Datum>.from(json["data"]!.map((x) => Datum.fromJson(x))),
-      error: json["error"],
-    );
-  }
-
-  Map<String, dynamic> toJson() => {
-    "code": code,
-    "message": message,
-    "data": data.map((x) => x?.toJson()).toList(),
-    "error": error,
-  };
-
-  @override
-  String toString(){
-    return "$code, $message, $data, $error, ";
   }
 }
 
@@ -89,7 +57,7 @@ class Datum {
   final bool? isRequired;
   final CourseInfo? courseInfo;
 
-  factory Datum.fromJson(Map<String, dynamic> json){
+  factory Datum.fromJson(Map<String, dynamic> json) {
     return Datum(
       quizId: json["quizId"],
       quizTitle: json["quizTitle"],
@@ -100,7 +68,10 @@ class Datum {
       startTime: json["startTime"],
       endTime: json["endTime"],
       isRequired: json["isRequired"],
-      courseInfo: json["courseInfo"] == null ? null : CourseInfo.fromJson(json["courseInfo"]),
+      courseInfo:
+          json["courseInfo"] == null
+              ? null
+              : CourseInfo.fromJson(json["courseInfo"]),
     );
   }
 
@@ -118,7 +89,7 @@ class Datum {
   };
 
   @override
-  String toString(){
+  String toString() {
     return "$quizId, $quizTitle, $quizDescription, $quizType, $passingScore, $maxAttempts, $startTime, $endTime, $isRequired, $courseInfo, ";
   }
 }
@@ -140,7 +111,7 @@ class CourseInfo {
   final String? lessonId;
   final String? lessonTitle;
 
-  factory CourseInfo.fromJson(Map<String, dynamic> json){
+  factory CourseInfo.fromJson(Map<String, dynamic> json) {
     return CourseInfo(
       courseId: json["courseId"],
       courseTitle: json["courseTitle"],
@@ -161,7 +132,7 @@ class CourseInfo {
   };
 
   @override
-  String toString(){
+  String toString() {
     return "$courseId, $courseTitle, $sectionId, $sectionTitle, $lessonId, $lessonTitle, ";
   }
 }

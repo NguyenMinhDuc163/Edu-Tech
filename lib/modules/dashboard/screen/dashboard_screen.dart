@@ -4,7 +4,9 @@ import 'package:ed_tech/core/constants/icon_path.dart';
 import 'package:ed_tech/core/theme/app_colors.dart';
 import 'package:ed_tech/core/widgets/drawer_widget.dart';
 import 'package:ed_tech/data/api_client.dart';
-import 'package:ed_tech/modules/assessment/bloc/quiz_controller.dart';
+import 'package:ed_tech/modules/assessment/bloc/list_quiz_controller.dart';
+import 'package:ed_tech/modules/assessment/bloc/list_quiz_cubit.dart';
+import 'package:ed_tech/modules/assessment/repository/quiz_repo.dart';
 import 'package:ed_tech/modules/assessment/screen/quiz_list_screen.dart';
 import 'package:ed_tech/modules/course/bloc/course_controller.dart';
 import 'package:ed_tech/modules/course/screen/course_screen.dart';
@@ -66,9 +68,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
       ),
     ),
-    DisposableProvider(
-      create: (_) => QuizController(),
-      child: QuizListScreen(),
+    RepositoryProvider(
+      create: (context) => QuizRepo(apiClient: ApiClient()),
+      child: BlocProvider(
+        create: (context) => ListQuizCubit(repo: context.read<QuizRepo>()),
+        child: DisposableProvider(
+          create: (_) => ListQuizController(),
+          child: QuizListScreen(),
+        ),
+      ),
     ),
   ];
 

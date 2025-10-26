@@ -3,8 +3,13 @@ import 'package:ed_tech/core/public/global_utils.dart';
 import 'package:ed_tech/core/theme/app_text_styles.dart';
 import 'package:ed_tech/core/widgets/template/function_screen_template.dart';
 import 'package:ed_tech/data/api_client.dart';
+import 'package:ed_tech/modules/assessment/bloc/quiz_detail_controller.dart';
+import 'package:ed_tech/modules/assessment/bloc/quiz_taking_controller.dart';
+import 'package:ed_tech/modules/assessment/bloc/quiz_taking_cubit.dart';
+import 'package:ed_tech/modules/assessment/repository/quiz_repo.dart';
 import 'package:ed_tech/modules/assessment/screen/quiz_detail_screen.dart';
 import 'package:ed_tech/modules/assessment/screen/quiz_result_screen.dart';
+import 'package:ed_tech/modules/assessment/screen/quiz_result_detail_screen.dart';
 import 'package:ed_tech/modules/assessment/screen/quiz_taking_screen.dart';
 import 'package:ed_tech/modules/auth/forgot_password/bloc/forgot_pass_controller.dart';
 import 'package:ed_tech/modules/auth/forgot_password/bloc/forgot_pass_cubit.dart';
@@ -285,17 +290,38 @@ class Routers {
       case QuizDetailScreen.routeName:
         return MaterialPageRoute(
           settings: settings,
-          builder: (_) => QuizDetailScreen(),
+          builder:
+              (_) => DisposableProvider(
+                create: (_) => QuizDetailController(),
+                child: QuizDetailScreen(),
+              ),
         );
       case QuizResultScreen.routeName:
         return MaterialPageRoute(
           settings: settings,
           builder: (_) => QuizResultScreen(),
         );
+      case QuizResultDetailScreen.routeName:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => QuizResultDetailScreen(),
+        );
       case QuizTakingScreen.routeName:
         return MaterialPageRoute(
           settings: settings,
-          builder: (_) => QuizTakingScreen(),
+          builder:
+              (context) => RepositoryProvider(
+                create: (context) => QuizRepo(apiClient: ApiClient()),
+                child: BlocProvider(
+                  create:
+                      (context) =>
+                          QuizTakingCubit(repo: context.read<QuizRepo>()),
+                  child: DisposableProvider(
+                    create: (_) => QuizTakingController(),
+                    child: QuizTakingScreen(),
+                  ),
+                ),
+              ),
         );
       case RankingScreen.routeName:
         return MaterialPageRoute(

@@ -1,14 +1,14 @@
 class QuizModel {
   final String id;
   final String title;
-  final String type; 
-  final int timeLimit; 
+  final String type;
+  final int timeLimit;
   final int questionCount;
   final QuizStatus status;
   final int? score;
   final int attempts;
   final DateTime? completedAt;
-  final String subject; 
+  final String subject;
 
   const QuizModel({
     required this.id,
@@ -54,6 +54,20 @@ class QuizModel {
     } else {
       return '${difference.inDays} ngày trước';
     }
+  }
+
+  // Factory method để chuyển đổi từ Datum (API response) sang QuizModel
+  static QuizModel fromDatum(dynamic datum) {
+    return QuizModel(
+      id: datum.quizId ?? '',
+      title: datum.quizTitle ?? '',
+      type: datum.quizType ?? 'ASSIGNMENT',
+      timeLimit: 0, // API không có thông tin timeLimit
+      questionCount: 0, // API không có thông tin số câu hỏi
+      status: QuizStatus.notTaken, // Mặc định chưa làm
+      attempts: 0, // Sẽ cần thêm thông tin này từ API nếu có
+      subject: datum.courseInfo?.courseTitle ?? '',
+    );
   }
 }
 

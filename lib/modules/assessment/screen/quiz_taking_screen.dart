@@ -3,12 +3,20 @@ import 'package:ed_tech/core/theme/app_colors.dart';
 import 'package:ed_tech/core/theme/app_text_styles.dart';
 import 'package:ed_tech/core/theme/app_pad.dart';
 import 'package:ed_tech/modules/assessment/screen/quiz_result_screen.dart';
+import 'package:ed_tech/modules/assessment/bloc/quiz_taking_controller.dart';
+import 'package:ed_tech/modules/assessment/bloc/quiz_taking_cubit.dart';
+import 'package:ed_tech/modules/assessment/models/quiz_model.dart';
+import 'package:ed_tech/modules/assessment/models/detail_quiz_model.dart' as detail;
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:disposable_provider/disposable_provider.dart';
 import '../models/question_model.dart';
 import '../widgets/question_card.dart';
 import '../widgets/quiz_progress_bar.dart';
 
 class QuizTakingScreen extends StatefulWidget {
   const QuizTakingScreen({super.key});
+
   static const String routeName = '/quiz-taking';
 
   @override
@@ -16,15 +24,19 @@ class QuizTakingScreen extends StatefulWidget {
 }
 
 class _QuizTakingScreenState extends State<QuizTakingScreen> {
-  late QuizSessionModel quizSession;
-  late Duration remainingTime;
-  late PageController pageController;
+  late final QuizTakingController controller;
+  late final PageController pageController;
+  bool _isInitialized = false;
 
   @override
-  void initState() {
-    super.initState();
-    _initializeQuiz();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!mounted || _isInitialized) return;
+
+    controller = DisposableProvider.of<QuizTakingController>(context);
     pageController = PageController();
+    _isInitialized = true;
+    _loadQuizData();
   }
 
   @override
@@ -33,83 +45,102 @@ class _QuizTakingScreenState extends State<QuizTakingScreen> {
     super.dispose();
   }
 
-  void _initializeQuiz() {
-    
-    final questions = [
-      QuestionModel(
-        id: '1',
-        questionText:
-            'Chọn đáp án đúng nhất cho câu hỏi: "What is the capital of Vietnam?"',
-        answers: [
-          AnswerModel(id: '1a', text: 'Ho Chi Minh City', isCorrect: false),
-          AnswerModel(id: '1b', text: 'Hanoi', isCorrect: true),
-          AnswerModel(id: '1c', text: 'Da Nang', isCorrect: false),
-          AnswerModel(id: '1d', text: 'Hue', isCorrect: false),
-        ],
-      ),
-      QuestionModel(
-        id: '2',
-        questionText:
-            'Which programming language is used for Flutter development?',
-        answers: [
-          AnswerModel(id: '2a', text: 'Java', isCorrect: false),
-          AnswerModel(id: '2b', text: 'Dart', isCorrect: true),
-          AnswerModel(id: '2c', text: 'Python', isCorrect: false),
-          AnswerModel(id: '2d', text: 'C++', isCorrect: false),
-        ],
-      ),
-      QuestionModel(
-        id: '3',
-        questionText:
-            'What is the main purpose of the setState() method in Flutter?',
-        answers: [
-          AnswerModel(
-            id: '3a',
-            text: 'To create new widgets',
-            isCorrect: false,
-          ),
-          AnswerModel(
-            id: '3b',
-            text: 'To update the UI when data changes',
-            isCorrect: true,
-          ),
-          AnswerModel(id: '3c', text: 'To handle user input', isCorrect: false),
-          AnswerModel(id: '3d', text: 'To manage app state', isCorrect: false),
-        ],
-      ),
-      QuestionModel(
-        id: '4',
-        questionText:
-            'Which widget is used to create a scrollable list in Flutter?',
-        answers: [
-          AnswerModel(id: '4a', text: 'Column', isCorrect: false),
-          AnswerModel(id: '4b', text: 'ListView', isCorrect: true),
-          AnswerModel(id: '4c', text: 'Container', isCorrect: false),
-          AnswerModel(id: '4d', text: 'Row', isCorrect: false),
-        ],
-      ),
-    ];
+  void _loadQuizData() {
+    final args = ModalRoute.of(context)?.settings.arguments as Map?;
+    final quiz = args?['quiz'] as QuizModel?;
 
-    quizSession = QuizSessionModel(
-      id: 'session_1',
-      quizId: 'quiz_1',
-      questions: questions,
-      userAnswers: {},
-      startTime: DateTime.now(),
-    );
-
-    
-    remainingTime = const Duration(minutes: 40);
+    if (quiz?.id != null) {
+      context.read<QuizTakingCubit>().getQuizDetail(quizId: quiz!.id);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    return BlocListener<QuizTakingCubit, QuizTakingState>(
+      listener: (context, state) {
+        if (state is QuizTakingInProgress) {
+          controller.setLoading(true);
+          controller.clearError();
+        } else if (state is QuizSubmitInProgress) {
+          controller.setLoading(true);
+          controller.clearError();
+        } else if (state is QuizSubmitSuccess) {
+          Navigator.pushNamed(context, QuizResultScreen.routeName);
+        } else if (state is QuizSubmitError) {
+          controller.setLoading(false);
+          controller.setError(state.message);
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.message), backgroundColor: AppColors.error));
+        } else if (state is QuizTakingSuccess) {
+          controller.setLoading(false);
+
+          final data = state.data.data;
+          if (data != null) {
+            final questions = data.questions.map((q) => q.toQuestionModel()).toList();
+
+            final quizSession = QuizSessionModel(
+              id: data.attemptId ?? 'attempt_${DateTime.now().millisecondsSinceEpoch}',
+              quizId: data.quizInfo?.quizId ?? '',
+              questions: questions,
+              userAnswers: {},
+              startTime: DateTime.now(),
+            );
+
+            controller.setQuizSession(quizSession);
+          }
+        } else if (state is QuizTakingError) {
+          controller.setLoading(false);
+          controller.setError(state.message);
+        }
+      },
+      child: ValueListenableBuilder<bool>(
+        valueListenable: controller.isLoading,
+        builder: (context, isLoading, child) {
+          if (isLoading) {
+            return Scaffold(
+              backgroundColor: AppColors.background,
+              appBar: AppBar(
+                backgroundColor: AppColors.white,
+                elevation: 0,
+                title: Text('Đang tải...', style: AppTextStyles.appbarTitle),
+              ),
+              body: const Center(child: CircularProgressIndicator()),
+            );
+          }
+
+          return ValueListenableBuilder<QuizSessionModel?>(
+            valueListenable: controller.quizSession,
+            builder: (context, quizSession, child) {
+              if (quizSession == null) {
+                return Scaffold(
+                  backgroundColor: AppColors.background,
+                  appBar: AppBar(
+                    backgroundColor: AppColors.white,
+                    elevation: 0,
+                    title: Text('Lỗi', style: AppTextStyles.appbarTitle),
+                  ),
+                  body: Center(
+                    child: Text('Không thể tải dữ liệu quiz', style: AppTextStyles.textContent2),
+                  ),
+                );
+              }
+
+              return _buildQuizContent(quizSession);
+            },
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildQuizContent(QuizSessionModel quizSession) {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: AppColors.white,
         elevation: 0,
-        title: Text('Đề Anh', style: AppTextStyles.appbarTitle),
+        title: Text('Đề thi', style: AppTextStyles.appbarTitle),
         centerTitle: true,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: AppColors.primary),
@@ -125,26 +156,20 @@ class _QuizTakingScreenState extends State<QuizTakingScreen> {
       ),
       body: Column(
         children: [
-          
           QuizProgressBar(
             progress: quizSession.progress,
             currentQuestion: quizSession.currentQuestionIndex + 1,
             totalQuestions: quizSession.totalQuestions,
-            remainingTime: remainingTime,
+            remainingTime: const Duration(minutes: 40),
             showTimer: true,
           ),
 
-          
           Expanded(
             child: PageView.builder(
               controller: pageController,
               itemCount: quizSession.questions.length,
               onPageChanged: (index) {
-                setState(() {
-                  quizSession = quizSession.copyWith(
-                    currentQuestionIndex: index,
-                  );
-                });
+                controller.updateCurrentQuestionIndex(index);
               },
               itemBuilder: (context, index) {
                 final question = quizSession.questions[index];
@@ -156,13 +181,12 @@ class _QuizTakingScreenState extends State<QuizTakingScreen> {
                   totalQuestions: quizSession.totalQuestions,
                   selectedAnswerId: selectedAnswer,
                   onAnswerSelected:
-                      (answerId) => _selectAnswer(question.id, answerId),
+                      (answerId) => controller.updateUserAnswer(question.id, answerId),
                 );
               },
             ),
           ),
 
-          
           Container(
             padding: AppPad.a16,
             decoration: BoxDecoration(
@@ -175,56 +199,54 @@ class _QuizTakingScreenState extends State<QuizTakingScreen> {
                 ),
               ],
             ),
-            child: Row(
-              children: [
-                
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed:
-                        quizSession.isFirstQuestion ? null : _previousQuestion,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.lightGray,
-                      foregroundColor: AppColors.color8F959E,
-                      elevation: 0,
-                      padding: AppPad.v12,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: Text(
-                      'Câu trước',
-                      style: AppTextStyles.textContent2.copyWith(
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ),
+            child: ValueListenableBuilder<QuizSessionModel?>(
+              valueListenable: controller.quizSession,
+              builder: (context, session, child) {
+                if (session == null) return const SizedBox.shrink();
 
-                const SizedBox(width: 16),
+                return Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: session.isFirstQuestion ? null : _previousQuestion,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.lightGray,
+                          foregroundColor: AppColors.color8F959E,
+                          elevation: 0,
+                          padding: AppPad.v12,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        ),
+                        child: Text(
+                          'Câu trước',
+                          style: AppTextStyles.textContent2.copyWith(fontWeight: FontWeight.w500),
+                        ),
+                      ),
+                    ),
 
-                
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: _nextOrSubmit,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: AppColors.white,
-                      elevation: 0,
-                      padding: AppPad.v12,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                    const SizedBox(width: 16),
+
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: _nextOrSubmit,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: AppColors.white,
+                          elevation: 0,
+                          padding: AppPad.v12,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        ),
+                        child: Text(
+                          session.isLastQuestion ? 'Nộp bài' : 'Câu sau',
+                          style: AppTextStyles.textContent2.copyWith(
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.white,
+                          ),
+                        ),
                       ),
                     ),
-                    child: Text(
-                      quizSession.isLastQuestion ? 'Nộp bài' : 'Câu sau',
-                      style: AppTextStyles.textContent2.copyWith(
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.white,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+                  ],
+                );
+              },
             ),
           ),
         ],
@@ -232,44 +254,28 @@ class _QuizTakingScreenState extends State<QuizTakingScreen> {
     );
   }
 
-  void _selectAnswer(String questionId, String answerId) {
-    setState(() {
-      final newAnswers = Map<String, String?>.from(quizSession.userAnswers);
-      newAnswers[questionId] = answerId;
-      quizSession = quizSession.copyWith(userAnswers: newAnswers);
-    });
-  }
-
   void _previousQuestion() {
-    if (!quizSession.isFirstQuestion) {
-      pageController.previousPage(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
-    }
+    pageController.previousPage(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
   }
 
   void _nextOrSubmit() {
-    if (quizSession.isLastQuestion) {
+    final session = controller.quizSession.value;
+    if (session?.isLastQuestion == true) {
       _submitQuiz();
     } else {
-      pageController.nextPage(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
+      pageController.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
     }
   }
 
   void _submitQuiz() {
-    
     showDialog(
       context: context,
       builder:
           (context) => AlertDialog(
-            title: Text(
-              'Nộp bài thi',
-              style: AppTextStyles.textStyleDefaultBold,
-            ),
+            title: Text('Nộp bài thi', style: AppTextStyles.textStyleDefaultBold),
             content: Text(
               'Bạn có chắc chắn muốn nộp bài thi? Sau khi nộp, bạn không thể thay đổi câu trả lời.',
               style: AppTextStyles.textContent2,
@@ -296,7 +302,21 @@ class _QuizTakingScreenState extends State<QuizTakingScreen> {
   }
 
   void _confirmSubmit() {
-    Navigator.pushNamed(context, QuizResultScreen.routeName);
+    final session = controller.quizSession.value;
+    if (session == null) return;
+
+    final answers =
+        session.userAnswers.entries
+            .where((entry) => entry.value != null)
+            .map((entry) => {'question_id': entry.key, 'answer_id': entry.value!})
+            .toList();
+
+    final args = ModalRoute.of(context)?.settings.arguments as Map?;
+    final quiz = args?['quiz'] as QuizModel?;
+
+    if (quiz?.id != null) {
+      context.read<QuizTakingCubit>().submitQuiz(quizId: quiz!.id, answers: answers);
+    }
   }
 
   void _showExitDialog() {
@@ -304,10 +324,7 @@ class _QuizTakingScreenState extends State<QuizTakingScreen> {
       context: context,
       builder:
           (context) => AlertDialog(
-            title: Text(
-              'Thoát bài thi',
-              style: AppTextStyles.textStyleDefaultBold,
-            ),
+            title: Text('Thoát bài thi', style: AppTextStyles.textStyleDefaultBold),
             content: Text(
               'Bạn có chắc chắn muốn thoát bài thi? Tiến độ hiện tại sẽ không được lưu.',
               style: AppTextStyles.textContent2,
