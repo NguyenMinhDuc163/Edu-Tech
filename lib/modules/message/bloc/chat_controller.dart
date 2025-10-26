@@ -2,14 +2,10 @@ import 'package:disposable_provider/disposable_provider.dart';
 import 'package:ed_tech/core/data_types.dart';
 
 class ChatController extends Disposable {
-  final BoolVs isTyping = BoolVs(false);
   final StringVs messageText = StringVs('');
   final BoolVs isBotResponding = BoolVs(false);
   final BoolVs isHistoryVisible = BoolVs(false);
-
-  void toggleTyping() {
-    isTyping.value = !isTyping.value;
-  }
+  final ListVs<ChatMessage> messages = ListVs<ChatMessage>([]);
 
   void updateMessageText(String text) {
     messageText.value = text;
@@ -27,11 +23,31 @@ class ChatController extends Disposable {
     messageText.value = '';
   }
 
+  void addMessage(ChatMessage message) {
+    messages.add(message);
+  }
+
+  void clearMessages() {
+    messages.clear();
+  }
+
   @override
   void dispose() {
-    isTyping.dispose();
     messageText.dispose();
     isBotResponding.dispose();
     isHistoryVisible.dispose();
+    messages.dispose();
   }
+}
+
+class ChatMessage {
+  final String content;
+  final bool isUser;
+  final DateTime timestamp;
+
+  ChatMessage({
+    required this.content,
+    required this.isUser,
+    required this.timestamp,
+  });
 }

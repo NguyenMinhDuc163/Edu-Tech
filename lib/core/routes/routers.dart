@@ -38,6 +38,9 @@ import 'package:ed_tech/modules/home/repository/home_repo.dart';
 import 'package:ed_tech/modules/home/screen/home_screen.dart';
 import 'package:ed_tech/modules/message/screen/chat_bot_screen.dart';
 import 'package:ed_tech/modules/message/screen/chat_history_screen.dart';
+import 'package:ed_tech/modules/message/bloc/chatbot_cubit.dart';
+import 'package:ed_tech/modules/message/bloc/chat_controller.dart';
+import 'package:ed_tech/modules/message/repository/chat_bot_repo.dart';
 import 'package:ed_tech/modules/payment/screen/address_form_screen.dart';
 import 'package:ed_tech/modules/payment/screen/confirm_screen.dart';
 import 'package:ed_tech/modules/payment/screen/new_card_screen.dart';
@@ -252,11 +255,6 @@ class Routers {
           settings: settings,
           builder: (_) => PaymentMethodScreen(),
         );
-      case ReviewScreen.routeName:
-        return MaterialPageRoute(
-          settings: settings,
-          builder: (_) => ReviewScreen(),
-        );
       case AddReviewScreen.routeName:
         return MaterialPageRoute(
           settings: settings,
@@ -265,7 +263,19 @@ class Routers {
       case ChatBotScreen.routeName:
         return MaterialPageRoute(
           settings: settings,
-          builder: (_) => ChatBotScreen(),
+          builder:
+              (context) => RepositoryProvider(
+                create: (context) => ChatBotRepo(apiClient: ApiClient()),
+                child: BlocProvider(
+                  create:
+                      (context) =>
+                          ChatbotCubit(repo: context.read<ChatBotRepo>()),
+                  child: DisposableProvider(
+                    create: (_) => ChatController(),
+                    child: ChatBotScreen(),
+                  ),
+                ),
+              ),
         );
       case ChatHistoryScreen.routeName:
         return MaterialPageRoute(
