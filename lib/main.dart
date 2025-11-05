@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:ed_tech/core/app_bloc_observer.dart';
 import 'package:ed_tech/data/services/auth_service.dart';
@@ -8,8 +9,17 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'firebase_options.dart';
 import 'modules/app.dart';
 
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+  }
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  HttpOverrides.global = MyHttpOverrides();
   Bloc.observer = AppBlocObserver();
   // await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await EasyLocalization.ensureInitialized();

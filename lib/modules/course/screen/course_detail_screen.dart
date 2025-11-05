@@ -1,11 +1,11 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ed_tech/modules/payment/screen/payment_method_screen.dart';
 import 'package:ed_tech/modules/reviews/screen/review_screen.dart';
-import 'package:flutter/material.dart';
 import 'package:ed_tech/init.dart';
 import 'package:ed_tech/modules/course/widgets/course_lesson_bottom_sheet.dart';
 import 'package:ed_tech/modules/course/bloc/course_cubit.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:video_player/video_player.dart';
+import 'package:chewie/chewie.dart';
 
 class CourseDetailScreen extends StatelessWidget {
   static const String routeName = '/CourseDetailScreen';
@@ -144,21 +144,21 @@ class _CourseDetailContent extends StatelessWidget {
     List<LessonData> lessons = [];
     for (var section in sections) {
       for (var content in section.contents) {
-        String duration = '0:00 mins';
         String? videoUrl;
-
-        for (var file in content.files) {
-          if (file.fileType == 'video' || file.url?.contains('youtube') == true) {
-            videoUrl = file.url;
-            break;
+        if (content.files.isNotEmpty) {
+          for (var file in content.files) {
+            if (file.fileType == 'video') {
+              videoUrl = file.url;
+              break;
+            }
           }
         }
 
         lessons.add(
           LessonData(
             id: content.contentId ?? '',
-            title: content.title ?? 'Untitled Lesson',
-            duration: duration,
+            title: content.title ?? '',
+            duration: '0:00',
             isCompleted: false,
             isLocked: !(content.isPreview ?? false),
             videoUrl: videoUrl,
@@ -174,9 +174,11 @@ class _CourseDetailContent extends StatelessWidget {
 
     for (var section in courseDetail.sections) {
       for (var content in section.contents) {
-        for (var file in content.files) {
-          if (file.fileType == 'video' || file.url?.contains('youtube') == true) {
-            return file.url;
+        if (content.files.isNotEmpty) {
+          for (var file in content.files) {
+            if (file.fileType == 'video') {
+              return file.url;
+            }
           }
         }
       }
@@ -184,53 +186,16 @@ class _CourseDetailContent extends StatelessWidget {
     return null;
   }
 
-  String _getYouTubeThumbnail(String videoUrl) {
-    String videoId = '';
-    if (videoUrl.contains('youtube.com/watch?v=')) {
-      videoId = videoUrl.split('v=')[1].split('&')[0];
-    } else if (videoUrl.contains('youtu.be/')) {
-      videoId = videoUrl.split('youtu.be/')[1].split('?')[0];
-    }
-
-    return 'https://img.youtube.com/vi/$videoId/maxresdefault.jpg';
-  }
-
-  void _playYouTubeVideo(BuildContext context, String videoUrl) {
-    String videoId = '';
-    if (videoUrl.contains('youtube.com/watch?v=')) {
-      videoId = videoUrl.split('v=')[1].split('&')[0];
-    } else if (videoUrl.contains('youtu.be/')) {
-      videoId = videoUrl.split('youtu.be/')[1].split('?')[0];
-    }
-
-    if (videoId.isNotEmpty) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => _YouTubePlayerScreen(videoId: videoId)),
-      );
-    }
-  }
-
-  void _playLessonVideo(LessonData lesson, BuildContext context) {
-    print('🎬 Playing lesson from preview: ${lesson.title}');
-    print('🎬 Lesson videoUrl: ${lesson.videoUrl}');
-
-    if (lesson.videoUrl != null && lesson.videoUrl!.isNotEmpty) {
-      print('🎬 Opening video: ${lesson.videoUrl}');
-      _playYouTubeVideo(context, lesson.videoUrl!);
-    } else {
-      showDialog(
-        context: context,
-        builder:
-            (context) => AlertDialog(
-              title: Text(lesson.title),
-              content: const Text('Video không khả dụng'),
-              actions: [
-                TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Đóng')),
-              ],
-            ),
-      );
-    }
+  void _playVideo(BuildContext context, String videoUrl, String title) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => _VideoPlayerScreen(
+          videoUrl: videoUrl,
+          title: title,
+        ),
+      ),
+    );
   }
 
   @override
@@ -249,136 +214,13 @@ class _CourseDetailContent extends StatelessWidget {
 
   Widget _buildVideoPlayerSection(BuildContext context) {
     String? videoUrl = _getFirstVideoUrl();
+    String? thumbnail = courseDetail?.thumbnailUrl ?? imageUrl;
 
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.4,
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFFFFEBF0), Color(0xFFFFF0F5)],
-        ),
-      ),
-      child: Stack(
-        children: [
-          Positioned(
-            top: 50,
-            left: 20,
-            child: GestureDetector(
-              onTap: () => Navigator.of(context).pop(),
-              child: Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.3),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: const Icon(Icons.arrow_back, color: Colors.white, size: 20),
-              ),
-            ),
-          ),
-
-          Center(
-            child: GestureDetector(
-              onTap: videoUrl != null ? () => _playYouTubeVideo(context, videoUrl) : null,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 200,
-                    height: 200,
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(100),
-                    ),
-                    child:
-                        videoUrl != null
-                            ? Stack(
-                              children: [
-                                const Center(
-                                  child: Icon(
-                                    Icons.play_circle_fill,
-                                    size: 80,
-                                    color: AppColors.primary,
-                                  ),
-                                ),
-                              ],
-                            )
-                            : const Icon(
-                              Icons.play_circle_outline,
-                              size: 80,
-                              color: AppColors.primary,
-                            ),
-                  ),
-
-                  const SizedBox(height: 20),
-                ],
-              ),
-            ),
-          ),
-
-          Positioned(
-            bottom: 20,
-            left: 20,
-            right: 20,
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      '4:10',
-                      style: AppTextStyles.textContent3.copyWith(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    Text(
-                      '6:10',
-                      style: AppTextStyles.textContent3.copyWith(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Container(
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.3),
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                  child: FractionallySizedBox(
-                    alignment: Alignment.centerLeft,
-                    widthFactor: 0.68,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: AppColors.colorFF6905,
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          Positioned(
-            bottom: 20,
-            right: 20,
-            child: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.3),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: const Icon(Icons.fullscreen, color: Colors.white, size: 20),
-            ),
-          ),
-        ],
-      ),
+    return _InlineVideoPlayer(
+      videoUrl: videoUrl,
+      thumbnail: thumbnail,
+      title: title,
+      onBack: () => Navigator.of(context).pop(),
     );
   }
 
@@ -542,6 +384,11 @@ class _CourseDetailContent extends StatelessWidget {
   }
 
   Widget _buildLessonsPreviewSection(BuildContext context) {
+    final sections = courseDetail?.sections ?? [];
+    final totalLessons = _getTotalLessonsCount(sections);
+    final sectionsToShow = totalLessons > 5 ? sections.take(2).toList() : sections;
+    final hasMore = totalLessons > 5;
+
     return Padding(
       padding: AppPad.h24.add(const EdgeInsets.only(top: 20)),
       child: Column(
@@ -550,95 +397,43 @@ class _CourseDetailContent extends StatelessWidget {
           Text('Lessons', style: AppTextStyles.textHeader3.copyWith(fontWeight: FontWeight.bold)),
           const SizedBox(height: 16),
 
-          ..._getLessonsFromApi(
-            courseDetail?.sections ?? [],
-          ).take(3).map((lesson) => _buildLessonItem(lesson, context)),
+          ...sectionsToShow.map((section) => _SectionItem(
+            section: section,
+            onPlayVideo: (videoUrl, title) => _playVideo(context, videoUrl, title),
+          )),
 
-          const SizedBox(height: 16),
-
-          GestureDetector(
-            onTap: () => _showLessonBottomSheet(context),
-            child: Container(
-              width: double.infinity,
-              padding: AppPad.v12,
-              decoration: BoxDecoration(
-                border: Border.all(color: AppColors.primary),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                'View All Lessons',
-                textAlign: TextAlign.center,
-                style: AppTextStyles.textButton.copyWith(color: AppColors.primary),
+          if (hasMore) ...[
+            const SizedBox(height: 16),
+            GestureDetector(
+              onTap: () => _showLessonBottomSheet(context),
+              child: Container(
+                width: double.infinity,
+                padding: AppPad.v12,
+                decoration: BoxDecoration(
+                  border: Border.all(color: AppColors.primary),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  'View All Lessons',
+                  textAlign: TextAlign.center,
+                  style: AppTextStyles.textButton.copyWith(color: AppColors.primary),
+                ),
               ),
             ),
-          ),
+          ],
         ],
       ),
     );
   }
 
-  Widget _buildLessonItem(LessonData lesson, BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: AppColors.lightGray,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Center(
-              child: Text(
-                lesson.id.padLeft(2, '0'),
-                style: AppTextStyles.textContent2.copyWith(
-                  color: AppColors.color8F959E,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-
-          const SizedBox(width: 16),
-
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  lesson.title,
-                  style: AppTextStyles.textContent1.copyWith(fontWeight: FontWeight.w500),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  lesson.duration,
-                  style: AppTextStyles.textContent3.copyWith(color: AppColors.color8F959E),
-                ),
-              ],
-            ),
-          ),
-
-          GestureDetector(
-            onTap: lesson.isLocked ? null : () => _playLessonVideo(lesson, context),
-            child: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: lesson.isLocked ? AppColors.lightGray : AppColors.primary,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Icon(
-                lesson.isLocked ? Icons.lock : Icons.play_arrow,
-                color: AppColors.white,
-                size: 20,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+  int _getTotalLessonsCount(List sections) {
+    int count = 0;
+    for (var section in sections) {
+      count += (section.contents as List).length;
+    }
+    return count;
   }
+
 }
 
 class LessonData {
@@ -659,30 +454,253 @@ class LessonData {
   });
 }
 
-class _YouTubePlayerScreen extends StatefulWidget {
-  final String videoId;
+class _InlineVideoPlayer extends StatefulWidget {
+  final String? videoUrl;
+  final String? thumbnail;
+  final String title;
+  final VoidCallback onBack;
 
-  const _YouTubePlayerScreen({required this.videoId});
+  const _InlineVideoPlayer({
+    required this.videoUrl,
+    required this.thumbnail,
+    required this.title,
+    required this.onBack,
+  });
 
   @override
-  State<_YouTubePlayerScreen> createState() => _YouTubePlayerScreenState();
+  State<_InlineVideoPlayer> createState() => _InlineVideoPlayerState();
 }
 
-class _YouTubePlayerScreenState extends State<_YouTubePlayerScreen> {
-  late YoutubePlayerController _controller;
+class _InlineVideoPlayerState extends State<_InlineVideoPlayer> {
+  VideoPlayerController? _videoPlayerController;
+  ChewieController? _chewieController;
+  bool _isPlaying = false;
 
   @override
-  void initState() {
-    super.initState();
-    _controller = YoutubePlayerController(
-      initialVideoId: widget.videoId,
-      flags: const YoutubePlayerFlags(autoPlay: true, mute: false, isLive: false),
+  void dispose() {
+    _videoPlayerController?.dispose();
+    _chewieController?.dispose();
+    super.dispose();
+  }
+
+  Future<void> _initializePlayer() async {
+    if (widget.videoUrl == null) return;
+
+    _videoPlayerController = VideoPlayerController.networkUrl(
+      Uri.parse(widget.videoUrl!),
+    );
+
+    await _videoPlayerController!.initialize();
+
+    _chewieController = ChewieController(
+      videoPlayerController: _videoPlayerController!,
+      autoPlay: true,
+      looping: false,
+      allowFullScreen: false,
+      allowMuting: true,
+      showControls: true,
+      materialProgressColors: ChewieProgressColors(
+        playedColor: AppColors.colorFF6905,
+        handleColor: AppColors.colorFF6905,
+        backgroundColor: Colors.grey,
+        bufferedColor: AppColors.colorFF6905.withOpacity(0.3),
+      ),
+      autoInitialize: true,
+    );
+
+    setState(() {
+      _isPlaying = true;
+    });
+  }
+
+  void _openFullscreenPlayer(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => _VideoPlayerScreen(
+          videoUrl: widget.videoUrl!,
+          title: widget.title,
+        ),
+      ),
     );
   }
 
   @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.4,
+      color: Colors.black,
+      child: Stack(
+        children: [
+          if (_isPlaying && _chewieController != null)
+            Positioned.fill(
+              child: Chewie(controller: _chewieController!),
+            )
+          else
+            Positioned.fill(
+              child: widget.thumbnail != null
+                  ? Image.network(
+                      widget.thumbnail!,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          decoration: const BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [Color(0xFFFFEBF0), Color(0xFFFFF0F5)],
+                            ),
+                          ),
+                        );
+                      },
+                    )
+                  : Container(
+                      decoration: const BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [Color(0xFFFFEBF0), Color(0xFFFFF0F5)],
+                        ),
+                      ),
+                    ),
+            ),
+
+          if (!_isPlaying)
+            Positioned.fill(
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.black.withOpacity(0.3),
+                      Colors.transparent,
+                      Colors.black.withOpacity(0.5),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+          Positioned(
+            top: 50,
+            left: 20,
+            child: GestureDetector(
+              onTap: widget.onBack,
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.5),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: const Icon(Icons.arrow_back, color: Colors.white, size: 20),
+              ),
+            ),
+          ),
+
+          if (!_isPlaying && widget.videoUrl != null)
+            Center(
+              child: GestureDetector(
+                onTap: _initializePlayer,
+                child: Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: AppColors.primary,
+                    borderRadius: BorderRadius.circular(40),
+                  ),
+                  child: const Icon(
+                    Icons.play_arrow,
+                    size: 50,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+
+          if (_isPlaying && widget.videoUrl != null)
+            Positioned(
+              bottom: 20,
+              right: 20,
+              child: GestureDetector(
+                onTap: () => _openFullscreenPlayer(context),
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.7),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(Icons.fullscreen, color: Colors.white, size: 24),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _VideoPlayerScreen extends StatefulWidget {
+  final String videoUrl;
+  final String title;
+
+  const _VideoPlayerScreen({
+    required this.videoUrl,
+    required this.title,
+  });
+
+  @override
+  State<_VideoPlayerScreen> createState() => _VideoPlayerScreenState();
+}
+
+class _VideoPlayerScreenState extends State<_VideoPlayerScreen> {
+  late VideoPlayerController _videoPlayerController;
+  ChewieController? _chewieController;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializePlayer();
+  }
+
+  Future<void> _initializePlayer() async {
+    _videoPlayerController = VideoPlayerController.networkUrl(
+      Uri.parse(widget.videoUrl),
+    );
+
+    await _videoPlayerController.initialize();
+
+    _chewieController = ChewieController(
+      videoPlayerController: _videoPlayerController,
+      autoPlay: true,
+      looping: false,
+      allowFullScreen: true,
+      allowMuting: true,
+      showControls: true,
+      materialProgressColors: ChewieProgressColors(
+        playedColor: AppColors.primary,
+        handleColor: AppColors.primary,
+        backgroundColor: Colors.grey,
+        bufferedColor: AppColors.primary.withOpacity(0.3),
+      ),
+      placeholder: Container(
+        color: Colors.black,
+        child: const Center(
+          child: CircularProgressIndicator(color: AppColors.primary),
+        ),
+      ),
+      autoInitialize: true,
+    );
+
+    setState(() {});
+  }
+
+  @override
   void dispose() {
-    _controller.dispose();
+    _videoPlayerController.dispose();
+    _chewieController?.dispose();
     super.dispose();
   }
 
@@ -696,18 +714,178 @@ class _YouTubePlayerScreenState extends State<_YouTubePlayerScreen> {
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: Text('Video Player', style: AppTextStyles.textHeader3.copyWith(color: Colors.white)),
+        title: Text(
+          widget.title,
+          style: AppTextStyles.textHeader3.copyWith(color: Colors.white),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
       ),
       body: Center(
-        child: YoutubePlayer(
-          controller: _controller,
-          showVideoProgressIndicator: true,
-          progressIndicatorColor: AppColors.primary,
-          progressColors: const ProgressBarColors(
-            playedColor: AppColors.primary,
-            handleColor: AppColors.primary,
+        child: _chewieController != null &&
+                _chewieController!.videoPlayerController.value.isInitialized
+            ? Chewie(controller: _chewieController!)
+            : const CircularProgressIndicator(color: AppColors.primary),
+      ),
+    );
+  }
+}
+
+class _SectionItem extends StatefulWidget {
+  final dynamic section;
+  final Function(String videoUrl, String title) onPlayVideo;
+
+  const _SectionItem({
+    required this.section,
+    required this.onPlayVideo,
+  });
+
+  @override
+  State<_SectionItem> createState() => _SectionItemState();
+}
+
+class _SectionItemState extends State<_SectionItem> {
+  bool _isExpanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final contents = widget.section.contents as List;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        border: Border.all(color: AppColors.lightGray),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        children: [
+          InkWell(
+            onTap: () {
+              setState(() {
+                _isExpanded = !_isExpanded;
+              });
+            },
+            borderRadius: BorderRadius.circular(12),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.section.title ?? '',
+                          style: AppTextStyles.textContent1.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        if (widget.section.description != null &&
+                            widget.section.description!.isNotEmpty) ...[
+                          const SizedBox(height: 4),
+                          Text(
+                            widget.section.description ?? '',
+                            style: AppTextStyles.textContent3.copyWith(
+                              color: AppColors.color8F959E,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Icon(
+                    _isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                    color: AppColors.color8F959E,
+                  ),
+                ],
+              ),
+            ),
           ),
-        ),
+          if (_isExpanded)
+            Container(
+              decoration: BoxDecoration(
+                color: AppColors.lightGray.withOpacity(0.3),
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(12),
+                  bottomRight: Radius.circular(12),
+                ),
+              ),
+              child: Column(
+                children: contents.map((content) {
+                  String? videoUrl;
+                  if (content.files.isNotEmpty) {
+                    for (var file in content.files) {
+                      if (file.fileType == 'video') {
+                        videoUrl = file.url;
+                        break;
+                      }
+                    }
+                  }
+
+                  final hasVideo = videoUrl != null && videoUrl.isNotEmpty;
+
+                  return InkWell(
+                    onTap: hasVideo
+                        ? () => widget.onPlayVideo(videoUrl!, content.title ?? '')
+                        : null,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      decoration: BoxDecoration(
+                        border: Border(
+                          top: BorderSide(color: AppColors.lightGray.withOpacity(0.5)),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          if (hasVideo)
+                            Icon(
+                              Icons.play_circle_outline,
+                              color: AppColors.primary,
+                              size: 24,
+                            )
+                          else
+                            Icon(
+                              Icons.description_outlined,
+                              color: AppColors.color8F959E,
+                              size: 24,
+                            ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  content.title ?? '',
+                                  style: AppTextStyles.textContent2.copyWith(
+                                    color: AppColors.text,
+                                    fontWeight: hasVideo ? FontWeight.w500 : FontWeight.normal,
+                                  ),
+                                ),
+                                if (content.description != null && content.description!.isNotEmpty) ...[
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    content.description ?? '',
+                                    style: AppTextStyles.textContent3.copyWith(
+                                      color: AppColors.color8F959E,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+        ],
       ),
     );
   }

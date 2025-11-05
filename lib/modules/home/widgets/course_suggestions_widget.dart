@@ -1,4 +1,3 @@
-import 'package:ed_tech/common/widgets/images/cached_network_shaped_image.dart';
 import 'package:ed_tech/core/widgets/app_gap.dart';
 import 'package:ed_tech/init.dart';
 import 'package:ed_tech/modules/home/bloc/home_cubit.dart';
@@ -200,19 +199,45 @@ class _CourseCard extends StatelessWidget {
               ),
             ),
             padding: AppPad.a10,
-            child: ResponsiveCachedNetworkRectangleImage(
-              width: 70,
-              height: 70,
-              imageUrl: course.thumbnailUrl,
-              fit: BoxFit.contain,
-              errorWidget: Container(
-                color: Colors.grey[200],
-                child: const Icon(
-                  Icons.error_outline,
-                  color: Colors.grey,
-                  size: 30,
-                ),
-              ),
+            child: Builder(
+              builder: (context) {
+                final url = course.thumbnailUrl?.toString() ?? '';
+                if (url.isEmpty) {
+                  return Container(
+                    color: Colors.grey[200],
+                    child: const Icon(
+                      Icons.image_not_supported,
+                      color: Colors.grey,
+                      size: 30,
+                    ),
+                  );
+                }
+                return Image.network(
+                  url,
+                  width: 70,
+                  height: 70,
+                  fit: BoxFit.contain,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Container(
+                      color: Colors.grey[200],
+                      child: const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    );
+                  },
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      color: Colors.grey[200],
+                      child: const Icon(
+                        Icons.error_outline,
+                        color: Colors.grey,
+                        size: 30,
+                      ),
+                    );
+                  },
+                );
+              },
             ),
           ),
           Expanded(

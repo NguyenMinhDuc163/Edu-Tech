@@ -101,7 +101,7 @@ class DataCourse {
   final dynamic thumbnailUrl;
   final DateTime? createdAt;
   final bool? isRegistered;
-  final int? progress;
+  final dynamic progress;
 
   factory DataCourse.fromJson(Map<String, dynamic> json){
     return DataCourse(
@@ -120,7 +120,7 @@ class DataCourse {
       courseDescription: json["courseDescription"],
       thumbnailUrl: json["thumbnailUrl"],
       createdAt: DateTime.tryParse(json["createdAt"] ?? ""),
-      isRegistered: json["isRegistered"],
+      isRegistered: json["isPaid"] ?? json["isRegistered"],
       progress: json["progress"],
     );
   }

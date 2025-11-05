@@ -75,6 +75,10 @@ class DataData {
     required this.accessLevel,
     required this.progress,
     required this.sections,
+    this.courseDuration,
+    this.teacher,
+    this.thumbnailUrl,
+    this.discountAmount,
   });
 
   final String? courseId;
@@ -86,6 +90,10 @@ class DataData {
   final String? accessLevel;
   final num? progress;
   final List<Section> sections;
+  final String? courseDuration;
+  final String? teacher;
+  final String? thumbnailUrl;
+  final String? discountAmount;
 
   factory DataData.fromJson(Map<String, dynamic> json){
     return DataData(
@@ -96,8 +104,14 @@ class DataData {
       currency: json["currency"],
       isPaid: json["isPaid"],
       accessLevel: json["accessLevel"],
-      progress: json["progress"],
+      progress: json["progress"] != null
+          ? (json["progress"] is String ? num.tryParse(json["progress"]) : json["progress"])
+          : null,
       sections: json["sections"] == null ? [] : List<Section>.from(json["sections"]!.map((x) => Section.fromJson(x))),
+      courseDuration: json["courseDuration"],
+      teacher: json["teacher"],
+      thumbnailUrl: json["thumbnailUrl"],
+      discountAmount: json["discountAmount"],
     );
   }
 
@@ -111,6 +125,10 @@ class DataData {
     "accessLevel": accessLevel,
     "progress": progress,
     "sections": sections.map((x) => x?.toJson()).toList(),
+    "courseDuration": courseDuration,
+    "teacher": teacher,
+    "thumbnailUrl": thumbnailUrl,
+    "discountAmount": discountAmount,
   };
 
   @override

@@ -15,7 +15,7 @@ class HomeRepo {
       throw Exception('Failed to fetch courses: ${res.message}');
     }
 
-    CourseResponse courseResponse = CourseResponse.fromJson(res.json);
-    return courseResponse.data?.data ?? [];
+    final List<dynamic> dataList = res.dataArray;
+    return dataList.map((json) => DataCourse.fromJson(json)).toList();
   }
 }

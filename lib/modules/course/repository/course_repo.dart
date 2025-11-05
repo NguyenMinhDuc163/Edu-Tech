@@ -16,8 +16,8 @@ class CourseRepo {
       throw Exception('Failed to fetch courses: ${res.message}');
     }
 
-    CourseResponse courseResponse = CourseResponse.fromJson(res.json);
-    return courseResponse.data?.data ?? [];
+    final List<dynamic> dataList = res.dataArray;
+    return dataList.map((json) => DataCourse.fromJson(json)).toList();
   }
 
   Future<DataData> getCourseDetail({required String courseId}) async {
@@ -30,11 +30,6 @@ class CourseRepo {
       throw Exception('Failed to fetch course detail: ${res.message}');
     }
 
-    DetailCourse detailCourse = DetailCourse.fromJson(res.json);
-    if (detailCourse.data?.data == null) {
-      throw Exception('Course detail not found');
-    }
-
-    return detailCourse.data!.data!;
+    return DataData.fromJson(res.data);
   }
 }
