@@ -27,6 +27,7 @@ class ApiPath {
   static const String listQuiz = '/student/quiz/list';
   static const String quizDetail = '/student/quiz/detail';
   static const String submitQuiz = '/student/quiz/submit';
+  static const String quizHistory = '/student/quiz/history';
 }
 
 // TODO trong intercepter => ds api can truyen id

@@ -4,6 +4,7 @@ import 'package:ed_tech/core/constants/api_path.dart';
 import 'package:ed_tech/modules/assessment/models/list_quiz_model.dart';
 import 'package:ed_tech/modules/assessment/models/detail_quiz_model.dart';
 import 'package:ed_tech/modules/assessment/models/submit_quiz_model.dart';
+import 'package:ed_tech/modules/assessment/models/quiz_history_model.dart';
 
 class QuizRepo {
   final ApiClient apiClient;
@@ -45,7 +46,7 @@ class QuizRepo {
     final response = DetailQuizModel.fromJson(res.json);
 
     if (response.status != 200) {
-      throw Exception(response.message ?? 'Lấy chi tiết quiz thất bại');
+      throw response.message ?? 'Lấy chi tiết quiz thất bại';
     }
 
     return response;
@@ -67,6 +68,22 @@ class QuizRepo {
 
     if (response.status != 200) {
       throw Exception(response.message ?? 'Nộp bài thi thất bại');
+    }
+
+    return response;
+  }
+
+  Future<QuizHistoryModel> getQuizHistory({required String quizId}) async {
+    final res = await apiClient.fetch(
+      ApiPath.quizHistory,
+      RequestMethod.post,
+      rawData: {"quiz_id": quizId},
+    );
+
+    final response = QuizHistoryModel.fromJson(res.json);
+
+    if (response.status != 200) {
+      throw response.message ?? 'Lấy lịch sử quiz thất bại';
     }
 
     return response;

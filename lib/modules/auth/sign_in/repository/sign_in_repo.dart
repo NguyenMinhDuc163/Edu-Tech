@@ -5,6 +5,7 @@ import 'package:ed_tech/core/constants/api_path.dart';
 import 'package:ed_tech/data/api_client.dart';
 import 'package:ed_tech/data/models/request_method.dart';
 import 'package:ed_tech/data/services/auth_service.dart';
+import 'package:ed_tech/data/services/user_service.dart';
 import 'package:ed_tech/modules/auth/login/model/login_social_response.dart';
 import 'package:ed_tech/modules/auth/sign_in/model/login_response.dart';
 
@@ -27,6 +28,18 @@ class SignInRepo {
 
     LoginResponse loginResponse = LoginResponse.fromJson(res.json);
     authService.saveToken(accessToken: loginResponse.data!.accessToken!, refreshToken: loginResponse.data!.refreshToken!);
+
+    if (loginResponse.data?.user != null) {
+      final user = loginResponse.data!.user!;
+      await UserService.instance.saveUserData(
+        UserData(
+          id: user.id ?? '',
+          username: user.username ?? '',
+          email: user.email ?? '',
+          role: user.role ?? 'student',
+        ),
+      );
+    }
   }
 
   Future<bool> loginSocial({required String token}) async {
@@ -55,14 +68,9 @@ class SignInRepo {
 
   Future<void> logout() async {
     try {
-      // final GoogleSignIn googleSignIn = GoogleSignIn();
-      // await googleSignIn.signOut();
-      //
-      // final FirebaseAuth auth = FirebaseAuth.instance;
-      // await auth.signOut();
-
       authService.logoutOnServer();
       authService.invalid();
+      await UserService.instance.clearUserData();
       AppEventService.didUserCompleteFirstExperience;
     } catch (e) {
       throw Exception('Lỗi đăng xuất: $e');

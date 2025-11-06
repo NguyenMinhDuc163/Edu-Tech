@@ -18,7 +18,8 @@ class QuizTakingCubit extends Cubit<QuizTakingState> {
       final response = await repo.getQuizDetail(quizId: quizId);
       emit(QuizTakingSuccess(data: response));
     } catch (e) {
-      emit(QuizTakingError(message: AppErrorState.getFriendlyErrorString(e)));
+      final message = e is String ? e : AppErrorState.getFriendlyErrorString(e);
+      emit(QuizTakingError(message: message));
     }
   }
 

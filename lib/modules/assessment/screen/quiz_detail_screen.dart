@@ -4,10 +4,13 @@ import 'package:ed_tech/core/theme/app_text_styles.dart';
 import 'package:ed_tech/core/theme/app_pad.dart';
 import 'package:ed_tech/modules/assessment/screen/quiz_taking_screen.dart';
 import 'package:ed_tech/modules/assessment/bloc/quiz_detail_controller.dart';
+import 'package:ed_tech/modules/assessment/bloc/quiz_history_cubit.dart';
 import 'package:ed_tech/modules/assessment/models/quiz_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:disposable_provider/disposable_provider.dart';
 import '../widgets/quiz_info_section.dart';
+import '../widgets/quiz_history_section.dart';
 
 class QuizDetailScreen extends StatefulWidget {
   const QuizDetailScreen({super.key});
@@ -39,6 +42,7 @@ class _QuizDetailScreenState extends State<QuizDetailScreen> {
 
       if (quiz != null) {
         controller.setQuiz(quiz);
+        context.read<QuizHistoryCubit>().getQuizHistory(quizId: quiz.id);
       }
     }
 
@@ -54,6 +58,7 @@ class _QuizDetailScreenState extends State<QuizDetailScreen> {
           subject: 'JavaScript',
         ),
       );
+      context.read<QuizHistoryCubit>().getQuizHistory(quizId: '3');
     }
   }
 
@@ -74,6 +79,38 @@ class _QuizDetailScreenState extends State<QuizDetailScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 QuizInfoSection(quiz: quiz, onStartQuiz: _onStartQuiz),
+                const SizedBox(height: 16),
+                BlocBuilder<QuizHistoryCubit, QuizHistoryState>(
+                  builder: (context, state) {
+                    if (state is QuizHistoryLoading) {
+                      return Container(
+                        padding: AppPad.a16,
+                        decoration: BoxDecoration(
+                          color: AppColors.white,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Center(child: CircularProgressIndicator()),
+                      );
+                    } else if (state is QuizHistorySuccess) {
+                      return QuizHistorySection(history: state.data.data);
+                    } else if (state is QuizHistoryError) {
+                      return Container(
+                        padding: AppPad.a16,
+                        decoration: BoxDecoration(
+                          color: AppColors.white,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Center(
+                          child: Text(
+                            state.message,
+                            style: AppTextStyles.textContent2.copyWith(color: AppColors.error),
+                          ),
+                        ),
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  },
+                ),
               ],
             ),
           ),

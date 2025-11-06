@@ -62,10 +62,10 @@ class QuizModel {
       id: datum.quizId ?? '',
       title: datum.quizTitle ?? '',
       type: datum.quizType ?? 'ASSIGNMENT',
-      timeLimit: 0, // API không có thông tin timeLimit
-      questionCount: 0, // API không có thông tin số câu hỏi
-      status: QuizStatus.notTaken, // Mặc định chưa làm
-      attempts: 0, // Sẽ cần thêm thông tin này từ API nếu có
+      timeLimit: 0,
+      questionCount: 0,
+      status: QuizStatus.notTaken,
+      attempts: (datum.maxAttempts ?? 0).toInt(),
       subject: datum.courseInfo?.courseTitle ?? '',
     );
   }

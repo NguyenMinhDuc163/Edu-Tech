@@ -6,6 +6,7 @@ import 'package:ed_tech/data/api_client.dart';
 import 'package:ed_tech/modules/assessment/bloc/quiz_detail_controller.dart';
 import 'package:ed_tech/modules/assessment/bloc/quiz_taking_controller.dart';
 import 'package:ed_tech/modules/assessment/bloc/quiz_taking_cubit.dart';
+import 'package:ed_tech/modules/assessment/bloc/quiz_history_cubit.dart';
 import 'package:ed_tech/modules/assessment/repository/quiz_repo.dart';
 import 'package:ed_tech/modules/assessment/screen/quiz_detail_screen.dart';
 import 'package:ed_tech/modules/assessment/screen/quiz_result_screen.dart';
@@ -291,9 +292,17 @@ class Routers {
         return MaterialPageRoute(
           settings: settings,
           builder:
-              (_) => DisposableProvider(
-                create: (_) => QuizDetailController(),
-                child: QuizDetailScreen(),
+              (context) => RepositoryProvider(
+                create: (context) => QuizRepo(apiClient: ApiClient()),
+                child: BlocProvider(
+                  create:
+                      (context) =>
+                          QuizHistoryCubit(repo: context.read<QuizRepo>()),
+                  child: DisposableProvider(
+                    create: (_) => QuizDetailController(),
+                    child: QuizDetailScreen(),
+                  ),
+                ),
               ),
         );
       case QuizResultScreen.routeName:

@@ -3,11 +3,7 @@ import 'package:ed_tech/core/theme/app_colors.dart';
 import 'package:ed_tech/core/theme/app_text_styles.dart';
 import 'package:ed_tech/core/theme/app_pad.dart';
 import 'package:ed_tech/modules/dashboard/screen/dashboard_screen.dart';
-import '../models/quiz_result_model.dart';
-import '../widgets/quiz_result_overview.dart';
-import '../widgets/quiz_statistics_table.dart';
-import '../widgets/quiz_detailed_answers.dart';
-import 'quiz_result_detail_screen.dart';
+import 'package:ed_tech/modules/assessment/models/submit_quiz_model.dart';
 import 'package:flutter/material.dart';
 
 class QuizResultScreen extends StatefulWidget {
@@ -20,88 +16,38 @@ class QuizResultScreen extends StatefulWidget {
 }
 
 class _QuizResultScreenState extends State<QuizResultScreen> {
-  QuizResultModel? result;
+  SubmitQuizModel? result;
+  Duration? timeSpent;
 
   @override
-  void initState() {
-    super.initState();
-    _initializeResult();
-  }
-
-  void _initializeResult() {
-    final questionResults = [
-      QuestionResultModel(
-        id: '1',
-        questionNumber: 1,
-        questionText: 'What is the capital of Vietnam?',
-        questionType: QuestionType.multipleChoice,
-        score: 2.5,
-        maxScore: 2.5,
-        isCorrect: true,
-        userAnswer: 'Hanoi',
-        correctAnswer: 'Hanoi',
-        explanation: 'Hanoi is the capital city of Vietnam.',
-      ),
-      QuestionResultModel(
-        id: '2',
-        questionNumber: 2,
-        questionText: 'Which programming language is used for Flutter?',
-        questionType: QuestionType.multipleChoice,
-        score: 2.5,
-        maxScore: 2.5,
-        isCorrect: true,
-        userAnswer: 'Dart',
-        correctAnswer: 'Dart',
-        explanation: 'Dart is the programming language used for Flutter development.',
-      ),
-      QuestionResultModel(
-        id: '3',
-        questionNumber: 3,
-        questionText: 'What is the main purpose of setState() in Flutter?',
-        questionType: QuestionType.multipleChoice,
-        score: 2.5,
-        maxScore: 2.5,
-        isCorrect: true,
-        userAnswer: 'To update the UI when data changes',
-        correctAnswer: 'To update the UI when data changes',
-        explanation:
-            'setState() is used to notify the framework that the internal state has changed.',
-      ),
-      QuestionResultModel(
-        id: '4',
-        questionNumber: 4,
-        questionText: 'Explain the difference between StatelessWidget and StatefulWidget.',
-        questionType: QuestionType.essay,
-        score: 2.4,
-        maxScore: 2.5,
-        isCorrect: true,
-        userAnswer: 'StatelessWidget is immutable while StatefulWidget can change its state.',
-        correctAnswer:
-            'StatelessWidget is immutable and cannot change its properties after creation, while StatefulWidget can change its state and rebuild when setState() is called.',
-        explanation: 'Good understanding of the basic concepts, but could be more detailed.',
-      ),
-    ];
-
-    result = QuizResultModel(
-      id: 'result_1',
-      quizId: 'quiz_1',
-      quizTitle: 'Đề Anh',
-      totalScore: 9.9,
-      maxScore: 10.0,
-      multipleChoiceScore: 7.5,
-      essayScore: 2.4,
-      questionResults: questionResults,
-      completedAt: DateTime.now(),
-      timeTaken: const Duration(minutes: 35),
-      performanceMessage: 'Xuất sắc! Gần như hoàn hảo rồi!',
-    );
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final args = ModalRoute.of(context)?.settings.arguments as Map?;
+    result = args?['result'] as SubmitQuizModel?;
+    timeSpent = args?['timeSpent'] as Duration?;
   }
 
   @override
   Widget build(BuildContext context) {
-    if (result == null) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    if (result?.data == null) {
+      return Scaffold(
+        backgroundColor: AppColors.background,
+        appBar: AppBar(
+          backgroundColor: AppColors.white,
+          elevation: 0,
+          title: Text('Kết quả bài thi', style: AppTextStyles.appbarTitle),
+          centerTitle: true,
+        ),
+        body: const Center(child: CircularProgressIndicator()),
+      );
     }
+
+    final data = result!.data!;
+    final score = double.tryParse(data.score ?? '0') ?? 0;
+    final passingScore = double.tryParse(data.passingScore ?? '70') ?? 70;
+    final percentage = (data.totalQuestions ?? 0) > 0
+        ? ((data.correctAnswers ?? 0) / (data.totalQuestions ?? 1)) * 100
+        : 0.0;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -111,166 +57,486 @@ class _QuizResultScreenState extends State<QuizResultScreen> {
         title: Text('Kết quả bài thi', style: AppTextStyles.appbarTitle),
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: AppColors.primary),
-          onPressed: () => Navigator.pop(context),
+          icon: Icon(Icons.close, color: AppColors.primary),
+          onPressed: () => _goToHome(),
         ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.share, color: AppColors.primary),
-            onPressed: () => _shareResult(),
-            tooltip: 'Chia sẻ kết quả',
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            QuizResultOverview(result: result!, onViewDetails: () => _viewDetailedWork()),
-
+            _buildResultHeader(data, score, passingScore, percentage),
             const SizedBox(height: 16),
-
-            QuizStatisticsTable(result: result!),
-
+            _buildStatisticsCard(data),
             const SizedBox(height: 16),
-
-            QuizDetailedAnswers(
-              result: result!,
-              onQuestionTap: (question) => _viewQuestionDetail(question),
-            ),
-
+            _buildQuestionResults(data),
             const SizedBox(height: 20),
-
-            Padding(
-              padding: AppPad.h16v20,
-              child: Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () => _retakeQuiz(),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.lightGray,
-                        foregroundColor: AppColors.color8F959E,
-                        elevation: 0,
-                        padding: AppPad.v12,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                      ),
-                      child: Text(
-                        'Làm lại',
-                        style: AppTextStyles.textContent2.copyWith(fontWeight: FontWeight.w500),
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(width: 16),
-
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () => _goToHome(),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        foregroundColor: AppColors.white,
-                        elevation: 0,
-                        padding: AppPad.v12,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                      ),
-                      child: Text(
-                        'Về trang chủ',
-                        style: AppTextStyles.textContent2.copyWith(
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            _buildActionButtons(),
+            const SizedBox(height: 20),
           ],
         ),
       ),
     );
   }
 
-  void _viewDetailedWork() {
-    Navigator.pushNamed(context, QuizResultDetailScreen.routeName, arguments: {'result': result});
+  Widget _buildResultHeader(Data data, double score, double passingScore, double percentage) {
+    final isPassed = data.isPassed ?? false;
+
+    return Container(
+      margin: AppPad.a16,
+      padding: AppPad.a24,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: isPassed
+              ? [AppColors.success, AppColors.success.withOpacity(0.8)]
+              : [AppColors.error, AppColors.error.withOpacity(0.8)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: (isPassed ? AppColors.success : AppColors.error).withOpacity(0.3),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Icon(
+            isPassed ? Icons.emoji_events : Icons.sentiment_dissatisfied,
+            size: 64,
+            color: AppColors.white,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            isPassed ? 'Chúc mừng!' : 'Cần cố gắng hơn!',
+            style: AppTextStyles.textHeader1.copyWith(
+              color: AppColors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 28,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            isPassed
+                ? 'Bạn đã vượt qua bài kiểm tra'
+                : 'Bạn chưa đạt điểm yêu cầu',
+            style: AppTextStyles.textContent2.copyWith(
+              color: AppColors.white.withOpacity(0.9),
+            ),
+          ),
+          const SizedBox(height: 24),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _buildHeaderStat(
+                icon: Icons.check_circle_outline,
+                label: 'Điểm số',
+                value: '${score.toStringAsFixed(1)}',
+              ),
+              Container(
+                width: 1,
+                height: 40,
+                color: AppColors.white.withOpacity(0.3),
+              ),
+              _buildHeaderStat(
+                icon: Icons.trending_up,
+                label: 'Đạt',
+                value: '${percentage.toStringAsFixed(0)}%',
+              ),
+              Container(
+                width: 1,
+                height: 40,
+                color: AppColors.white.withOpacity(0.3),
+              ),
+              _buildHeaderStat(
+                icon: Icons.timer_outlined,
+                label: 'Thời gian',
+                value: _formatDuration(timeSpent),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 
-  void _viewQuestionDetail(QuestionResultModel question) {
-    showDialog(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            title: Text(
-              'Chi tiết câu hỏi ${question.questionNumber}',
-              style: AppTextStyles.textStyleDefaultBold,
+  Widget _buildHeaderStat({
+    required IconData icon,
+    required String label,
+    required String value,
+  }) {
+    return Column(
+      children: [
+        Icon(icon, color: AppColors.white, size: 20),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: AppTextStyles.textHeader3.copyWith(
+            color: AppColors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Text(
+          label,
+          style: AppTextStyles.textContent4.copyWith(
+            color: AppColors.white.withOpacity(0.8),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStatisticsCard(Data data) {
+    return Container(
+      margin: AppPad.h16,
+      padding: AppPad.a20,
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.shadowBlack15,
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.bar_chart, color: AppColors.primary, size: 24),
+              const SizedBox(width: 8),
+              Text(
+                'Thống kê chi tiết',
+                style: AppTextStyles.textHeader3.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          _buildStatRow(
+            icon: Icons.quiz,
+            label: 'Tổng số câu',
+            value: '${data.totalQuestions ?? 0}',
+            color: AppColors.primary,
+          ),
+          const SizedBox(height: 12),
+          _buildStatRow(
+            icon: Icons.check_circle,
+            label: 'Số câu đúng',
+            value: '${data.correctAnswers ?? 0}',
+            color: AppColors.success,
+          ),
+          const SizedBox(height: 12),
+          _buildStatRow(
+            icon: Icons.cancel,
+            label: 'Số câu sai',
+            value: '${(data.totalQuestions ?? 0) - (data.correctAnswers ?? 0)}',
+            color: AppColors.error,
+          ),
+          const SizedBox(height: 12),
+          _buildStatRow(
+            icon: Icons.flag,
+            label: 'Điểm cần đạt',
+            value: '${data.passingScore}',
+            color: AppColors.orange,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatRow({
+    required IconData icon,
+    required String label,
+    required String value,
+    required Color color,
+  }) {
+    return Container(
+      padding: AppPad.a12,
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: AppPad.a8,
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(8),
             ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
+            child: Icon(icon, size: 20, color: color),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              label,
+              style: AppTextStyles.textContent2.copyWith(
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          Text(
+            value,
+            style: AppTextStyles.textContent2.copyWith(
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuestionResults(Data data) {
+    return Container(
+      margin: AppPad.h16,
+      padding: AppPad.a20,
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.shadowBlack15,
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.list_alt, color: AppColors.primary, size: 24),
+              const SizedBox(width: 8),
+              Text(
+                'Chi tiết từng câu hỏi',
+                style: AppTextStyles.textHeader3.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: data.questionResults.length,
+            separatorBuilder: (context, index) => const SizedBox(height: 12),
+            itemBuilder: (context, index) {
+              final question = data.questionResults[index];
+              return _buildQuestionItem(question, index + 1);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuestionItem(QuestionResult question, int number) {
+    final isCorrect = question.isCorrect ?? false;
+
+    return Container(
+      padding: AppPad.a16,
+      decoration: BoxDecoration(
+        color: isCorrect
+            ? AppColors.success.withOpacity(0.05)
+            : AppColors.error.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isCorrect
+              ? AppColors.success.withOpacity(0.3)
+              : AppColors.error.withOpacity(0.3),
+          width: 1.5,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: isCorrect ? AppColors.success : AppColors.error,
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: Text(
+                    '$number',
+                    style: AppTextStyles.textContent2.copyWith(
+                      color: AppColors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  question.questionText ?? '',
+                  style: AppTextStyles.textContent2.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: isCorrect ? AppColors.success : AppColors.error,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      isCorrect ? Icons.check : Icons.close,
+                      size: 16,
+                      color: AppColors.white,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      isCorrect ? 'Đúng' : 'Sai',
+                      style: AppTextStyles.textContent3.copyWith(
+                        color: AppColors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Container(
+            padding: AppPad.a12,
+            decoration: BoxDecoration(
+              color: AppColors.lightGray.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(question.questionText, style: AppTextStyles.textContent2),
-                const SizedBox(height: 12),
-                if (question.userAnswer != null) ...[
-                  Text(
-                    'Câu trả lời của bạn:',
-                    style: AppTextStyles.textContent3.copyWith(fontWeight: FontWeight.w600),
+                Row(
+                  children: [
+                    Icon(Icons.person, size: 16, color: AppColors.primary),
+                    const SizedBox(width: 6),
+                    Text(
+                      'Câu trả lời của bạn:',
+                      style: AppTextStyles.textContent3.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  question.userAnswer?.answerId ?? 'Chưa trả lời',
+                  style: AppTextStyles.textContent3.copyWith(
+                    color: isCorrect ? AppColors.success : AppColors.error,
                   ),
-                  Text(
-                    question.userAnswer!,
-                    style: AppTextStyles.textContent3.copyWith(color: AppColors.primary),
+                ),
+                if (!isCorrect) ...[
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Icon(Icons.lightbulb, size: 16, color: AppColors.success),
+                      const SizedBox(width: 6),
+                      Text(
+                        'Đáp án đúng:',
+                        style: AppTextStyles.textContent3.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.success,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 8),
-                ],
-                if (question.correctAnswer != null) ...[
+                  const SizedBox(height: 4),
                   Text(
-                    'Đáp án đúng:',
-                    style: AppTextStyles.textContent3.copyWith(fontWeight: FontWeight.w600),
-                  ),
-                  Text(
-                    question.correctAnswer!,
-                    style: AppTextStyles.textContent3.copyWith(color: AppColors.success),
-                  ),
-                  const SizedBox(height: 8),
-                ],
-                if (question.explanation != null) ...[
-                  Text(
-                    'Giải thích:',
-                    style: AppTextStyles.textContent3.copyWith(fontWeight: FontWeight.w600),
-                  ),
-                  Text(
-                    question.explanation!,
+                    question.correctAnswerId ?? '',
                     style: AppTextStyles.textContent3.copyWith(
-                      color: AppColors.color8F959E,
-                      fontStyle: FontStyle.italic,
+                      color: AppColors.success,
                     ),
                   ),
                 ],
               ],
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text('Đóng', style: AppTextStyles.textButton),
-              ),
-            ],
           ),
+        ],
+      ),
     );
   }
 
-  void _shareResult() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Chia sẻ kết quả bài thi'), backgroundColor: AppColors.success),
-    );
-  }
-
-  void _retakeQuiz() {
-    Navigator.pop(context);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Bắt đầu làm lại bài thi'), backgroundColor: AppColors.primary),
+  Widget _buildActionButtons() {
+    return Padding(
+      padding: AppPad.h16,
+      child: Column(
+        children: [
+          SizedBox(
+            width: double.infinity,
+            height: 52,
+            child: ElevatedButton(
+              onPressed: _goToHome,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: AppColors.white,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.home, size: 24, color: AppColors.white),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Về trang chủ',
+                    style: AppTextStyles.textContent2.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.white,
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   void _goToHome() {
-    Navigator.pushNamedAndRemoveUntil(context, DashboardScreen.routeName, (route) => false);
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      DashboardScreen.routeName,
+      (route) => false,
+    );
+  }
+
+  String _formatDuration(Duration? duration) {
+    if (duration == null) return '0 phút';
+
+    final hours = duration.inHours;
+    final minutes = duration.inMinutes.remainder(60);
+    final seconds = duration.inSeconds.remainder(60);
+
+    if (hours > 0) {
+      return '${hours}h ${minutes}m';
+    } else if (minutes > 0) {
+      return '${minutes} phút';
+    } else {
+      return '${seconds} giây';
+    }
   }
 }

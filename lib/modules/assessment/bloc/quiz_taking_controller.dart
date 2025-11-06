@@ -7,6 +7,7 @@ class QuizTakingController extends Disposable {
   final ValueNotifier<QuizSessionModel?> quizSession =
       ValueNotifier<QuizSessionModel?>(null);
   final ValueNotifier<String?> errorMessage = ValueNotifier<String?>(null);
+  final ValueNotifier<Duration?> timeSpent = ValueNotifier<Duration?>(null);
 
   void setLoading(bool loading) {
     isLoading.value = loading;
@@ -41,10 +42,15 @@ class QuizTakingController extends Disposable {
     quizSession.value = currentSession.copyWith(currentQuestionIndex: index);
   }
 
+  void setTimeSpent(Duration time) {
+    timeSpent.value = time;
+  }
+
   @override
   void dispose() {
     isLoading.dispose();
     quizSession.dispose();
     errorMessage.dispose();
+    timeSpent.dispose();
   }
 }

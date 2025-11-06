@@ -60,6 +60,7 @@ class _QuizListScreenState extends State<QuizListScreen> {
         actionsWidget: [
           SvgPicture.asset(IconPath.iconRanking, width: 25, height: 25, color: AppColors.black50),
         ],
+        isShowAppBar: false,
         isShowBottomButton: false,
         screen: ValueListenableBuilder<bool>(
           valueListenable: context.read<ListQuizController>().isLoading,
@@ -77,16 +78,19 @@ class _QuizListScreenState extends State<QuizListScreen> {
                   );
                 }
 
-                return SingleChildScrollView(
-                  padding: AppPad.a16,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildSectionHeader('Tất cả bài kiểm tra (${quizzes.length})'),
-                      ...quizzes.map(
-                        (quiz) => QuizCardWidget(quiz: quiz, onTap: () => _onQuizTap(quiz)),
-                      ),
-                    ],
+                return RefreshIndicator(
+                  onRefresh: _onRefresh,
+                  child: SingleChildScrollView(
+                    padding: AppPad.a16,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildSectionHeader('Tất cả bài kiểm tra (${quizzes.length})'),
+                        ...quizzes.map(
+                          (quiz) => QuizCardWidget(quiz: quiz, onTap: () => _onQuizTap(quiz)),
+                        ),
+                      ],
+                    ),
                   ),
                 );
               },
@@ -100,17 +104,27 @@ class _QuizListScreenState extends State<QuizListScreen> {
   Widget _buildSectionHeader(String title) {
     return Padding(
       padding: AppPad.b20,
-      child: Text(
-        title,
-        style: AppTextStyles.textStyleDefaultBold.copyWith(
-          fontSize: 18,
-          color: AppColors.raisinBlack,
-        ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: AppTextStyles.textStyleDefaultBold.copyWith(
+              fontSize: 18,
+              color: AppColors.raisinBlack,
+            ),
+          ),
+          SvgPicture.asset(IconPath.iconRanking, width: 25, height: 25, color: AppColors.black50),
+        ],
       ),
     );
   }
 
   void _onQuizTap(QuizModel quiz) {
     Navigator.pushNamed(context, QuizDetailScreen.routeName, arguments: {'quiz': quiz});
+  }
+
+  Future<void> _onRefresh() async {
+    await context.read<ListQuizCubit>().getListQuiz();
   }
 }

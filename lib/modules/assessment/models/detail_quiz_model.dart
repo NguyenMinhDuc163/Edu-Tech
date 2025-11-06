@@ -13,7 +13,7 @@ class DetailQuizModel {
     return DetailQuizModel(
       status: json["status"],
       message: json["message"],
-      data: json["data"] == null ? null : Data.fromJson(json["data"]),
+      data: json["data"] == null || json["data"] is String ? null : Data.fromJson(json["data"]),
     );
   }
 

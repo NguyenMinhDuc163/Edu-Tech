@@ -2,6 +2,7 @@ import 'package:ed_tech/init.dart';
 import 'package:ed_tech/core/theme/app_colors.dart';
 import 'package:ed_tech/core/theme/app_text_styles.dart';
 import 'package:ed_tech/core/theme/app_pad.dart';
+import 'package:ed_tech/core/widgets/error_dialog.dart';
 import 'package:ed_tech/modules/assessment/screen/quiz_result_screen.dart';
 import 'package:ed_tech/modules/assessment/bloc/quiz_taking_controller.dart';
 import 'package:ed_tech/modules/assessment/bloc/quiz_taking_cubit.dart';
@@ -65,7 +66,14 @@ class _QuizTakingScreenState extends State<QuizTakingScreen> {
           controller.setLoading(true);
           controller.clearError();
         } else if (state is QuizSubmitSuccess) {
-          Navigator.pushNamed(context, QuizResultScreen.routeName);
+          Navigator.pushNamed(
+            context,
+            QuizResultScreen.routeName,
+            arguments: {
+              'result': state.data,
+              'timeSpent': controller.timeSpent.value,
+            },
+          );
         } else if (state is QuizSubmitError) {
           controller.setLoading(false);
           controller.setError(state.message);
@@ -92,6 +100,11 @@ class _QuizTakingScreenState extends State<QuizTakingScreen> {
         } else if (state is QuizTakingError) {
           controller.setLoading(false);
           controller.setError(state.message);
+          ErrorDialog.show(
+            context,
+            message: state.message,
+            onClose: () => Navigator.pop(context),
+          );
         }
       },
       child: ValueListenableBuilder<bool>(
@@ -315,6 +328,8 @@ class _QuizTakingScreenState extends State<QuizTakingScreen> {
     final quiz = args?['quiz'] as QuizModel?;
 
     if (quiz?.id != null) {
+      final timeSpent = DateTime.now().difference(session.startTime);
+      controller.setTimeSpent(timeSpent);
       context.read<QuizTakingCubit>().submitQuiz(quizId: quiz!.id, answers: answers);
     }
   }

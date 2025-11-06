@@ -1,4 +1,5 @@
 import 'package:ed_tech/init.dart';
+import 'package:ed_tech/data/services/user_service.dart';
 
 class HomeHeaderWidget extends StatelessWidget {
   const HomeHeaderWidget({super.key, this.stackChildren = const []});
@@ -24,7 +25,7 @@ class HomeHeaderWidget extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Hi, Nguyen Duc',
+                    'Hi, ${UserService.instance.displayName}',
                     style: AppTextStyles.textHeader2.copyWith(
                       color: AppColors.white,
                     ),

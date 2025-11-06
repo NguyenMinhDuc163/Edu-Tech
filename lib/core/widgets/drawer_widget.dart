@@ -8,6 +8,7 @@ import 'package:ed_tech/modules/auth/login/screen/login_screen.dart';
 import 'package:ed_tech/modules/auth/sign_in/repository/sign_in_repo.dart';
 import 'package:ed_tech/modules/auth/sign_in/screen/sign_in_screen.dart';
 import 'package:ed_tech/common/app_event_service.dart';
+import 'package:ed_tech/data/services/user_service.dart';
 
 class DrawerWidget extends StatelessWidget {
   const DrawerWidget({super.key});
@@ -78,26 +79,28 @@ class DrawerWidget extends StatelessWidget {
   }
 
   Widget _buildDrawerHeader() {
+    final username = UserService.instance.displayName;
+    final email = UserService.instance.email;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       spacing: width_8,
       children: [
         CircleAvatar(radius: 25, backgroundColor: Colors.grey[200], child: Icon(Icons.person)),
 
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("Nguyen Duc", style: AppTextStyles.textHeader3),
-            Row(
-              children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(username, style: AppTextStyles.textHeader3),
+              if (email.isNotEmpty)
                 Text(
-                  "common.verified_profile".tr(),
-                  style: AppTextStyles.textContent2.copyWith(color: AppColors.coolGray),
+                  email,
+                  style: AppTextStyles.textContent3.copyWith(color: AppColors.coolGray),
+                  overflow: TextOverflow.ellipsis,
                 ),
-                SvgPicture.asset(IconPath.iconDone),
-              ],
-            ),
-          ],
+            ],
+          ),
         ),
         ButtonWidget(
           title: "common.orders".tr(),
