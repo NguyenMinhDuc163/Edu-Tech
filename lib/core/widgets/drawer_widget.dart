@@ -7,6 +7,7 @@ import 'package:ed_tech/init.dart';
 import 'package:ed_tech/modules/auth/login/screen/login_screen.dart';
 import 'package:ed_tech/modules/auth/sign_in/repository/sign_in_repo.dart';
 import 'package:ed_tech/modules/auth/sign_in/screen/sign_in_screen.dart';
+import 'package:ed_tech/common/app_event_service.dart';
 
 class DrawerWidget extends StatelessWidget {
   const DrawerWidget({super.key});
@@ -62,9 +63,12 @@ class DrawerWidget extends StatelessWidget {
               iconColor: Colors.red,
               textStyle: AppTextStyles.textContent2.copyWith(color: Colors.red),
               onTap: () async {
-                context.read<SignInRepo>().logout();
+                final navigator = Navigator.of(context);
 
-                Navigator.pushReplacementNamed(context, SignInScreen.routeName);
+                context.read<SignInRepo>().logout();
+                await AppEventService.notifyUserSignOut();
+
+                navigator.pushReplacementNamed(SignInScreen.routeName);
               },
             ),
           ],

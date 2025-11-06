@@ -61,6 +61,8 @@ abstract final class AppEventService {
   }
 
   static Future<void> notifyUserSignOut() {
+    AppEventLogging.resetFirstLaunch();
+
     return _safeWait(futures: [
       // _firebaseCrashlytics.setUserIdentifier(''),
     ]);
@@ -100,5 +102,10 @@ abstract final class AppEventLogging {
 
   static void _logEventUserStartExperience() {
     SpUtil.putString(_firstTimeExperienceAtKey, DateTime.now().toString());
+  }
+
+  static void resetFirstLaunch() {
+    SpUtil.remove(_firstLaunchAtKey);
+    SpUtil.remove(_firstTimeExperienceAtKey);
   }
 }

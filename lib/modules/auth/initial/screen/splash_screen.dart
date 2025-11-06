@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ed_tech/init.dart';
 import 'package:ed_tech/modules/auth/sign_in/repository/sign_in_repo.dart';
 import 'package:ed_tech/common/app_status.dart';
+import 'package:ed_tech/common/app_event_service.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -26,7 +27,10 @@ class _SplashScreenState extends State<SplashScreen> {
 
     if (!mounted) return;
 
-    if (AppStatus.isFirstTimeAppLaunch) {
+    final isFirstTime = AppStatus.isFirstTimeAppLaunch;
+    AppEventService.notifyAppLaunch();
+
+    if (isFirstTime) {
       Navigator.pushNamed(context, OnboardingScreen.routeName);
     } else {
       Navigator.of(context).pushNamed(SignInScreen.routeName);
