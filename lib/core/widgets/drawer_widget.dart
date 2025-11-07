@@ -3,6 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:ed_tech/core/widgets/switch_botton_widget.dart';
 import 'package:ed_tech/core/widgets/template/button_widget.dart';
+import 'package:ed_tech/core/theme/locale_cubit.dart';
+import 'package:ed_tech/core/theme/theme_cubit.dart';
+import 'package:ed_tech/core/theme/theme_extensions.dart';
 import 'package:ed_tech/init.dart';
 import 'package:ed_tech/modules/auth/login/screen/login_screen.dart';
 import 'package:ed_tech/modules/auth/sign_in/repository/sign_in_repo.dart';
@@ -55,7 +58,55 @@ class DrawerWidget extends StatelessWidget {
                     onTap: () => Navigator.pop(context),
                   ),
                 ),
-                Padding(padding: AppPad.h10, child: SwitchBottomWidget(onChanged: (value) {})),
+                Padding(
+                  padding: AppPad.h10,
+                  child: SwitchBottomWidget(
+                    onChanged: (value) {
+                      final newThemeMode = value ? ThemeMode.dark : ThemeMode.light;
+                      context.read<ThemeCubit>().setThemeMode(newThemeMode);
+                    },
+                  ),
+                ),
+              ],
+            ),
+            // Language switcher
+            Row(
+              children: [
+                Expanded(
+                  child: _buildDrawerItem(
+                    icon: IconPath.iconAssigment,
+                    title: 'common.language'.tr(),
+                    onTap: () {}, // Không làm gì - chỉ để hiển thị label
+                  ),
+                ),
+                Padding(
+                  padding: AppPad.h10,
+                  child: BlocBuilder<LocaleCubit, Locale>(
+                    builder: (context, locale) {
+                      final isEnglish = locale.languageCode == 'en';
+                      return GestureDetector(
+                        onTap: () {
+                          final localeCubit = context.read<LocaleCubit>();
+                          localeCubit.toggleLocale(context);
+                        },
+                        child: Container(
+                          padding: AppPad.a8,
+                          decoration: BoxDecoration(
+                            color: AppColors.offWhite,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            isEnglish ? 'EN' : 'VI',
+                            style: AppTextStyles.textContent3.copyWith(
+                              color: AppColors.coolGray,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
               ],
             ),
             _buildDrawerItem(
@@ -82,32 +133,37 @@ class DrawerWidget extends StatelessWidget {
     final username = UserService.instance.displayName;
     final email = UserService.instance.email;
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      spacing: width_8,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        CircleAvatar(radius: 25, backgroundColor: Colors.grey[200], child: Icon(Icons.person)),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          spacing: width_8,
+          children: [
+            CircleAvatar(radius: 25, backgroundColor: Colors.grey[200], child: Icon(Icons.person)),
 
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(username, style: AppTextStyles.textHeader3),
-              if (email.isNotEmpty)
-                Text(
-                  email,
-                  style: AppTextStyles.textContent3.copyWith(color: AppColors.coolGray),
-                  overflow: TextOverflow.ellipsis,
-                ),
-            ],
-          ),
-        ),
-        ButtonWidget(
-          title: "common.orders".tr(),
-          boderRadius: AppBorderRadius.a8,
-          padding: AppPad.h10v8,
-          backgroundColor: AppColors.offWhite,
-          titleStyle: AppTextStyles.textContent3.copyWith(color: AppColors.coolGray),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(username, style: AppTextStyles.textHeader3),
+                  if (email.isNotEmpty)
+                    Text(
+                      email,
+                      style: AppTextStyles.textContent3.copyWith(color: AppColors.coolGray),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                ],
+              ),
+            ),
+            ButtonWidget(
+              title: "common.orders".tr(),
+              boderRadius: AppBorderRadius.a8,
+              padding: AppPad.h10v8,
+              backgroundColor: AppColors.offWhite,
+              titleStyle: AppTextStyles.textContent3.copyWith(color: AppColors.coolGray),
+            ),
+          ],
         ),
       ],
     );

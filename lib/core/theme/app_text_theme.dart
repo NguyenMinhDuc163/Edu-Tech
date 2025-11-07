@@ -1,6 +1,6 @@
+import 'package:ed_tech/core/constants/app_constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:ed_tech/core/constants/app_constants.dart';
 
 class AppTextTheme {
   static const defaultTextStyle = TextStyle(
