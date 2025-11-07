@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:ed_tech/init.dart';
 import 'package:ed_tech/core/theme/app_colors.dart';
 import 'package:ed_tech/core/theme/app_text_styles.dart';
@@ -116,7 +117,7 @@ class _QuizTakingScreenState extends State<QuizTakingScreen> {
               appBar: AppBar(
                 backgroundColor: AppColors.white,
                 elevation: 0,
-                title: Text('Đang tải...', style: AppTextStyles.appbarTitle),
+                title: Text('assessment.loading'.tr(), style: AppTextStyles.appbarTitle),
               ),
               body: const Center(child: CircularProgressIndicator()),
             );
@@ -131,10 +132,10 @@ class _QuizTakingScreenState extends State<QuizTakingScreen> {
                   appBar: AppBar(
                     backgroundColor: AppColors.white,
                     elevation: 0,
-                    title: Text('Lỗi', style: AppTextStyles.appbarTitle),
+                    title: Text('assessment.error'.tr(), style: AppTextStyles.appbarTitle),
                   ),
                   body: Center(
-                    child: Text('Không thể tải dữ liệu quiz', style: AppTextStyles.textContent2),
+                    child: Text('assessment.cannot_load_quiz'.tr(), style: AppTextStyles.textContent2),
                   ),
                 );
               }
@@ -153,7 +154,7 @@ class _QuizTakingScreenState extends State<QuizTakingScreen> {
       appBar: AppBar(
         backgroundColor: AppColors.white,
         elevation: 0,
-        title: Text('Đề thi', style: AppTextStyles.appbarTitle),
+        title: Text('assessment.quiz_title'.tr(), style: AppTextStyles.appbarTitle),
         centerTitle: true,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: AppColors.primary),
@@ -163,7 +164,7 @@ class _QuizTakingScreenState extends State<QuizTakingScreen> {
           IconButton(
             icon: Icon(Icons.flag, color: AppColors.error),
             onPressed: () => _submitQuiz(),
-            tooltip: 'Nộp bài',
+            tooltip: 'assessment.submit_quiz'.tr(),
           ),
         ],
       ),
@@ -230,7 +231,7 @@ class _QuizTakingScreenState extends State<QuizTakingScreen> {
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                         ),
                         child: Text(
-                          'Câu trước',
+                          'assessment.previous_question'.tr(),
                           style: AppTextStyles.textContent2.copyWith(fontWeight: FontWeight.w500),
                         ),
                       ),
@@ -249,7 +250,7 @@ class _QuizTakingScreenState extends State<QuizTakingScreen> {
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                         ),
                         child: Text(
-                          session.isLastQuestion ? 'Nộp bài' : 'Câu sau',
+                          session.isLastQuestion ? 'assessment.submit_quiz'.tr() : 'assessment.next_question'.tr(),
                           style: AppTextStyles.textContent2.copyWith(
                             fontWeight: FontWeight.w500,
                             color: AppColors.white,
@@ -288,15 +289,15 @@ class _QuizTakingScreenState extends State<QuizTakingScreen> {
       context: context,
       builder:
           (context) => AlertDialog(
-            title: Text('Nộp bài thi', style: AppTextStyles.textStyleDefaultBold),
+            title: Text('assessment.submit_quiz_title'.tr(), style: AppTextStyles.textStyleDefaultBold),
             content: Text(
-              'Bạn có chắc chắn muốn nộp bài thi? Sau khi nộp, bạn không thể thay đổi câu trả lời.',
+              'assessment.submit_quiz_confirmation'.tr(),
               style: AppTextStyles.textContent2,
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: Text('Hủy', style: AppTextStyles.textButton),
+                child: Text('assessment.cancel'.tr(), style: AppTextStyles.textButton),
               ),
               ElevatedButton(
                 onPressed: () {
@@ -307,7 +308,7 @@ class _QuizTakingScreenState extends State<QuizTakingScreen> {
                   backgroundColor: AppColors.primary,
                   foregroundColor: AppColors.white,
                 ),
-                child: Text('Nộp bài', style: AppTextStyles.button),
+                child: Text('assessment.submit_quiz'.tr(), style: AppTextStyles.button),
               ),
             ],
           ),
@@ -339,15 +340,15 @@ class _QuizTakingScreenState extends State<QuizTakingScreen> {
       context: context,
       builder:
           (context) => AlertDialog(
-            title: Text('Thoát bài thi', style: AppTextStyles.textStyleDefaultBold),
+            title: Text('assessment.exit_quiz_title'.tr(), style: AppTextStyles.textStyleDefaultBold),
             content: Text(
-              'Bạn có chắc chắn muốn thoát bài thi? Tiến độ hiện tại sẽ không được lưu.',
+              'assessment.exit_quiz_confirmation'.tr(),
               style: AppTextStyles.textContent2,
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: Text('Hủy', style: AppTextStyles.textButton),
+                child: Text('assessment.cancel'.tr(), style: AppTextStyles.textButton),
               ),
               ElevatedButton(
                 onPressed: () {
@@ -358,7 +359,7 @@ class _QuizTakingScreenState extends State<QuizTakingScreen> {
                   backgroundColor: AppColors.error,
                   foregroundColor: AppColors.white,
                 ),
-                child: Text('Thoát', style: AppTextStyles.button),
+                child: Text('assessment.exit'.tr(), style: AppTextStyles.button),
               ),
             ],
           ),

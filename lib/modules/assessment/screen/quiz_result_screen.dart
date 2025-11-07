@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:ed_tech/init.dart';
 import 'package:ed_tech/core/theme/app_colors.dart';
 import 'package:ed_tech/core/theme/app_text_styles.dart';
@@ -35,7 +36,7 @@ class _QuizResultScreenState extends State<QuizResultScreen> {
         appBar: AppBar(
           backgroundColor: AppColors.white,
           elevation: 0,
-          title: Text('Kết quả bài thi', style: AppTextStyles.appbarTitle),
+          title: Text('assessment.quiz_result_title'.tr(), style: AppTextStyles.appbarTitle),
           centerTitle: true,
         ),
         body: const Center(child: CircularProgressIndicator()),
@@ -110,7 +111,7 @@ class _QuizResultScreenState extends State<QuizResultScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            isPassed ? 'Chúc mừng!' : 'Cần cố gắng hơn!',
+            isPassed ? 'assessment.congratulations'.tr() : 'assessment.need_improvement'.tr(),
             style: AppTextStyles.textHeader1.copyWith(
               color: AppColors.white,
               fontWeight: FontWeight.bold,
@@ -120,8 +121,8 @@ class _QuizResultScreenState extends State<QuizResultScreen> {
           const SizedBox(height: 8),
           Text(
             isPassed
-                ? 'Bạn đã vượt qua bài kiểm tra'
-                : 'Bạn chưa đạt điểm yêu cầu',
+                ? 'assessment.passed_message'.tr()
+                : 'assessment.not_passed_message'.tr(),
             style: AppTextStyles.textContent2.copyWith(
               color: AppColors.white.withOpacity(0.9),
             ),
@@ -132,7 +133,7 @@ class _QuizResultScreenState extends State<QuizResultScreen> {
             children: [
               _buildHeaderStat(
                 icon: Icons.check_circle_outline,
-                label: 'Điểm số',
+                label: 'assessment.score'.tr(),
                 value: '${score.toStringAsFixed(1)}',
               ),
               Container(
@@ -142,7 +143,7 @@ class _QuizResultScreenState extends State<QuizResultScreen> {
               ),
               _buildHeaderStat(
                 icon: Icons.trending_up,
-                label: 'Đạt',
+                label: 'assessment.achieved'.tr(),
                 value: '${percentage.toStringAsFixed(0)}%',
               ),
               Container(
@@ -152,7 +153,7 @@ class _QuizResultScreenState extends State<QuizResultScreen> {
               ),
               _buildHeaderStat(
                 icon: Icons.timer_outlined,
-                label: 'Thời gian',
+                label: 'assessment.time'.tr(),
                 value: _formatDuration(timeSpent),
               ),
             ],
@@ -211,7 +212,7 @@ class _QuizResultScreenState extends State<QuizResultScreen> {
               Icon(Icons.bar_chart, color: AppColors.primary, size: 24),
               const SizedBox(width: 8),
               Text(
-                'Thống kê chi tiết',
+                'assessment.detailed_statistics'.tr(),
                 style: AppTextStyles.textHeader3.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
@@ -221,28 +222,28 @@ class _QuizResultScreenState extends State<QuizResultScreen> {
           const SizedBox(height: 20),
           _buildStatRow(
             icon: Icons.quiz,
-            label: 'Tổng số câu',
+            label: 'assessment.total_questions'.tr(),
             value: '${data.totalQuestions ?? 0}',
             color: AppColors.primary,
           ),
           const SizedBox(height: 12),
           _buildStatRow(
             icon: Icons.check_circle,
-            label: 'Số câu đúng',
+            label: 'assessment.correct_answers'.tr(),
             value: '${data.correctAnswers ?? 0}',
             color: AppColors.success,
           ),
           const SizedBox(height: 12),
           _buildStatRow(
             icon: Icons.cancel,
-            label: 'Số câu sai',
+            label: 'assessment.wrong_answers'.tr(),
             value: '${(data.totalQuestions ?? 0) - (data.correctAnswers ?? 0)}',
             color: AppColors.error,
           ),
           const SizedBox(height: 12),
           _buildStatRow(
             icon: Icons.flag,
-            label: 'Điểm cần đạt',
+            label: 'assessment.passing_score'.tr(),
             value: '${data.passingScore}',
             color: AppColors.orange,
           ),
@@ -317,7 +318,7 @@ class _QuizResultScreenState extends State<QuizResultScreen> {
               Icon(Icons.list_alt, color: AppColors.primary, size: 24),
               const SizedBox(width: 8),
               Text(
-                'Chi tiết từng câu hỏi',
+                'assessment.question_details'.tr(),
                 style: AppTextStyles.textHeader3.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
@@ -404,7 +405,7 @@ class _QuizResultScreenState extends State<QuizResultScreen> {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      isCorrect ? 'Đúng' : 'Sai',
+                      isCorrect ? 'assessment.correct'.tr() : 'assessment.wrong'.tr(),
                       style: AppTextStyles.textContent3.copyWith(
                         color: AppColors.white,
                         fontWeight: FontWeight.w600,
@@ -430,7 +431,7 @@ class _QuizResultScreenState extends State<QuizResultScreen> {
                     Icon(Icons.person, size: 16, color: AppColors.primary),
                     const SizedBox(width: 6),
                     Text(
-                      'Câu trả lời của bạn:',
+                      'assessment.your_answer_label'.tr(),
                       style: AppTextStyles.textContent3.copyWith(
                         fontWeight: FontWeight.w600,
                         color: AppColors.primary,
@@ -440,7 +441,7 @@ class _QuizResultScreenState extends State<QuizResultScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  question.userAnswer?.answerId ?? 'Chưa trả lời',
+                  question.userAnswer?.answerId ?? 'assessment.not_answered'.tr(),
                   style: AppTextStyles.textContent3.copyWith(
                     color: isCorrect ? AppColors.success : AppColors.error,
                   ),
@@ -452,7 +453,7 @@ class _QuizResultScreenState extends State<QuizResultScreen> {
                       Icon(Icons.lightbulb, size: 16, color: AppColors.success),
                       const SizedBox(width: 6),
                       Text(
-                        'Đáp án đúng:',
+                        'assessment.correct_answer_label'.tr(),
                         style: AppTextStyles.textContent3.copyWith(
                           fontWeight: FontWeight.w600,
                           color: AppColors.success,
@@ -500,7 +501,7 @@ class _QuizResultScreenState extends State<QuizResultScreen> {
                   Icon(Icons.home, size: 24, color: AppColors.white),
                   const SizedBox(width: 8),
                   Text(
-                    'Về trang chủ',
+                    'assessment.go_home'.tr(),
                     style: AppTextStyles.textContent2.copyWith(
                       fontWeight: FontWeight.bold,
                       color: AppColors.white,
@@ -525,18 +526,18 @@ class _QuizResultScreenState extends State<QuizResultScreen> {
   }
 
   String _formatDuration(Duration? duration) {
-    if (duration == null) return '0 phút';
+    if (duration == null) return '0 ${'assessment.minutes'.tr()}';
 
     final hours = duration.inHours;
     final minutes = duration.inMinutes.remainder(60);
     final seconds = duration.inSeconds.remainder(60);
 
     if (hours > 0) {
-      return '${hours}h ${minutes}m';
+      return '${hours}${'assessment.hours'.tr()} ${minutes}${'assessment.minutes'.tr()}';
     } else if (minutes > 0) {
-      return '${minutes} phút';
+      return '${minutes} ${'assessment.minutes'.tr()}';
     } else {
-      return '${seconds} giây';
+      return '${seconds} ${'assessment.seconds'.tr()}';
     }
   }
 }

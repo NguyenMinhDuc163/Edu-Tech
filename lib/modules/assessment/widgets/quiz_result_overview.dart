@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:ed_tech/core/theme/app_colors.dart';
 import 'package:ed_tech/core/theme/app_text_styles.dart';
@@ -106,7 +107,7 @@ class QuizResultOverview extends StatelessWidget {
                   children: [
                     
                     _buildScoreItem(
-                      label: 'Điểm trắc nghiệm:',
+                      label: 'assessment.multiple_choice_score'.tr(),
                       score: '${result.multipleChoiceScore}',
                       backgroundColor: AppColors.lavenderColor.withOpacity(0.1),
                       textColor: AppColors.lavenderColor,
@@ -116,7 +117,7 @@ class QuizResultOverview extends StatelessWidget {
 
                     
                     _buildScoreItem(
-                      label: 'Điểm tự luận:',
+                      label: 'assessment.essay_score'.tr(),
                       score: '${result.essayScore}',
                       backgroundColor: AppColors.lavenderColor.withOpacity(0.1),
                       textColor: AppColors.lavenderColor,
@@ -126,7 +127,7 @@ class QuizResultOverview extends StatelessWidget {
 
                     
                     _buildScoreItem(
-                      label: 'Tổng điểm:',
+                      label: 'assessment.total_score'.tr(),
                       score: '${result.totalScore} / ${result.maxScore}',
                       backgroundColor: AppColors.success.withOpacity(0.1),
                       textColor: AppColors.success,
@@ -164,7 +165,7 @@ class QuizResultOverview extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    'Xem bài làm chi tiết',
+                    'assessment.view_detailed_answers'.tr(),
                     style: AppTextStyles.textStyleDefaultBold.copyWith(
                       fontSize: 16,
                       color: AppColors.white,

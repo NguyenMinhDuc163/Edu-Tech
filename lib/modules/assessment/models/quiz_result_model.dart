@@ -1,3 +1,5 @@
+import 'package:easy_localization/easy_localization.dart';
+
 class QuizResultModel {
   final String id;
   final String quizId;
@@ -73,7 +75,7 @@ class QuestionResultModel {
   });
 
   String get scoreText => '$score/$maxScore';
-  String get questionHeader => 'Câu $questionNumber ($score/$maxScore điểm)';
+  String get questionHeader => '${'assessment.question_header'.tr()} $questionNumber ($score/$maxScore ${'assessment.points_label'.tr()})';
 }
 
 enum QuestionType { multipleChoice, essay }

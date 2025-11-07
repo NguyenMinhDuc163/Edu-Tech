@@ -134,7 +134,7 @@ class _SignInContent extends StatelessWidget {
             AppGap.h10,
             ButtonWidget(
               titleWidget: TitleWidget(
-                title: "Google",
+                title: "login.google".tr(),
                 iconPath: IconPath.iconGoogle,
               ),
               onPressed: () {

@@ -7,15 +7,15 @@ class SignInInProgress extends SignInState {}
 class SignInSuccess extends SignInState {}
 
 class SignInFailure extends SignInState {
-  final String message;
+  final String? message;
 
-  SignInFailure({this.message = 'Đăng nhập thất bại'});
+  SignInFailure({this.message});
 }
 
 class SignInError extends SignInState {
-  final String message;
+  final String? message;
 
-  SignInError({this.message = 'Đã xảy ra lỗi'});
+  SignInError({this.message});
 }
 
 class SignInAuthenticated extends SignInState {}

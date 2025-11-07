@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:ed_tech/core/theme/app_colors.dart';
@@ -31,7 +32,7 @@ class QuizHistorySection extends StatelessWidget {
             children: [
               Icon(Icons.history, size: 48, color: AppColors.coolGray),
               const SizedBox(height: 8),
-              Text('Chưa có lịch sử làm bài', style: AppTextStyles.textContent2.copyWith(color: AppColors.coolGray)),
+              Text('assessment.no_history'.tr(), style: AppTextStyles.textContent2.copyWith(color: AppColors.coolGray)),
             ],
           ),
         ),
@@ -59,7 +60,7 @@ class QuizHistorySection extends StatelessWidget {
               children: [
                 Icon(Icons.history, color: AppColors.primary, size: 24),
                 const SizedBox(width: 8),
-                Text('Lịch sử làm bài', style: AppTextStyles.textHeader3),
+                Text('assessment.history_title'.tr(), style: AppTextStyles.textHeader3),
               ],
             ),
           ),
@@ -129,7 +130,7 @@ class QuizHistorySection extends StatelessWidget {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
-                        isPassed ? 'Đạt' : 'Không đạt',
+                        isPassed ? 'assessment.passed'.tr() : 'assessment.not_passed'.tr(),
                         style: AppTextStyles.textContent3.copyWith(
                           color: AppColors.white,
                           fontWeight: FontWeight.w600,
@@ -144,14 +145,14 @@ class QuizHistorySection extends StatelessWidget {
                     Icon(Icons.star, size: 16, color: AppColors.orange),
                     const SizedBox(width: 4),
                     Text(
-                      'Điểm: ${score.toStringAsFixed(1)}',
+                      '${'assessment.score_label_colon'.tr()}${score.toStringAsFixed(1)}',
                       style: AppTextStyles.textContent3.copyWith(color: AppColors.coolGray),
                     ),
                     const SizedBox(width: 16),
                     Icon(Icons.access_time, size: 16, color: AppColors.coolGray),
                     const SizedBox(width: 4),
                     Text(
-                      '${item.timeSpentMinutes} phút',
+                      '${item.timeSpentMinutes} ${'assessment.time_spent'.tr()}',
                       style: AppTextStyles.textContent3.copyWith(color: AppColors.coolGray),
                     ),
                   ],

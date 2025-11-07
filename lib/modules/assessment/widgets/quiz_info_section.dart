@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:ed_tech/core/theme/app_colors.dart';
 import 'package:ed_tech/core/theme/app_text_styles.dart';
@@ -61,8 +62,8 @@ class QuizInfoSection extends StatelessWidget {
           _buildParameterItem(
             icon: Icons.access_time,
             iconColor: AppColors.error,
-            label: 'Thời gian làm bài',
-            value: '${quiz.timeLimit} phút',
+            label: 'assessment.time_limit_label'.tr(),
+            value: '${quiz.timeLimit} ${'assessment.time_limit_value'.tr()}',
           ),
 
           const SizedBox(height: 12),
@@ -70,8 +71,8 @@ class QuizInfoSection extends StatelessWidget {
           _buildParameterItem(
             icon: Icons.calendar_today,
             iconColor: AppColors.success,
-            label: 'Thời gian vào thi',
-            value: 'Không thời hạn',
+            label: 'assessment.exam_time_label'.tr(),
+            value: 'assessment.no_deadline'.tr(),
           ),
 
           const SizedBox(height: 12),
@@ -79,8 +80,8 @@ class QuizInfoSection extends StatelessWidget {
           _buildParameterItem(
             icon: Icons.quiz_outlined,
             iconColor: AppColors.primary,
-            label: 'Loại đề',
-            value: 'Hỗn hợp',
+            label: 'assessment.quiz_type_label'.tr(),
+            value: 'assessment.mixed'.tr(),
           ),
 
           const SizedBox(height: 12),
@@ -88,8 +89,8 @@ class QuizInfoSection extends StatelessWidget {
           _buildParameterItem(
             icon: Icons.help_outline,
             iconColor: AppColors.color8F959E,
-            label: 'Số lượng câu hỏi',
-            value: '${quiz.questionCount} câu',
+            label: 'assessment.question_count_label'.tr(),
+            value: '${quiz.questionCount} ${'assessment.question_count_value'.tr()}',
           ),
 
           const SizedBox(height: 20),
@@ -114,7 +115,7 @@ class QuizInfoSection extends StatelessWidget {
                   Icon(Icons.edit_outlined, size: 20, color: AppColors.white),
                   const SizedBox(width: 8),
                   Text(
-                    'Bắt đầu thi',
+                    'assessment.start_quiz'.tr(),
                     style: AppTextStyles.textStyleDefaultBold.copyWith(
                       fontSize: 16,
                       color: AppColors.white,

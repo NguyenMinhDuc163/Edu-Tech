@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:ed_tech/common/app_event_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -73,7 +74,7 @@ class SignInRepo {
       await UserService.instance.clearUserData();
       AppEventService.didUserCompleteFirstExperience;
     } catch (e) {
-      throw Exception('Lỗi đăng xuất: $e');
+      throw Exception('${'login.logout_error'.tr()}: $e');
     }
   }
 

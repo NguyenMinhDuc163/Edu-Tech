@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:ed_tech/core/theme/app_colors.dart';
 import 'package:ed_tech/core/theme/app_text_styles.dart';
@@ -35,7 +36,7 @@ class QuizDetailedAnswers extends StatelessWidget {
         children: [
           
           Text(
-            'Đáp án chi tiết (${result.totalQuestions} câu)',
+            '${'assessment.detailed_answers'.tr()} (${result.totalQuestions} ${'assessment.question_count_value'.tr()})',
             style: AppTextStyles.textHeader3.copyWith(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -47,7 +48,7 @@ class QuizDetailedAnswers extends StatelessWidget {
 
           
           if (result.multipleChoiceQuestions.isNotEmpty) ...[
-            _buildSectionTitle('Phần 1. TRẮC NGHIỆM'),
+            _buildSectionTitle('assessment.section_1'.tr()),
             const SizedBox(height: 12),
             ...result.multipleChoiceQuestions.map(
               (question) => _buildQuestionItem(question),
@@ -57,7 +58,7 @@ class QuizDetailedAnswers extends StatelessWidget {
 
           
           if (result.essayQuestions.isNotEmpty) ...[
-            _buildSectionTitle('Phần 2. TỰ LUẬN'),
+            _buildSectionTitle('assessment.section_2'.tr()),
             const SizedBox(height: 12),
             ...result.essayQuestions.map(
               (question) => _buildQuestionItem(question),
@@ -134,7 +135,7 @@ class QuizDetailedAnswers extends StatelessWidget {
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
-              question.isCorrect ? 'Đúng' : 'Sai',
+              question.isCorrect ? 'assessment.correct'.tr() : 'assessment.wrong'.tr(),
               style: AppTextStyles.textContent3.copyWith(
                 color: AppColors.white,
                 fontWeight: FontWeight.w500,

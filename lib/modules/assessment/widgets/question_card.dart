@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:ed_tech/core/theme/app_colors.dart';
 import 'package:ed_tech/core/theme/app_text_styles.dart';
@@ -49,7 +50,7 @@ class QuestionCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
-                  'Câu $questionNumber/$totalQuestions',
+                  '${'assessment.question'.tr()} $questionNumber/$totalQuestions',
                   style: AppTextStyles.textContent3.copyWith(
                     color: AppColors.primary,
                     fontWeight: FontWeight.w600,

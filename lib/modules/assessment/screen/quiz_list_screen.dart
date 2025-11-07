@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:ed_tech/init.dart';
 import 'package:ed_tech/core/theme/app_colors.dart';
 import 'package:ed_tech/core/theme/app_text_styles.dart';
@@ -74,7 +75,7 @@ class _QuizListScreenState extends State<QuizListScreen> {
               builder: (context, quizzes, child) {
                 if (quizzes.isEmpty) {
                   return Center(
-                    child: Text('Chưa có bài kiểm tra nào', style: AppTextStyles.textStyleDefault),
+                    child: Text('assessment.no_quizzes'.tr(), style: AppTextStyles.textStyleDefault),
                   );
                 }
 
@@ -85,7 +86,7 @@ class _QuizListScreenState extends State<QuizListScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildSectionHeader('Tất cả bài kiểm tra (${quizzes.length})'),
+                        _buildSectionHeader('${'assessment.all_quizzes'.tr()} (${quizzes.length})'),
                         ...quizzes.map(
                           (quiz) => QuizCardWidget(quiz: quiz, onTap: () => _onQuizTap(quiz)),
                         ),

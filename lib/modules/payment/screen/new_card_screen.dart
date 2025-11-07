@@ -89,7 +89,7 @@ class _NewCardScreenState extends State<NewCardScreen> {
                   child: TextInputCustom(
                     controller: expController,
                     fillColor: true,
-                    label: 'EXP'.tr(),
+                    label: 'payment.exp'.tr(),
                     hintText: "07/25",
                     titleStyle: AppTextStyles.textContent1.copyWith(
                       fontWeight: FontWeight.bold,
@@ -101,7 +101,7 @@ class _NewCardScreenState extends State<NewCardScreen> {
                   child: TextInputCustom(
                     controller: cvvController,
                     fillColor: true,
-                    label: 'CVV'.tr(),
+                    label: 'payment.cvv'.tr(),
                     hintText: "123",
                     titleStyle: AppTextStyles.textContent1.copyWith(
                       fontWeight: FontWeight.bold,

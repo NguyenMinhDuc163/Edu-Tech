@@ -1,3 +1,5 @@
+import 'package:easy_localization/easy_localization.dart';
+
 class QuizModel {
   final String id;
   final String title;
@@ -26,18 +28,18 @@ class QuizModel {
   bool get isCompleted => status == QuizStatus.completed;
   bool get hasTimeLimit => timeLimit > 0;
   String get timeLimitText =>
-      hasTimeLimit ? '${timeLimit} Phút' : 'Không thời hạn';
-  String get questionCountText => '$questionCount câu';
-  String get attemptsText => '$attempts lượt làm đề';
+      hasTimeLimit ? '${timeLimit} ${'assessment.time_limit_value'.tr()}' : 'assessment.no_deadline'.tr();
+  String get questionCountText => '$questionCount ${'assessment.question_count_value'.tr()}';
+  String get attemptsText => '$attempts ${'assessment.attempts'.tr()}';
   String get scoreText => score?.toString() ?? '';
   String get statusText {
     switch (status) {
       case QuizStatus.notTaken:
-        return 'Trạng thái: chưa thi';
+        return 'assessment.status_not_taken'.tr();
       case QuizStatus.inProgress:
-        return 'Trạng thái: đang thi';
+        return 'assessment.status_in_progress'.tr();
       case QuizStatus.completed:
-        return 'Đã thi: ${_getTimeAgo()}';
+        return '${'assessment.status_completed'.tr()} ${_getTimeAgo()}';
     }
   }
 
@@ -48,11 +50,11 @@ class QuizModel {
     final difference = now.difference(completedAt!);
 
     if (difference.inMinutes < 60) {
-      return '${difference.inMinutes} phút trước';
+      return '${difference.inMinutes} ${'assessment.minutes_ago'.tr()}';
     } else if (difference.inHours < 24) {
-      return '${difference.inHours} giờ trước';
+      return '${difference.inHours} ${'assessment.hours_ago'.tr()}';
     } else {
-      return '${difference.inDays} ngày trước';
+      return '${difference.inDays} ${'assessment.days_ago'.tr()}';
     }
   }
 

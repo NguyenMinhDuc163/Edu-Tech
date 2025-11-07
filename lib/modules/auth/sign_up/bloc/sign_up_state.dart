@@ -9,15 +9,15 @@ class SignUpInProgress extends SignUpState {}
 class SignUpSuccess extends SignUpState {}
 
 class SignUpFailure extends SignUpState {
-  final String message;
+  final String? message;
 
-  SignUpFailure({this.message = 'Đăng ký thất bại'});
+  SignUpFailure({this.message});
 }
 
 class SignUpError extends SignUpState {
-  final String message;
+  final String? message;
 
-  SignUpError({this.message = 'Đã xảy ra lỗi'});
+  SignUpError({this.message});
 }
 
 class CheckUsernameInProgress extends SignUpState {}
@@ -29,9 +29,9 @@ class CheckUsernameSuccess extends SignUpState {
 }
 
 class CheckUsernameFailure extends SignUpState {
-  final String message;
+  final String? message;
 
-  CheckUsernameFailure({this.message = 'Kiểm tra username thất bại'});
+  CheckUsernameFailure({this.message});
 }
 
 class CheckEmailInProgress extends SignUpState {}
@@ -43,7 +43,7 @@ class CheckEmailSuccess extends SignUpState {
 }
 
 class CheckEmailFailure extends SignUpState {
-  final String message;
+  final String? message;
 
-  CheckEmailFailure({this.message = 'Kiểm tra email thất bại'});
+  CheckEmailFailure({this.message});
 }

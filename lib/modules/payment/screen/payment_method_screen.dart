@@ -101,7 +101,7 @@ class _PaymentMethodContent extends StatelessWidget {
                       child: TextInputCustom(
                         controller: controller.expController.value,
                         fillColor: true,
-                        label: 'EXP'.tr(),
+                        label: 'payment.exp'.tr(),
                         hintText: "07/25",
                         titleStyle: AppTextStyles.textContent1.copyWith(
                           fontWeight: FontWeight.bold,
@@ -113,7 +113,7 @@ class _PaymentMethodContent extends StatelessWidget {
                       child: TextInputCustom(
                         controller: controller.cvvController.value,
                         fillColor: true,
-                        label: 'CVV'.tr(),
+                        label: 'payment.cvv'.tr(),
                         hintText: "123",
                         titleStyle: AppTextStyles.textContent1.copyWith(
                           fontWeight: FontWeight.bold,

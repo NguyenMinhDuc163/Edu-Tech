@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:ed_tech/init.dart';
 import 'package:ed_tech/core/theme/app_colors.dart';
 import 'package:ed_tech/core/theme/app_text_styles.dart';
@@ -42,7 +43,7 @@ class _QuizResultDetailScreenState extends State<QuizResultDetailScreen> {
       appBar: AppBar(
         backgroundColor: AppColors.white,
         elevation: 0,
-        title: Text('Chi tiết bài làm', style: AppTextStyles.appbarTitle),
+        title: Text('assessment.result_detail_title'.tr(), style: AppTextStyles.appbarTitle),
         centerTitle: true,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: AppColors.primary),
@@ -86,7 +87,7 @@ class _QuizResultDetailScreenState extends State<QuizResultDetailScreen> {
       child: Row(
         children: [
           Text(
-            'Câu ${currentQuestionIndex + 1}/${result.questionResults.length}',
+            '${'assessment.question'.tr()} ${currentQuestionIndex + 1}/${result.questionResults.length}',
             style: AppTextStyles.textContent3.copyWith(
               color: AppColors.color8F959E,
               fontWeight: FontWeight.w500,
@@ -94,7 +95,7 @@ class _QuizResultDetailScreenState extends State<QuizResultDetailScreen> {
           ),
           const Spacer(),
           Text(
-            'Điểm: ${result.questionResults[currentQuestionIndex].scoreText}',
+            '${'assessment.score_label'.tr()}${result.questionResults[currentQuestionIndex].scoreText}',
             style: AppTextStyles.textContent3.copyWith(
               color: AppColors.primary,
               fontWeight: FontWeight.w600,
@@ -146,7 +147,7 @@ class _QuizResultDetailScreenState extends State<QuizResultDetailScreen> {
                       ),
                       const SizedBox(width: 6),
                       Text(
-                        question.isCorrect ? 'Trả lời đúng' : 'Trả lời sai',
+                        question.isCorrect ? 'assessment.answered_correctly'.tr() : 'assessment.answered_wrongly'.tr(),
                         style: AppTextStyles.textContent4.copyWith(
                           color: question.isCorrect ? AppColors.success : AppColors.error,
                           fontWeight: FontWeight.w600,
@@ -199,7 +200,7 @@ class _QuizResultDetailScreenState extends State<QuizResultDetailScreen> {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      'Câu trả lời của bạn',
+                      'assessment.your_answer'.tr(),
                       style: AppTextStyles.textContent2.copyWith(
                         fontWeight: FontWeight.w600,
                         color: question.isCorrect ? AppColors.success : AppColors.error,
@@ -236,7 +237,7 @@ class _QuizResultDetailScreenState extends State<QuizResultDetailScreen> {
                       Icon(Icons.check_circle_outline, size: 18, color: AppColors.success),
                       const SizedBox(width: 8),
                       Text(
-                        'Đáp án đúng',
+                        'assessment.correct_answer'.tr(),
                         style: AppTextStyles.textContent2.copyWith(
                           fontWeight: FontWeight.w600,
                           color: AppColors.success,
@@ -273,7 +274,7 @@ class _QuizResultDetailScreenState extends State<QuizResultDetailScreen> {
                       Icon(Icons.lightbulb_outline, size: 18, color: AppColors.primary),
                       const SizedBox(width: 8),
                       Text(
-                        'Giải thích',
+                        'assessment.explanation'.tr(),
                         style: AppTextStyles.textContent2.copyWith(
                           fontWeight: FontWeight.w600,
                           color: AppColors.primary,
@@ -326,7 +327,7 @@ class _QuizResultDetailScreenState extends State<QuizResultDetailScreen> {
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               ),
               child: Text(
-                'Câu trước',
+                'assessment.previous_question'.tr(),
                 style: AppTextStyles.textContent2.copyWith(fontWeight: FontWeight.w500),
               ),
             ),
@@ -350,7 +351,7 @@ class _QuizResultDetailScreenState extends State<QuizResultDetailScreen> {
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               ),
               child: Text(
-                'Câu sau',
+                'assessment.next_question'.tr(),
                 style: AppTextStyles.textContent2.copyWith(
                   fontWeight: FontWeight.w500,
                   color: AppColors.white,

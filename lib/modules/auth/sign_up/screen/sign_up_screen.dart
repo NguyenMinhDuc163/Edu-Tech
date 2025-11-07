@@ -91,7 +91,7 @@ class _SignUpContent extends StatelessWidget {
                 },
                 builder: (context, state) {
                   return TextInputCustom(
-                    label: 'Email',
+                    label: 'sign_up.email'.tr(),
                     controller: controller.emailController,
                     hintText: "sign_up.enter_email".tr(),
                     borderRadius: BorderRadius.circular(12),

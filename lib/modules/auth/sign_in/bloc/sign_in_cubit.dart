@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ed_tech/core/error_handling/app_error_state.dart';
 import 'package:ed_tech/core/values/login_type.dart';
@@ -52,7 +53,8 @@ class SignInCubit extends Cubit<SignInState> {
       await repo.login(username: username, password: password);
       emit(SignInSuccess());
     } catch (e) {
-      emit(SignInError(message: AppErrorState.getFriendlyErrorString(e)));
+      final errorMessage = AppErrorState.getFriendlyErrorString(e);
+      emit(SignInError(message: errorMessage.isNotEmpty ? errorMessage : 'login.error_occurred'.tr()));
     }
   }
 
@@ -66,10 +68,11 @@ class SignInCubit extends Cubit<SignInState> {
       } else if (res == null) {
         emit(SignInInitial());
       } else {
-        emit(SignInFailure());
+        emit(SignInFailure(message: 'login.failed'.tr()));
       }
     } catch (e) {
-      emit(SignInError(message: AppErrorState.getFriendlyErrorString(e)));
+      final errorMessage = AppErrorState.getFriendlyErrorString(e);
+      emit(SignInError(message: errorMessage.isNotEmpty ? errorMessage : 'login.error_occurred'.tr()));
       rethrow;
     }
   }
@@ -79,7 +82,8 @@ class SignInCubit extends Cubit<SignInState> {
       await repo.logout();
       emit(SignInInitial());
     } catch (e) {
-      emit(SignInError(message: AppErrorState.getFriendlyErrorString(e)));
+      final errorMessage = AppErrorState.getFriendlyErrorString(e);
+      emit(SignInError(message: errorMessage.isNotEmpty ? errorMessage : 'login.error_occurred'.tr()));
     }
   }
 }

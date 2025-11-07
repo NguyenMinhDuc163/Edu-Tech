@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:ed_tech/core/widgets/app_gap.dart';
 import 'package:ed_tech/modules/reviews/model/review_model.dart';
 import 'package:ed_tech/modules/reviews/widget/stars_widget.dart';
@@ -75,7 +76,7 @@ class ReviewItemWidget extends StatelessWidget {
                           ),
                           AppGap.w4,
                           Text(
-                            "rating",
+                            'review.rating'.tr(),
                             style: AppTextStyles.textContent3.copyWith(
                               color: AppColors.coolGray,
                             ),

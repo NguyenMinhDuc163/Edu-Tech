@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:ed_tech/core/theme/app_colors.dart';
 import 'package:ed_tech/core/theme/app_text_styles.dart';
@@ -30,7 +31,7 @@ class QuizStatisticsTable extends StatelessWidget {
         children: [
           
           Text(
-            'Bảng thống kê',
+            'assessment.statistics_table'.tr(),
             style: AppTextStyles.textHeader3.copyWith(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -42,7 +43,7 @@ class QuizStatisticsTable extends StatelessWidget {
 
           
           _buildQuestionTypeSection(
-            title: 'Trắc nghiệm một đáp án (${result.totalMultipleChoice} Câu)',
+            title: '${'assessment.multiple_choice_title'.tr()} (${result.totalMultipleChoice} ${'assessment.question'.tr()})',
             correctCount: result.correctMultipleChoice,
             totalCount: result.totalMultipleChoice,
             score: result.multipleChoiceScore,
@@ -56,7 +57,7 @@ class QuizStatisticsTable extends StatelessWidget {
           
           if (result.totalEssay > 0) ...[
             _buildQuestionTypeSection(
-              title: 'Tự luận (${result.totalEssay} Câu)',
+              title: '${'assessment.essay_title'.tr()} (${result.totalEssay} ${'assessment.question'.tr()})',
               correctCount: result.correctEssay,
               totalCount: result.totalEssay,
               score: result.essayScore,
@@ -109,13 +110,13 @@ class QuizStatisticsTable extends StatelessWidget {
                     
                     if (!isEssay) ...[
                       _buildStatItem(
-                        label: 'Số câu đúng:',
+                        label: '${'assessment.correct_answers'.tr()}:',
                         value: '$correctCount/$totalCount',
                         color: AppColors.primary,
                       ),
                       const SizedBox(height: 4),
                       _buildStatItem(
-                        label: 'Số câu sai:',
+                        label: '${'assessment.wrong_answers'.tr()}:',
                         value: '${totalCount - correctCount}/$totalCount',
                         color: AppColors.primary,
                       ),
@@ -126,7 +127,7 @@ class QuizStatisticsTable extends StatelessWidget {
                         return Padding(
                           padding: AppPad.b8,
                           child: Text(
-                            'Câu ${questionResult.questionNumber}: ${questionResult.score} điểm',
+                            '${'assessment.question_header'.tr()} ${questionResult.questionNumber}: ${questionResult.score} ${'assessment.points_label'.tr()}',
                             style: AppTextStyles.textContent3.copyWith(
                               color: AppColors.primary,
                             ),
@@ -153,7 +154,7 @@ class QuizStatisticsTable extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        'Điểm',
+                        'assessment.score'.tr(),
                         style: AppTextStyles.textContent4.copyWith(
                           color: AppColors.primary,
                           fontWeight: FontWeight.w500,

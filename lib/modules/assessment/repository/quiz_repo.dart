@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:ed_tech/data/api_client.dart';
 import 'package:ed_tech/data/models/request_method.dart';
 import 'package:ed_tech/core/constants/api_path.dart';
@@ -30,7 +31,7 @@ class QuizRepo {
     final response = ListQuizModel.fromJson(res.json);
 
     if (response.status != 200) {
-      throw Exception(response.message ?? 'Lấy danh sách quiz thất bại');
+      throw Exception(response.message ?? 'assessment.get_list_quiz_failed'.tr());
     }
 
     return response;
@@ -46,7 +47,7 @@ class QuizRepo {
     final response = DetailQuizModel.fromJson(res.json);
 
     if (response.status != 200) {
-      throw response.message ?? 'Lấy chi tiết quiz thất bại';
+      throw response.message ?? 'assessment.get_quiz_detail_failed'.tr();
     }
 
     return response;
@@ -67,7 +68,7 @@ class QuizRepo {
     final response = SubmitQuizModel.fromJson(res.json);
 
     if (response.status != 200) {
-      throw Exception(response.message ?? 'Nộp bài thi thất bại');
+      throw Exception(response.message ?? 'assessment.submit_quiz_failed'.tr());
     }
 
     return response;
@@ -83,7 +84,7 @@ class QuizRepo {
     final response = QuizHistoryModel.fromJson(res.json);
 
     if (response.status != 200) {
-      throw response.message ?? 'Lấy lịch sử quiz thất bại';
+      throw response.message ?? 'assessment.get_quiz_history_failed'.tr();
     }
 
     return response;

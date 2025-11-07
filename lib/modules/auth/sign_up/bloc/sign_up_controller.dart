@@ -31,7 +31,7 @@ class SignUpController extends Disposable {
     }
 
     if (state is SignUpError) {
-      showToastTop(message: state.message);
+      showToastTop(message: state.message ?? 'sign_up.error_occurred'.tr());
     }
   }
 

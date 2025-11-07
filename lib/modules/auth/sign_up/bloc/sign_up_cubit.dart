@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ed_tech/core/error_handling/app_error_state.dart';
 import 'package:ed_tech/modules/auth/sign_up/bloc/sign_up_state.dart';
@@ -31,10 +32,11 @@ class SignUpCubit extends Cubit<SignUpState> {
       if (res) {
         emit(SignUpSuccess());
       } else {
-        emit(SignUpFailure(message: 'Thông tin đăng ký không hợp lệ hoặc tài khoản đã tồn tại'));
+        emit(SignUpFailure(message: 'sign_up.invalid_registration_info'.tr()));
       }
     } catch (e) {
-      emit(SignUpError(message: AppErrorState.getFriendlyErrorString(e)));
+      final errorMessage = AppErrorState.getFriendlyErrorString(e);
+      emit(SignUpError(message: errorMessage.isNotEmpty ? errorMessage : 'sign_up.error_occurred'.tr()));
       return;
     }
   }
@@ -64,7 +66,8 @@ class SignUpCubit extends Cubit<SignUpState> {
         emit(CheckUsernameSuccess(isAvailable: false));
       }
     } catch (e) {
-      emit(CheckUsernameFailure(message: AppErrorState.getFriendlyErrorString(e)));
+      final errorMessage = AppErrorState.getFriendlyErrorString(e);
+      emit(CheckUsernameFailure(message: errorMessage.isNotEmpty ? errorMessage : 'sign_up.check_username_failed'.tr()));
       return;
     }
   }
@@ -94,7 +97,8 @@ class SignUpCubit extends Cubit<SignUpState> {
         emit(CheckEmailSuccess(isAvailable: false));
       }
     } catch (e) {
-      emit(CheckEmailFailure(message: AppErrorState.getFriendlyErrorString(e)));
+      final errorMessage = AppErrorState.getFriendlyErrorString(e);
+      emit(CheckEmailFailure(message: errorMessage.isNotEmpty ? errorMessage : 'sign_up.check_email_failed'.tr()));
       return;
     }
   }
