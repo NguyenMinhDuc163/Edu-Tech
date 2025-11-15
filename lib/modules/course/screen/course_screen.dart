@@ -5,6 +5,7 @@ import 'package:ed_tech/modules/course/widgets/course_card_widget.dart';
 import 'package:ed_tech/modules/course/widgets/course_category_tabs_widget.dart';
 import 'package:ed_tech/modules/course/widgets/course_list_widget.dart';
 import 'package:ed_tech/modules/course/bloc/course_controller.dart';
+import 'package:ed_tech/modules/course/screen/search_course_screen.dart';
 import 'package:ed_tech/core/widgets/search_filter_bottom_sheet.dart';
 
 class CourseScreen extends StatefulWidget {
@@ -131,11 +132,12 @@ class _SearchBar extends StatelessWidget {
           const Icon(Icons.search, color: AppColors.colorB8B8D2),
           const SizedBox(width: 8),
           Expanded(
-            child: ValueListenableBuilder<String>(
-              valueListenable: controller.searchQuery,
-              builder: (context, searchQuery, child) {
-                return TextField(
-                  onChanged: controller.updateSearchQuery,
+            child: GestureDetector(
+              onTap: () {
+                Navigator.pushNamed(context, SearchCourseScreen.routeName);
+              },
+              child: AbsorbPointer(
+                child: TextField(
                   decoration: InputDecoration(
                     isDense: true,
                     hintText: 'Find Course',
@@ -144,8 +146,8 @@ class _SearchBar extends StatelessWidget {
                     ),
                     border: InputBorder.none,
                   ),
-                );
-              },
+                ),
+              ),
             ),
           ),
           const SizedBox(width: 8),

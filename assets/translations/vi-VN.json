@@ -137,6 +137,15 @@
     "star": "Sao",
     "submit_review": "Gửi đánh giá"
   },
+  "search": {
+    "title": "Tìm kiếm khóa học",
+    "search_placeholder": "Tìm kiếm khóa học...",
+    "no_results": "Không tìm thấy khóa học",
+    "search_results": "Kết quả tìm kiếm",
+    "results_count": "kết quả",
+    "recent_searches": "Tìm kiếm gần đây",
+    "no_history": "Chưa có lịch sử tìm kiếm"
+  },
   "assessment": {
     "no_quizzes": "Chưa có bài kiểm tra nào",
     "all_quizzes": "Tất cả bài kiểm tra",

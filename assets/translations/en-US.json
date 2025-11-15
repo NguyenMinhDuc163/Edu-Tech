@@ -137,6 +137,15 @@
     "star": "Star",
     "submit_review": "Submit Review"
   },
+  "search": {
+    "title": "Search Courses",
+    "search_placeholder": "Search for courses...",
+    "no_results": "No courses found",
+    "search_results": "Search Results",
+    "results_count": "results found",
+    "recent_searches": "Recent Searches",
+    "no_history": "No search history"
+  },
   "assessment": {
     "no_quizzes": "No quizzes available",
     "all_quizzes": "All quizzes",

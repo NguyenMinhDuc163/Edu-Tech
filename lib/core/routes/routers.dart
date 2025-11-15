@@ -34,9 +34,13 @@ import 'package:ed_tech/modules/auth/sign_up/repository/sign_up_repo.dart';
 import 'package:ed_tech/modules/auth/sign_up/screen/sign_up_screen.dart';
 import 'package:ed_tech/modules/course/screen/course_screen.dart';
 import 'package:ed_tech/modules/course/screen/course_detail_screen.dart';
+import 'package:ed_tech/modules/course/screen/search_course_screen.dart';
 import 'package:ed_tech/modules/course/bloc/course_controller.dart';
 import 'package:ed_tech/modules/course/bloc/course_cubit.dart';
+import 'package:ed_tech/modules/course/bloc/search_course_controller.dart';
+import 'package:ed_tech/modules/course/bloc/search_course_cubit.dart';
 import 'package:ed_tech/modules/course/repository/course_repo.dart';
+import 'package:ed_tech/modules/course/repository/search_course_repo.dart';
 import 'package:ed_tech/modules/dashboard/screen/dashboard_screen.dart';
 import 'package:ed_tech/modules/home/bloc/home_cubit.dart';
 import 'package:ed_tech/modules/home/bloc/home_controller.dart';
@@ -233,6 +237,23 @@ class Routers {
                       (context) =>
                           CourseCubit(repo: context.read<CourseRepo>()),
                   child: CourseDetailScreen(),
+                ),
+              ),
+        );
+      case SearchCourseScreen.routeName:
+        return MaterialPageRoute(
+          settings: settings,
+          builder:
+              (context) => RepositoryProvider(
+                create: (context) => SearchCourseRepo(apiClient: ApiClient()),
+                child: BlocProvider(
+                  create:
+                      (context) =>
+                          SearchCourseCubit(repo: context.read<SearchCourseRepo>()),
+                  child: DisposableProvider(
+                    create: (_) => SearchCourseController(),
+                    child: const SearchCourseScreen(),
+                  ),
                 ),
               ),
         );
