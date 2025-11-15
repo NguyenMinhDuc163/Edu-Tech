@@ -31,6 +31,7 @@ class ApiPath {
   static const String quizHistory = '/student/quiz/history';
   static const String searchCourses = '/search/courses';
   static const String searchHistory = '/search/history';
+  static const String createPayment = '/api/create-qr';
 }
 
 // TODO trong intercepter => ds api can truyen id

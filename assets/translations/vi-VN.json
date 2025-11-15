@@ -119,7 +119,16 @@
     "go_to_orders": "Đi đến Đơn hàng",
     "continue_shopping": "Tiếp tục mua sắm",
     "exp": "Hạn sử dụng",
-    "cvv": "Mã CVV"
+    "cvv": "Mã CVV",
+    "order_confirmation": "Xác nhận đơn hàng",
+    "course_details": "Thông tin khóa học",
+    "buyer_information": "Thông tin người mua",
+    "total_amount": "Tổng tiền",
+    "proceed_to_payment": "Tiến hành thanh toán",
+    "course_name": "Tên khóa học",
+    "instructor": "Giảng viên",
+    "duration": "Thời lượng",
+    "username": "Tên người dùng"
   },
   "review": {
     "title": "Đánh giá",

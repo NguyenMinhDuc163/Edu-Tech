@@ -119,7 +119,16 @@
     "go_to_orders": "Go to Orders",
     "continue_shopping": "Continue Shopping",
     "exp": "Expiry Date",
-    "cvv": "CVV"
+    "cvv": "CVV",
+    "order_confirmation": "Order Confirmation",
+    "course_details": "Course Details",
+    "buyer_information": "Buyer Information",
+    "total_amount": "Total Amount",
+    "proceed_to_payment": "Proceed to Payment",
+    "course_name": "Course Name",
+    "instructor": "Instructor",
+    "duration": "Duration",
+    "username": "Username"
   },
   "review": {
     "title": "Reviews",

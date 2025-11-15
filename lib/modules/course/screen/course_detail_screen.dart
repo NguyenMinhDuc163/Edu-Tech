@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:ed_tech/modules/payment/screen/payment_method_screen.dart';
+import 'package:ed_tech/modules/payment/screen/order_confirmation_screen.dart';
 import 'package:ed_tech/modules/reviews/screen/review_screen.dart';
 import 'package:ed_tech/init.dart';
 import 'package:ed_tech/modules/course/widgets/course_lesson_bottom_sheet.dart';
@@ -321,7 +321,18 @@ class _CourseDetailContent extends StatelessWidget {
                 ),
                 child: TextButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, PaymentMethodScreen.routeName);
+                    Navigator.pushNamed(
+                      context,
+                      OrderConfirmationScreen.routeName,
+                      arguments: {
+                        'courseId': courseId,
+                        'title': title,
+                        'instructor': instructor,
+                        'price': price,
+                        'duration': duration,
+                        'thumbnailUrl': courseDetail?.thumbnailUrl ?? imageUrl,
+                      },
+                    );
                   },
                   child: Text('Buy Now', style: AppTextStyles.button),
                 ),

@@ -55,6 +55,9 @@ import 'package:ed_tech/modules/payment/screen/address_form_screen.dart';
 import 'package:ed_tech/modules/payment/screen/confirm_screen.dart';
 import 'package:ed_tech/modules/payment/screen/new_card_screen.dart';
 import 'package:ed_tech/modules/payment/screen/payment_method_screen.dart';
+import 'package:ed_tech/modules/payment/screen/order_confirmation_screen.dart';
+import 'package:ed_tech/modules/payment/bloc/payment_cubit.dart';
+import 'package:ed_tech/modules/payment/repository/payment_repo.dart';
 import 'package:ed_tech/modules/ranking/screen/ranking_screen.dart';
 import 'package:ed_tech/modules/reviews/screen/add_review_screen.dart';
 import 'package:ed_tech/modules/reviews/screen/review_screen.dart';
@@ -281,6 +284,17 @@ class Routers {
         return MaterialPageRoute(
           settings: settings,
           builder: (_) => PaymentMethodScreen(),
+        );
+      case OrderConfirmationScreen.routeName:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (context) => RepositoryProvider(
+            create: (context) => PaymentRepo(apiClient: ApiClient()),
+            child: BlocProvider(
+              create: (context) => PaymentCubit(repo: context.read<PaymentRepo>()),
+              child: const OrderConfirmationScreen(),
+            ),
+          ),
         );
       case AddReviewScreen.routeName:
         return MaterialPageRoute(
