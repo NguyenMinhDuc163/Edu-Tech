@@ -56,6 +56,7 @@ import 'package:ed_tech/modules/payment/screen/confirm_screen.dart';
 import 'package:ed_tech/modules/payment/screen/new_card_screen.dart';
 import 'package:ed_tech/modules/payment/screen/payment_method_screen.dart';
 import 'package:ed_tech/modules/payment/screen/order_confirmation_screen.dart';
+import 'package:ed_tech/modules/payment/screen/payment_webview_screen.dart';
 import 'package:ed_tech/modules/payment/bloc/payment_cubit.dart';
 import 'package:ed_tech/modules/payment/repository/payment_repo.dart';
 import 'package:ed_tech/modules/ranking/screen/ranking_screen.dart';
@@ -295,6 +296,11 @@ class Routers {
               child: const OrderConfirmationScreen(),
             ),
           ),
+        );
+      case PaymentWebViewScreen.routeName:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => const PaymentWebViewScreen(),
         );
       case AddReviewScreen.routeName:
         return MaterialPageRoute(

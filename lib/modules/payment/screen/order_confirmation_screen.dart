@@ -2,24 +2,52 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:ed_tech/data/services/user_service.dart';
 import 'package:ed_tech/modules/payment/bloc/payment_cubit.dart';
 import 'package:ed_tech/modules/payment/bloc/payment_state.dart';
+import 'package:ed_tech/modules/payment/screen/payment_webview_screen.dart';
 import 'package:ed_tech/init.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class OrderConfirmationScreen extends StatelessWidget {
   static const String routeName = '/orderConfirmationScreen';
 
   const OrderConfirmationScreen({super.key});
 
-  Future<void> _launchPaymentUrl(String url) async {
-    final Uri uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(
-        uri,
-        mode: LaunchMode.externalApplication,
-      );
-    } else {
-      throw Exception('Could not launch payment URL');
+  Future<void> _openPaymentWebView(BuildContext context, String paymentUrl) async {
+    final result = await Navigator.of(
+      context,
+    ).pushNamed(PaymentWebViewScreen.routeName, arguments: paymentUrl);
+
+    if (result != null && result is Map<String, dynamic>) {
+      if (!context.mounted) return;
+
+      final bool success = result['success'] ?? false;
+      final bool cancelled = result['cancelled'] ?? false;
+
+      if (cancelled) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('payment.payment_cancelled'.tr()),
+            backgroundColor: AppColors.color8F959E,
+          ),
+        );
+
+        context.read<PaymentCubit>().reset();
+      } else if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('payment.payment_success'.tr()),
+            backgroundColor: Colors.green,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+
+        Navigator.of(context).pop();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('payment.payment_failed'.tr()), backgroundColor: AppColors.error),
+        );
+
+        context.read<PaymentCubit>().reset();
+      }
     }
   }
 
@@ -29,11 +57,7 @@ class OrderConfirmationScreen extends StatelessWidget {
         ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
 
     if (args == null) {
-      return Scaffold(
-        body: Center(
-          child: Text('No order data available'),
-        ),
-      );
+      return Scaffold(body: Center(child: Text('No order data available')));
     }
 
     final String courseId = args['courseId'] ?? '';
@@ -48,14 +72,11 @@ class OrderConfirmationScreen extends StatelessWidget {
     return BlocListener<PaymentCubit, PaymentState>(
       listener: (context, state) {
         if (state is PaymentSuccess) {
-          _launchPaymentUrl(state.paymentUrl);
+          _openPaymentWebView(context, state.paymentUrl);
         } else if (state is PaymentError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.message),
-              backgroundColor: AppColors.error,
-            ),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.message), backgroundColor: AppColors.error));
         }
       },
       child: FunctionScreenTemplate(
@@ -79,10 +100,7 @@ class OrderConfirmationScreen extends StatelessWidget {
                           gradient: LinearGradient(
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
-                            colors: [
-                              AppColors.primary.withAlpha(26),
-                              AppColors.colorFFEBF0,
-                            ],
+                            colors: [AppColors.primary.withAlpha(26), AppColors.colorFFEBF0],
                           ),
                         ),
                         child: Column(
@@ -202,10 +220,7 @@ class OrderConfirmationScreen extends StatelessWidget {
                                 gradient: LinearGradient(
                                   begin: Alignment.centerLeft,
                                   end: Alignment.centerRight,
-                                  colors: [
-                                    AppColors.primary,
-                                    AppColors.color0961F5,
-                                  ],
+                                  colors: [AppColors.primary, AppColors.color0961F5],
                                 ),
                                 borderRadius: BorderRadius.circular(16),
                                 boxShadow: [
@@ -217,17 +232,18 @@ class OrderConfirmationScreen extends StatelessWidget {
                                 ],
                               ),
                               child: ElevatedButton(
-                                onPressed: isLoading
-                                    ? null
-                                    : () {
-                                        final numPrice = double.tryParse(price) ?? 0;
-                                        final amountInVND = (numPrice * 1).toInt();
+                                onPressed:
+                                    isLoading
+                                        ? null
+                                        : () {
+                                          final numPrice = double.tryParse(price) ?? 0;
+                                          final amountInVND = (numPrice * 1).toInt();
 
-                                        context.read<PaymentCubit>().createPayment(
-                                              courseId: courseId,
-                                              amount: amountInVND,
-                                            );
-                                      },
+                                          context.read<PaymentCubit>().createPayment(
+                                            courseId: courseId,
+                                            amount: amountInVND,
+                                          );
+                                        },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.transparent,
                                   shadowColor: Colors.transparent,
@@ -236,33 +252,34 @@ class OrderConfirmationScreen extends StatelessWidget {
                                   ),
                                   disabledBackgroundColor: Colors.transparent,
                                 ),
-                                child: isLoading
-                                    ? const SizedBox(
-                                        width: 24,
-                                        height: 24,
-                                        child: CircularProgressIndicator(
-                                          color: AppColors.white,
-                                          strokeWidth: 2.5,
-                                        ),
-                                      )
-                                    : Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            'payment.proceed_to_payment'.tr(),
-                                            style: AppTextStyles.button.copyWith(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 12),
-                                          const Icon(
-                                            Icons.arrow_forward_rounded,
+                                child:
+                                    isLoading
+                                        ? const SizedBox(
+                                          width: 24,
+                                          height: 24,
+                                          child: CircularProgressIndicator(
                                             color: AppColors.white,
-                                            size: 20,
+                                            strokeWidth: 2.5,
                                           ),
-                                        ],
-                                      ),
+                                        )
+                                        : Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              'payment.proceed_to_payment'.tr(),
+                                              style: AppTextStyles.button.copyWith(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 12),
+                                            const Icon(
+                                              Icons.arrow_forward_rounded,
+                                              color: AppColors.white,
+                                              size: 20,
+                                            ),
+                                          ],
+                                        ),
                               ),
                             ),
 
@@ -319,53 +336,44 @@ class _CourseInfoCard extends StatelessWidget {
               topLeft: Radius.circular(20),
               topRight: Radius.circular(20),
             ),
-            child: thumbnailUrl != null && thumbnailUrl!.isNotEmpty
-                ? Image.network(
-                    thumbnailUrl!,
-                    width: double.infinity,
-                    height: 180,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        width: double.infinity,
-                        height: 180,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              AppColors.colorFFEBF0,
-                              AppColors.primary.withAlpha(77),
-                            ],
+            child:
+                thumbnailUrl != null && thumbnailUrl!.isNotEmpty
+                    ? Image.network(
+                      thumbnailUrl!,
+                      width: double.infinity,
+                      height: 180,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          width: double.infinity,
+                          height: 180,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [AppColors.colorFFEBF0, AppColors.primary.withAlpha(77)],
+                            ),
                           ),
+                          child: const Icon(
+                            Icons.school_rounded,
+                            color: AppColors.primary,
+                            size: 64,
+                          ),
+                        );
+                      },
+                    )
+                    : Container(
+                      width: double.infinity,
+                      height: 180,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [AppColors.colorFFEBF0, AppColors.primary.withAlpha(77)],
                         ),
-                        child: const Icon(
-                          Icons.school_rounded,
-                          color: AppColors.primary,
-                          size: 64,
-                        ),
-                      );
-                    },
-                  )
-                : Container(
-                    width: double.infinity,
-                    height: 180,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          AppColors.colorFFEBF0,
-                          AppColors.primary.withAlpha(77),
-                        ],
                       ),
+                      child: const Icon(Icons.school_rounded, color: AppColors.primary, size: 64),
                     ),
-                    child: const Icon(
-                      Icons.school_rounded,
-                      color: AppColors.primary,
-                      size: 64,
-                    ),
-                  ),
           ),
 
           Padding(
@@ -401,11 +409,7 @@ class _CourseInfoCard extends StatelessWidget {
                           color: AppColors.primary.withAlpha(26),
                           borderRadius: BorderRadius.circular(6),
                         ),
-                        child: const Icon(
-                          Icons.person_rounded,
-                          size: 16,
-                          color: AppColors.primary,
-                        ),
+                        child: const Icon(Icons.person_rounded, size: 16, color: AppColors.primary),
                       ),
                       const SizedBox(width: 8),
                       Expanded(
@@ -506,10 +510,7 @@ class _BuyerInfoCard extends StatelessWidget {
             iconBgColor: AppColors.primary.withAlpha(26),
           ),
           const SizedBox(height: 16),
-          Container(
-            height: 1,
-            color: AppColors.lightGray,
-          ),
+          Container(height: 1, color: AppColors.lightGray),
           const SizedBox(height: 16),
           _InfoRow(
             label: 'sign_up.email'.tr(),
@@ -545,15 +546,8 @@ class _InfoRow extends StatelessWidget {
       children: [
         Container(
           padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: iconBgColor,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Icon(
-            icon,
-            size: 24,
-            color: iconColor,
-          ),
+          decoration: BoxDecoration(color: iconBgColor, borderRadius: BorderRadius.circular(12)),
+          child: Icon(icon, size: 24, color: iconColor),
         ),
         const SizedBox(width: 16),
         Expanded(
@@ -596,11 +590,7 @@ class _PriceSummary extends StatelessWidget {
       final numPrice = double.tryParse(price);
       if (numPrice == null) return price;
 
-      final formatter = NumberFormat.currency(
-        locale: 'vi_VN',
-        symbol: '₫',
-        decimalDigits: 0,
-      );
+      final formatter = NumberFormat.currency(locale: 'vi_VN', symbol: '₫', decimalDigits: 0);
       return formatter.format(numPrice);
     } catch (e) {
       return price;
@@ -615,10 +605,7 @@ class _PriceSummary extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            AppColors.colorFF6905,
-            AppColors.colorFF6905.withAlpha(204),
-          ],
+          colors: [AppColors.colorFF6905, AppColors.colorFF6905.withAlpha(204)],
         ),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
@@ -677,16 +664,9 @@ class _PriceSummary extends StatelessWidget {
             decoration: BoxDecoration(
               color: AppColors.white.withAlpha(38),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: AppColors.white.withAlpha(77),
-                width: 2,
-              ),
+              border: Border.all(color: AppColors.white.withAlpha(77), width: 2),
             ),
-            child: const Icon(
-              Icons.payments_rounded,
-              color: AppColors.white,
-              size: 40,
-            ),
+            child: const Icon(Icons.payments_rounded, color: AppColors.white, size: 40),
           ),
         ],
       ),

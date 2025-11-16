@@ -128,7 +128,19 @@
     "course_name": "Tên khóa học",
     "instructor": "Giảng viên",
     "duration": "Thời lượng",
-    "username": "Tên người dùng"
+    "username": "Tên người dùng",
+    "payment_processing": "Đang xử lý thanh toán",
+    "loading": "Đang tải trang thanh toán...",
+    "error_loading": "Lỗi tải trang thanh toán",
+    "retry": "Thử lại",
+    "cancel": "Hủy",
+    "back": "Quay lại",
+    "cancel_payment": "Hủy thanh toán",
+    "cancel_payment_message": "Bạn có chắc chắn muốn hủy thanh toán? Đơn hàng của bạn sẽ không được xử lý.",
+    "continue": "Tiếp tục thanh toán",
+    "payment_cancelled": "Đã hủy thanh toán",
+    "payment_success": "Thanh toán thành công",
+    "payment_failed": "Thanh toán thất bại"
   },
   "review": {
     "title": "Đánh giá",

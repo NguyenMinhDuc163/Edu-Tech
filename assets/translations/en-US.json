@@ -128,7 +128,19 @@
     "course_name": "Course Name",
     "instructor": "Instructor",
     "duration": "Duration",
-    "username": "Username"
+    "username": "Username",
+    "payment_processing": "Payment Processing",
+    "loading": "Loading payment...",
+    "error_loading": "Error Loading Payment",
+    "retry": "Retry",
+    "cancel": "Cancel",
+    "back": "Back",
+    "cancel_payment": "Cancel Payment",
+    "cancel_payment_message": "Are you sure you want to cancel the payment? Your order will not be processed.",
+    "continue": "Continue Payment",
+    "payment_cancelled": "Payment Cancelled",
+    "payment_success": "Payment Successful",
+    "payment_failed": "Payment Failed"
   },
   "review": {
     "title": "Reviews",
