@@ -9,8 +9,28 @@ import 'package:ed_tech/modules/course/screen/course_cancellation_screen.dart';
 import 'package:video_player/video_player.dart';
 import 'package:chewie/chewie.dart';
 
-class CourseDetailScreen extends StatelessWidget {
+class CourseDetailScreen extends StatefulWidget {
   static const String routeName = '/CourseDetailScreen';
+
+  const CourseDetailScreen({super.key});
+
+  @override
+  State<CourseDetailScreen> createState() => _CourseDetailScreenState();
+}
+
+class _CourseDetailScreenState extends State<CourseDetailScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Gọi API chỉ 1 lần khi widget được khởi tạo
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+      if (args != null) {
+        final String courseId = args['courseId'] ?? '';
+        context.read<CourseCubit>().getCourseDetail(courseId);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,10 +48,6 @@ class CourseDetailScreen extends StatelessWidget {
     final String duration = args['duration'] ?? '0h 0m';
     final String? imageUrl = args['imageUrl'];
     final String? description = args['description'];
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<CourseCubit>().getCourseDetail(courseId);
-    });
 
     return BlocBuilder<CourseCubit, CourseState>(
       builder: (context, state) {
@@ -67,7 +83,7 @@ class CourseDetailScreen extends StatelessWidget {
   }
 }
 
-class _CourseDetailContent extends StatelessWidget {
+class _CourseDetailContent extends StatefulWidget {
   final String courseId;
   final String title;
   final String instructor;
@@ -88,16 +104,47 @@ class _CourseDetailContent extends StatelessWidget {
     this.courseDetail,
   });
 
+  @override
+  State<_CourseDetailContent> createState() => _CourseDetailContentState();
+}
+
+class _CourseDetailContentState extends State<_CourseDetailContent> {
+  bool _showBottomButton = true;
+  final DraggableScrollableController _sheetController = DraggableScrollableController();
+
+  @override
+  void initState() {
+    super.initState();
+    _sheetController.addListener(_onSheetChanged);
+  }
+
+  @override
+  void dispose() {
+    _sheetController.removeListener(_onSheetChanged);
+    _sheetController.dispose();
+    super.dispose();
+  }
+
+  void _onSheetChanged() {
+    final size = _sheetController.size;
+    final shouldShow = size <= 0.65;
+    if (shouldShow != _showBottomButton) {
+      setState(() {
+        _showBottomButton = shouldShow;
+      });
+    }
+  }
+
   void _showLessonBottomSheet(BuildContext context) {
-    final sections = courseDetail?.sections ?? [];
-    final accessLevel = courseDetail?.accessLevel ?? 'FREE';
+    final sections = widget.courseDetail?.sections ?? [];
+    final accessLevel = widget.courseDetail?.accessLevel ?? 'FREE';
 
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => CourseLessonBottomSheet(
-        courseTitle: title,
+        courseTitle: widget.title,
         sections: sections,
         accessLevel: accessLevel,
         onPlayVideo: (videoUrl, title) => _playVideo(context, videoUrl, title),
@@ -106,9 +153,9 @@ class _CourseDetailContent extends StatelessWidget {
   }
 
   String? _getFirstVideoUrl() {
-    if (courseDetail?.sections == null) return null;
+    if (widget.courseDetail?.sections == null) return null;
 
-    for (var section in courseDetail.sections) {
+    for (var section in widget.courseDetail.sections) {
       for (var content in section.contents) {
         if (content.files.isNotEmpty) {
           for (var file in content.files) {
@@ -142,7 +189,8 @@ class _CourseDetailContent extends StatelessWidget {
         children: [
           _buildVideoPlayerSection(context),
           _buildBottomSheet(context),
-          _buildBottomActionButtons(context),
+          if (_showBottomButton) _buildBottomActionButtons(context),
+          if (!_showBottomButton) _buildFloatingActionButton(context),
         ],
       ),
     );
@@ -150,18 +198,19 @@ class _CourseDetailContent extends StatelessWidget {
 
   Widget _buildVideoPlayerSection(BuildContext context) {
     String? videoUrl = _getFirstVideoUrl();
-    String? thumbnail = courseDetail?.thumbnailUrl ?? imageUrl;
+    String? thumbnail = widget.courseDetail?.thumbnailUrl ?? widget.imageUrl;
 
     return _InlineVideoPlayer(
       videoUrl: videoUrl,
       thumbnail: thumbnail,
-      title: title,
+      title: widget.title,
       onBack: () => Navigator.of(context).pop(),
     );
   }
 
   Widget _buildBottomSheet(BuildContext context) {
     return DraggableScrollableSheet(
+      controller: _sheetController,
       initialChildSize: 0.6,
       minChildSize: 0.6,
       maxChildSize: 0.9,
@@ -212,12 +261,14 @@ class _CourseDetailContent extends StatelessWidget {
   }
 
   Widget _buildBottomActionButtons(BuildContext context) {
-    final accessLevel = courseDetail?.accessLevel ?? 'FREE';
+    final accessLevel = widget.courseDetail?.accessLevel ?? 'FREE';
     final hasFullAccess = accessLevel == 'FULL';
-    final daysLeftToCancel = courseDetail?.daysLeftToCancel ?? 0;
+    final daysLeftToCancel = widget.courseDetail?.daysLeftToCancel ?? 0;
 
-    return Positioned(
-      bottom: 0,
+    return AnimatedPositioned(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+      bottom: _showBottomButton ? 0 : -100,
       left: 0,
       right: 0,
       child: Container(
@@ -228,7 +279,7 @@ class _CourseDetailContent extends StatelessWidget {
             BoxShadow(
               offset: const Offset(0, -2),
               blurRadius: 10,
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withAlpha(26),
             ),
           ],
         ),
@@ -259,6 +310,63 @@ class _CourseDetailContent extends StatelessWidget {
               ),
       ),
     );
+  }
+
+  Widget _buildFloatingActionButton(BuildContext context) {
+    final accessLevel = widget.courseDetail?.accessLevel ?? 'FREE';
+    final hasFullAccess = accessLevel == 'FULL';
+
+    return Positioned(
+      bottom: 24,
+      right: 24,
+      child: FloatingActionButton.extended(
+        onPressed: () {
+          if (hasFullAccess) {
+            _showLessonBottomSheet(context);
+          } else {
+            _handleBuyAction(context);
+          }
+        },
+        backgroundColor: hasFullAccess ? AppColors.success : AppColors.primary,
+        elevation: 6,
+        label: Row(
+          children: [
+            Icon(
+              hasFullAccess ? Icons.play_circle_filled : Icons.shopping_cart,
+              color: AppColors.white,
+              size: 20,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              hasFullAccess ? 'course.continue_learning'.tr() : 'course.buy_now'.tr(),
+              style: AppTextStyles.button.copyWith(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _handleBuyAction(BuildContext context) async {
+    final result = await Navigator.pushNamed(
+      context,
+      OrderConfirmationScreen.routeName,
+      arguments: {
+        'courseId': widget.courseId,
+        'title': widget.title,
+        'instructor': widget.instructor,
+        'price': widget.price,
+        'duration': widget.duration,
+        'thumbnailUrl': widget.courseDetail?.thumbnailUrl ?? widget.imageUrl,
+      },
+    );
+
+    if (result == true && context.mounted) {
+      context.read<CourseCubit>().getCourseDetail(widget.courseId);
+    }
   }
 
   Widget _buildEnrolledWithCancelLayout(BuildContext context, int daysLeft) {
@@ -345,8 +453,8 @@ class _CourseDetailContent extends StatelessWidget {
         builder: (context) => BlocProvider.value(
           value: courseCubit,
           child: CourseCancellationScreen(
-            courseId: courseId,
-            courseTitle: title,
+            courseId: widget.courseId,
+            courseTitle: widget.title,
             daysLeftToCancel: daysLeft,
           ),
         ),
@@ -354,7 +462,7 @@ class _CourseDetailContent extends StatelessWidget {
     );
 
     if (result == true && context.mounted) {
-      courseCubit.getCourseDetail(courseId);
+      courseCubit.getCourseDetail(widget.courseId);
     }
   }
 
@@ -370,32 +478,14 @@ class _CourseDetailContent extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withOpacity(0.4),
+            color: AppColors.primary.withAlpha(102),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
         ],
       ),
       child: TextButton(
-        onPressed: () async {
-          final result = await Navigator.pushNamed(
-            context,
-            OrderConfirmationScreen.routeName,
-            arguments: {
-              'courseId': courseId,
-              'title': title,
-              'instructor': instructor,
-              'price': price,
-              'duration': duration,
-              'thumbnailUrl': courseDetail?.thumbnailUrl ?? imageUrl,
-            },
-          );
-
-          // Nếu thanh toán thành công, refresh course detail
-          if (result == true && context.mounted) {
-            context.read<CourseCubit>().getCourseDetail(courseId);
-          }
-        },
+        onPressed: () => _handleBuyAction(context),
         style: TextButton.styleFrom(
           backgroundColor: Colors.transparent,
           shape: RoundedRectangleBorder(
@@ -433,13 +523,13 @@ class _CourseDetailContent extends StatelessWidget {
           end: Alignment.centerRight,
           colors: [
             AppColors.success,
-            AppColors.success.withOpacity(0.8),
+            AppColors.success.withAlpha(204),
           ],
         ),
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: AppColors.success.withOpacity(0.3),
+            color: AppColors.success.withAlpha(77),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -485,7 +575,7 @@ class _CourseDetailContent extends StatelessWidget {
         children: [
           Expanded(
             child: Text(
-              title,
+              widget.title,
               style: AppTextStyles.textHeader2.copyWith(fontWeight: FontWeight.bold),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
@@ -493,7 +583,7 @@ class _CourseDetailContent extends StatelessWidget {
           ),
           const SizedBox(width: 16),
           Text(
-            price,
+            widget.price,
             style: AppTextStyles.textHeader2.copyWith(
               color: AppColors.primary,
               fontWeight: FontWeight.bold,
@@ -516,7 +606,7 @@ class _CourseDetailContent extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Text(
-            description ??
+            widget.description ??
                 'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.',
             style: AppTextStyles.textContent2.copyWith(color: AppColors.color8F959E, height: 1.5),
           ),
@@ -528,7 +618,7 @@ class _CourseDetailContent extends StatelessWidget {
   }
 
   Widget _buildLessonsPreviewSection(BuildContext context) {
-    final sections = courseDetail?.sections ?? [];
+    final sections = widget.courseDetail?.sections ?? [];
     final totalLessons = _getTotalLessonsCount(sections);
     final sectionsToShow = totalLessons > 5 ? sections.take(2).toList() : sections;
     final hasMore = totalLessons > 5;
