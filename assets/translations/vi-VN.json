@@ -140,7 +140,8 @@
     "continue": "Tiếp tục thanh toán",
     "payment_cancelled": "Đã hủy thanh toán",
     "payment_success": "Thanh toán thành công",
-    "payment_failed": "Thanh toán thất bại"
+    "payment_failed": "Thanh toán thất bại",
+    "processing_order": "Đang xử lý đơn hàng..."
   },
   "review": {
     "title": "Đánh giá",
@@ -166,6 +167,34 @@
     "results_count": "kết quả",
     "recent_searches": "Tìm kiếm gần đây",
     "no_history": "Chưa có lịch sử tìm kiếm"
+  },
+  "course": {
+    "course_content": "Nội dung khóa học",
+    "lessons": "Bài học",
+    "lesson": "Bài",
+    "locked": "Đã khóa",
+    "purchase_to_unlock": "Mua khóa học để mở khóa",
+    "video_unavailable": "Video không khả dụng",
+    "no_content": "Chưa có nội dung",
+    "buy_now": "Mua ngay",
+    "enrolled": "Đã đăng ký",
+    "continue_learning": "Tiếp tục học",
+    "cancel_course": "Hủy khóa học",
+    "days_left_to_cancel": "Còn {days} ngày để hủy",
+    "cancel_confirmation": "Xác nhận hủy khóa học",
+    "refund_policy": "Chính sách hoàn tiền",
+    "refund_info": "Số tiền hoàn lại sẽ được chuyển về tài khoản của bạn trong vòng 5-7 ngày làm việc.",
+    "cancellation_terms": "Điều khoản hủy",
+    "terms_point_1": "Bạn sẽ mất quyền truy cập vào tất cả nội dung khóa học",
+    "terms_point_2": "Tiến độ học tập của bạn sẽ không được lưu lại",
+    "terms_point_3": "Chứng chỉ (nếu có) sẽ bị thu hồi",
+    "cancellation_commitment": "Cam kết hủy",
+    "commitment_info": "Bằng việc hủy khóa học, bạn xác nhận rằng bạn đã đọc và hiểu các điều khoản trên.",
+    "proceed_cancel": "Tiếp tục hủy",
+    "back": "Quay lại",
+    "cancelling_course": "Đang hủy khóa học...",
+    "cancel_success": "Hủy khóa học thành công",
+    "cancel_failed": "Hủy khóa học thất bại"
   },
   "assessment": {
     "no_quizzes": "Chưa có bài kiểm tra nào",

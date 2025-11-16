@@ -140,7 +140,8 @@
     "continue": "Continue Payment",
     "payment_cancelled": "Payment Cancelled",
     "payment_success": "Payment Successful",
-    "payment_failed": "Payment Failed"
+    "payment_failed": "Payment Failed",
+    "processing_order": "Processing your order..."
   },
   "review": {
     "title": "Reviews",
@@ -166,6 +167,34 @@
     "results_count": "results found",
     "recent_searches": "Recent Searches",
     "no_history": "No search history"
+  },
+  "course": {
+    "course_content": "Course Content",
+    "lessons": "Lessons",
+    "lesson": "Lesson",
+    "locked": "Locked",
+    "purchase_to_unlock": "Purchase course to unlock",
+    "video_unavailable": "Video unavailable",
+    "no_content": "No content available",
+    "buy_now": "Buy Now",
+    "enrolled": "Enrolled",
+    "continue_learning": "Continue Learning",
+    "cancel_course": "Cancel Course",
+    "days_left_to_cancel": "{days} days left to cancel",
+    "cancel_confirmation": "Course Cancellation Confirmation",
+    "refund_policy": "Refund Policy",
+    "refund_info": "The refund amount will be transferred to your account within 5-7 business days.",
+    "cancellation_terms": "Cancellation Terms",
+    "terms_point_1": "You will lose access to all course content",
+    "terms_point_2": "Your learning progress will not be saved",
+    "terms_point_3": "Certificates (if any) will be revoked",
+    "cancellation_commitment": "Cancellation Commitment",
+    "commitment_info": "By canceling the course, you confirm that you have read and understood the above terms.",
+    "proceed_cancel": "Proceed to Cancel",
+    "back": "Back",
+    "cancelling_course": "Cancelling course...",
+    "cancel_success": "Course cancelled successfully",
+    "cancel_failed": "Failed to cancel course"
   },
   "assessment": {
     "no_quizzes": "No quizzes available",

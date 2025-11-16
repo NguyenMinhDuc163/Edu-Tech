@@ -32,15 +32,8 @@ class OrderConfirmationScreen extends StatelessWidget {
 
         context.read<PaymentCubit>().reset();
       } else if (success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('payment.payment_success'.tr()),
-            backgroundColor: Colors.green,
-            duration: const Duration(seconds: 3),
-          ),
-        );
-
-        Navigator.of(context).pop();
+        // Hiển thị dialog thành công với loading
+        _showPaymentSuccessDialog(context);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('payment.payment_failed'.tr()), backgroundColor: AppColors.error),
@@ -49,6 +42,86 @@ class OrderConfirmationScreen extends StatelessWidget {
         context.read<PaymentCubit>().reset();
       }
     }
+  }
+
+  Future<void> _showPaymentSuccessDialog(BuildContext context) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => PopScope(
+        canPop: false,
+        child: Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(32),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Success Icon
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: Colors.green.withAlpha(26),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.check_circle,
+                    color: Colors.green,
+                    size: 60,
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // Title
+                Text(
+                  'payment.payment_success'.tr(),
+                  style: AppTextStyles.textHeader3.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.text,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 12),
+
+                // Description
+                Text(
+                  'payment.processing_order'.tr(),
+                  style: AppTextStyles.textContent2.copyWith(
+                    color: AppColors.color8F959E,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+
+                // Loading indicator
+                const SizedBox(
+                  width: 30,
+                  height: 30,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 3,
+                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
+    // Delay 3 giây để backend xử lý callback từ VNPay
+    await Future.delayed(const Duration(seconds: 3));
+
+    if (!context.mounted) return;
+
+    // Đóng dialog
+    Navigator.of(context).pop();
+
+    // Đóng OrderConfirmationScreen và trả về true
+    Navigator.of(context).pop(true);
   }
 
   @override

@@ -23,7 +23,7 @@ class CourseCubit extends Cubit<CourseState> {
     }
   }
 
-  
+
   Future<void> getCourseDetail(String courseId) async {
     emit(CourseDetailProgress());
     try {
@@ -34,7 +34,18 @@ class CourseCubit extends Cubit<CourseState> {
     }
   }
 
-  
+
+  Future<void> cancelCourse(String courseId) async {
+    emit(CourseCancellationProgress());
+    try {
+      final cancelledCourseId = await repo.cancelCourse(courseId: courseId);
+      emit(CourseCancellationSuccess(courseId: cancelledCourseId));
+    } catch (e) {
+      emit(CourseCancellationError(message: AppErrorState.getFriendlyErrorString(e)));
+    }
+  }
+
+
   void reset() {
     emit(CourseInitial());
   }

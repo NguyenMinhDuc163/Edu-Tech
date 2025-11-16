@@ -8,8 +8,8 @@ part 'api_path.g.dart';
 class ApiPath {
   /// Base URL
   @EnviedField(varName: 'BASE_URL', obfuscate: true)
-  static String baseUrl = _ApiPath.baseUrl;
-  // static String baseUrl = "http://172.17.54.109:3000";
+  // static String baseUrl = _ApiPath.baseUrl;
+  static String baseUrl = "http://172.17.53.17:3000";
   @EnviedField(varName: 'REGISTER_ID', obfuscate: true)
   static String registerId = _ApiPath.registerId;
 
@@ -32,6 +32,7 @@ class ApiPath {
   static const String searchCourses = '/search/courses';
   static const String searchHistory = '/search/history';
   static const String createPayment = '/api/create-qr';
+  static const String studentRegistrations = '/student/registrations';
 }
 
 // TODO trong intercepter => ds api can truyen id

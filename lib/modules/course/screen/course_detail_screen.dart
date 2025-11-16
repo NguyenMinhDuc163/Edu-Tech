@@ -1,9 +1,11 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ed_tech/modules/payment/screen/order_confirmation_screen.dart';
 import 'package:ed_tech/modules/reviews/screen/review_screen.dart';
 import 'package:ed_tech/init.dart';
 import 'package:ed_tech/modules/course/widgets/course_lesson_bottom_sheet.dart';
 import 'package:ed_tech/modules/course/bloc/course_cubit.dart';
+import 'package:ed_tech/modules/course/screen/course_cancellation_screen.dart';
 import 'package:video_player/video_player.dart';
 import 'package:chewie/chewie.dart';
 
@@ -87,86 +89,20 @@ class _CourseDetailContent extends StatelessWidget {
   });
 
   void _showLessonBottomSheet(BuildContext context) {
-    List<LessonData> lessons =
-        courseDetail?.sections != null
-            ? _getLessonsFromApi(courseDetail.sections)
-            : _getSampleLessons();
+    final sections = courseDetail?.sections ?? [];
+    final accessLevel = courseDetail?.accessLevel ?? 'FREE';
 
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => CourseLessonBottomSheet(courseTitle: title, lessons: lessons),
+      builder: (context) => CourseLessonBottomSheet(
+        courseTitle: title,
+        sections: sections,
+        accessLevel: accessLevel,
+        onPlayVideo: (videoUrl, title) => _playVideo(context, videoUrl, title),
+      ),
     );
-  }
-
-  List<LessonData> _getSampleLessons() {
-    return [
-      const LessonData(
-        id: '1',
-        title: 'Welcome to the Course',
-        duration: '6:10 mins',
-        isCompleted: true,
-        isLocked: false,
-      ),
-      const LessonData(
-        id: '2',
-        title: 'Process overview',
-        duration: '6:10 mins',
-        isCompleted: false,
-        isLocked: false,
-      ),
-      const LessonData(
-        id: '3',
-        title: 'Discovery',
-        duration: '6:10 mins',
-        isCompleted: false,
-        isLocked: true,
-      ),
-      const LessonData(
-        id: '4',
-        title: 'User Research',
-        duration: '8:15 mins',
-        isCompleted: false,
-        isLocked: true,
-      ),
-      const LessonData(
-        id: '5',
-        title: 'Wireframing',
-        duration: '12:30 mins',
-        isCompleted: false,
-        isLocked: true,
-      ),
-    ];
-  }
-
-  List<LessonData> _getLessonsFromApi(List sections) {
-    List<LessonData> lessons = [];
-    for (var section in sections) {
-      for (var content in section.contents) {
-        String? videoUrl;
-        if (content.files.isNotEmpty) {
-          for (var file in content.files) {
-            if (file.fileType == 'video') {
-              videoUrl = file.url;
-              break;
-            }
-          }
-        }
-
-        lessons.add(
-          LessonData(
-            id: content.contentId ?? '',
-            title: content.title ?? '',
-            duration: '0:00',
-            isCompleted: false,
-            isLocked: !(content.isPreview ?? false),
-            videoUrl: videoUrl,
-          ),
-        );
-      }
-    }
-    return lessons;
   }
 
   String? _getFirstVideoUrl() {
@@ -276,6 +212,10 @@ class _CourseDetailContent extends StatelessWidget {
   }
 
   Widget _buildBottomActionButtons(BuildContext context) {
+    final accessLevel = courseDetail?.accessLevel ?? 'FREE';
+    final hasFullAccess = accessLevel == 'FULL';
+    final daysLeftToCancel = courseDetail?.daysLeftToCancel ?? 0;
+
     return Positioned(
       bottom: 0,
       left: 0,
@@ -292,50 +232,243 @@ class _CourseDetailContent extends StatelessWidget {
             ),
           ],
         ),
-        child: Row(
-          children: [
-            GestureDetector(
-              onTap: () {
-                Navigator.pushNamed(context, ReviewScreen.routeName);
-              },
-              child: Container(
-                width: 60,
-                height: 50,
-                decoration: BoxDecoration(
-                  color: AppColors.colorFFEBF0,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.colorFF6905),
+        child: hasFullAccess && daysLeftToCancel > 0
+            ? _buildEnrolledWithCancelLayout(context, daysLeftToCancel)
+            : Row(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(context, ReviewScreen.routeName);
+                    },
+                    child: Container(
+                      width: 60,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        color: AppColors.colorFFEBF0,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: AppColors.colorFF6905),
+                      ),
+                      child: const Icon(Icons.star_border, color: AppColors.colorFF6905, size: 24),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: hasFullAccess ? _buildEnrolledButton(context) : _buildBuyButton(context),
+                  ),
+                ],
+              ),
+      ),
+    );
+  }
+
+  Widget _buildEnrolledWithCancelLayout(BuildContext context, int daysLeft) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: AppColors.colorFF6905.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: AppColors.colorFF6905.withOpacity(0.3),
+              width: 1,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.access_time,
+                color: AppColors.colorFF6905,
+                size: 16,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                'course.days_left_to_cancel'.tr().replaceAll('{days}', daysLeft.toString()),
+                style: AppTextStyles.textContent3.copyWith(
+                  color: AppColors.colorFF6905,
+                  fontWeight: FontWeight.w500,
                 ),
-                child: const Icon(Icons.star_border, color: AppColors.colorFF6905, size: 24),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              flex: 2,
+              child: _buildEnrolledButton(context),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _buildCancelButton(context, daysLeft),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCancelButton(BuildContext context, int daysLeft) {
+    return Container(
+      height: 50,
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.error, width: 1.5),
+      ),
+      child: TextButton(
+        onPressed: () => _showCancelCourseDialog(context, daysLeft),
+        style: TextButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+        child: Icon(
+          Icons.cancel_outlined,
+          color: AppColors.error,
+          size: 20,
+        ),
+      ),
+    );
+  }
+
+  void _showCancelCourseDialog(BuildContext context, int daysLeft) async {
+    final courseCubit = context.read<CourseCubit>();
+
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => BlocProvider.value(
+          value: courseCubit,
+          child: CourseCancellationScreen(
+            courseId: courseId,
+            courseTitle: title,
+            daysLeftToCancel: daysLeft,
+          ),
+        ),
+      ),
+    );
+
+    if (result == true && context.mounted) {
+      courseCubit.getCourseDetail(courseId);
+    }
+  }
+
+  Widget _buildBuyButton(BuildContext context) {
+    return Container(
+      height: 50,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+          colors: [AppColors.primary, AppColors.color0961F5],
+        ),
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withOpacity(0.4),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: TextButton(
+        onPressed: () async {
+          final result = await Navigator.pushNamed(
+            context,
+            OrderConfirmationScreen.routeName,
+            arguments: {
+              'courseId': courseId,
+              'title': title,
+              'instructor': instructor,
+              'price': price,
+              'duration': duration,
+              'thumbnailUrl': courseDetail?.thumbnailUrl ?? imageUrl,
+            },
+          );
+
+          // Nếu thanh toán thành công, refresh course detail
+          if (result == true && context.mounted) {
+            context.read<CourseCubit>().getCourseDetail(courseId);
+          }
+        },
+        style: TextButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'course.buy_now'.tr(),
+              style: AppTextStyles.button.copyWith(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
               ),
             ),
+            const SizedBox(width: 8),
+            const Icon(
+              Icons.arrow_forward,
+              color: AppColors.white,
+              size: 20,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
-            const SizedBox(width: 12),
-
-            Expanded(
-              child: Container(
-                height: 50,
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: TextButton(
-                  onPressed: () {
-                    Navigator.pushNamed(
-                      context,
-                      OrderConfirmationScreen.routeName,
-                      arguments: {
-                        'courseId': courseId,
-                        'title': title,
-                        'instructor': instructor,
-                        'price': price,
-                        'duration': duration,
-                        'thumbnailUrl': courseDetail?.thumbnailUrl ?? imageUrl,
-                      },
-                    );
-                  },
-                  child: Text('Buy Now', style: AppTextStyles.button),
-                ),
+  Widget _buildEnrolledButton(BuildContext context) {
+    return Container(
+      height: 50,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+          colors: [
+            AppColors.success,
+            AppColors.success.withOpacity(0.8),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.success.withOpacity(0.3),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: TextButton(
+        onPressed: () {
+          _showLessonBottomSheet(context);
+        },
+        style: TextButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.check_circle,
+              color: AppColors.white,
+              size: 20,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              'course.continue_learning'.tr(),
+              style: AppTextStyles.button.copyWith(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ],
@@ -445,24 +578,6 @@ class _CourseDetailContent extends StatelessWidget {
     return count;
   }
 
-}
-
-class LessonData {
-  final String id;
-  final String title;
-  final String duration;
-  final bool isCompleted;
-  final bool isLocked;
-  final String? videoUrl;
-
-  const LessonData({
-    required this.id,
-    required this.title,
-    required this.duration,
-    required this.isCompleted,
-    required this.isLocked,
-    this.videoUrl,
-  });
 }
 
 class _InlineVideoPlayer extends StatefulWidget {

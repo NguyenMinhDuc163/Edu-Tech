@@ -48,3 +48,18 @@ class CourseDetailError extends CourseState {
 
   CourseDetailError({this.message = 'Đã xảy ra lỗi'});
 }
+
+
+class CourseCancellationProgress extends CourseState {}
+
+class CourseCancellationSuccess extends CourseState {
+  final String courseId;
+
+  CourseCancellationSuccess({required this.courseId});
+}
+
+class CourseCancellationError extends CourseState {
+  final String message;
+
+  CourseCancellationError({this.message = 'Đã xảy ra lỗi'});
+}

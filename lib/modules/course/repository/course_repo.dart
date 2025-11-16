@@ -32,4 +32,18 @@ class CourseRepo {
 
     return DataData.fromJson(res.data);
   }
+
+  Future<String> cancelCourse({required String courseId}) async {
+    final res = await apiClient.fetch(
+      ApiPath.studentRegistrations,
+      RequestMethod.delete,
+      rawData: {'course_id': courseId},
+    );
+
+    if (res.code != 200) {
+      throw Exception('Failed to cancel course: ${res.message}');
+    }
+
+    return res.data['courseId'] as String? ?? courseId;
+  }
 }

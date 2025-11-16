@@ -79,6 +79,7 @@ class DataData {
     this.teacher,
     this.thumbnailUrl,
     this.discountAmount,
+    this.daysLeftToCancel,
   });
 
   final String? courseId;
@@ -94,6 +95,7 @@ class DataData {
   final String? teacher;
   final String? thumbnailUrl;
   final String? discountAmount;
+  final int? daysLeftToCancel;
 
   factory DataData.fromJson(Map<String, dynamic> json){
     return DataData(
@@ -112,6 +114,7 @@ class DataData {
       teacher: json["teacher"],
       thumbnailUrl: json["thumbnailUrl"],
       discountAmount: json["discountAmount"],
+      daysLeftToCancel: json["daysLeftToCancel"],
     );
   }
 
@@ -129,6 +132,7 @@ class DataData {
     "teacher": teacher,
     "thumbnailUrl": thumbnailUrl,
     "discountAmount": discountAmount,
+    "daysLeftToCancel": daysLeftToCancel,
   };
 
   @override
