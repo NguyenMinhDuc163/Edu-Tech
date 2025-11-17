@@ -8,8 +8,8 @@ part 'api_path.g.dart';
 class ApiPath {
   /// Base URL
   @EnviedField(varName: 'BASE_URL', obfuscate: true)
-  // static String baseUrl = _ApiPath.baseUrl;
-  static String baseUrl = "http://172.17.53.17:3000";
+  static String baseUrl = _ApiPath.baseUrl;
+  // static String baseUrl = "http://172.17.53.17:3000";
   @EnviedField(varName: 'REGISTER_ID', obfuscate: true)
   static String registerId = _ApiPath.registerId;
 
