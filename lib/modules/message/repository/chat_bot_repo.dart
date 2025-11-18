@@ -15,7 +15,10 @@ class ChatBotRepo {
       rawData: {"message": message},
     );
 
-    
+    if (res.code != 200) {
+      throw Exception('Failed to send message: ${res.message}');
+    }
+
     final response = ChatResponse.fromJson(res.json);
 
     if (response.status != 200) {

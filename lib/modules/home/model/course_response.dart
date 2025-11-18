@@ -83,6 +83,8 @@ class DataCourse {
     required this.createdAt,
     required this.isRegistered,
     required this.progress,
+    this.rating,
+    this.score,
   });
 
   final String? courseId;
@@ -102,10 +104,12 @@ class DataCourse {
   final DateTime? createdAt;
   final bool? isRegistered;
   final dynamic progress;
+  final double? rating;
+  final double? score;
 
   factory DataCourse.fromJson(Map<String, dynamic> json){
     return DataCourse(
-      courseId: json["courseId"],
+      courseId: json["courseId"] ?? json["course_id"],
       title: json["title"],
       description: json["description"],
       price: json["price"],
@@ -118,10 +122,12 @@ class DataCourse {
       teacher: json["teacher"],
       discountAmount: json["discountAmount"],
       courseDescription: json["courseDescription"],
-      thumbnailUrl: json["thumbnailUrl"],
+      thumbnailUrl: json["thumbnailUrl"] ?? json["thumbnail_url"],
       createdAt: DateTime.tryParse(json["createdAt"] ?? ""),
       isRegistered: json["isPaid"] ?? json["isRegistered"],
       progress: json["progress"],
+      rating: json["rating"] != null ? (json["rating"] as num).toDouble() : null,
+      score: json["score"] != null ? (json["score"] as num).toDouble() : null,
     );
   }
 
@@ -143,10 +149,12 @@ class DataCourse {
     "createdAt": createdAt?.toIso8601String(),
     "isRegistered": isRegistered,
     "progress": progress,
+    "rating": rating,
+    "score": score,
   };
 
   @override
   String toString(){
-    return "$courseId, $title, $description, $price, $currency, $category, $categoryId, $status, $visibility, $courseDuration, $teacher, $discountAmount, $courseDescription, $thumbnailUrl, $createdAt, $isRegistered, $progress, ";
+    return "$courseId, $title, $description, $price, $currency, $category, $categoryId, $status, $visibility, $courseDuration, $teacher, $discountAmount, $courseDescription, $thumbnailUrl, $createdAt, $isRegistered, $progress, $rating, $score, ";
   }
 }
