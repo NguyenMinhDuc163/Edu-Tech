@@ -17,7 +17,15 @@
     "home": "Trang chủ",
     "course": "Khóa học",
     "message": "Tin nhắn",
-    "account": "Tài khoản"
+    "account": "Tài khoản",
+    "learning_progress": "Tiến độ học tập",
+    "total_quizzes": "Tổng bài kiểm tra",
+    "average_score": "Điểm trung bình",
+    "pass_rate": "Tỷ lệ đạt",
+    "recent_results": "Kết quả gần đây",
+    "passed": "Đạt",
+    "failed": "Không đạt",
+    "no_stats": "Chưa có tiến độ học tập"
   },
   "login_screen": {
     "title": "Đăng nhập",

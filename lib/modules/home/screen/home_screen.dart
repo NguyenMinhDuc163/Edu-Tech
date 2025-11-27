@@ -11,7 +11,9 @@ import 'package:ed_tech/modules/home/widgets/learning_plan_widget.dart';
 import 'package:ed_tech/modules/home/widgets/course_suggestions_widget.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen();
+  final VoidCallback? onNavigateToQuizTab;
+
+  const HomeScreen({this.onNavigateToQuizTab});
   static const String routeName = '/HomeScreen';
 
   @override
@@ -81,7 +83,7 @@ class HomeScreen extends StatelessWidget {
             SizedBox(height: 70),
             Padding(padding: AppPad.h16, child: HomePromoCarousel()),
             const SizedBox(height: 25),
-            const LearningPlanWidget(),
+            LearningPlanWidget(onNavigateToQuizTab: onNavigateToQuizTab),
             const SizedBox(height: 16),
             const CourseSuggestionsWidget(),
           ],

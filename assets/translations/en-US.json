@@ -17,7 +17,15 @@
     "home": "Home",
     "course": "Course",
     "message": "Message",
-    "account": "Account"
+    "account": "Account",
+    "learning_progress": "Learning Progress",
+    "total_quizzes": "Total Quizzes",
+    "average_score": "Average Score",
+    "pass_rate": "Pass Rate",
+    "recent_results": "Recent Results",
+    "passed": "Passed",
+    "failed": "Failed",
+    "no_stats": "No learning progress yet"
   },
   "login_screen": {
     "title": "Login Screen",

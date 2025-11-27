@@ -1,4 +1,5 @@
 import 'package:ed_tech/modules/home/model/course_response.dart';
+import 'package:ed_tech/modules/home/model/course_stats_response.dart';
 
 sealed class HomeState {}
 
@@ -40,4 +41,20 @@ class CourseError extends HomeState {
   final String message;
 
   CourseError({this.message = 'Đã xảy ra lỗi'});
+}
+
+class StatsInitial extends HomeState {}
+
+class StatsProgress extends HomeState {}
+
+class StatsSuccess extends HomeState {
+  final CourseStatsData stats;
+
+  StatsSuccess({required this.stats});
+}
+
+class StatsError extends HomeState {
+  final String message;
+
+  StatsError({this.message = 'Đã xảy ra lỗi'});
 }

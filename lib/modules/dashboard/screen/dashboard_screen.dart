@@ -50,7 +50,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
         create: (context) => HomeCubit(repo: context.read<HomeRepo>()),
         child: DisposableProvider(
           create: (_) => HomeController(),
-          child: HomeScreen(),
+          child: HomeScreen(
+            onNavigateToQuizTab: () {
+              setState(() {
+                _currentIndex = 3;
+              });
+            },
+          ),
         ),
       ),
     ),

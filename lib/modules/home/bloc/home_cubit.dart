@@ -17,4 +17,14 @@ class HomeCubit extends Cubit<HomeState> {
       emit(CourseError(message: AppErrorState.getFriendlyErrorString(e)));
     }
   }
+
+  Future getCourseStats({String? courseId}) async {
+    emit(StatsProgress());
+    try {
+      final stats = await repo.getCourseStats(courseId: courseId);
+      emit(StatsSuccess(stats: stats));
+    } catch (e) {
+      emit(StatsError(message: AppErrorState.getFriendlyErrorString(e)));
+    }
+  }
 }
