@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:disposable_provider/disposable_provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:ed_tech/init.dart';
@@ -6,6 +5,7 @@ import 'package:ed_tech/modules/course/bloc/search_course_controller.dart';
 import 'package:ed_tech/modules/course/bloc/search_course_cubit.dart';
 import 'package:ed_tech/modules/course/model/search_course_result.dart';
 import 'package:ed_tech/modules/course/model/search_history.dart';
+import 'package:ed_tech/modules/course/model/autocomplete_suggestion.dart';
 import 'package:ed_tech/modules/course/screen/course_detail_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -19,7 +19,6 @@ class SearchCourseScreen extends StatefulWidget {
 
 class _SearchCourseScreenState extends State<SearchCourseScreen> {
   final TextEditingController _textController = TextEditingController();
-  Timer? _debounce;
 
   @override
   void initState() {
@@ -32,19 +31,16 @@ class _SearchCourseScreenState extends State<SearchCourseScreen> {
   @override
   void dispose() {
     _textController.dispose();
-    _debounce?.cancel();
     super.dispose();
   }
 
   void _onSearchChanged(String query) {
-    if (_debounce?.isActive ?? false) _debounce!.cancel();
-    _debounce = Timer(const Duration(milliseconds: 500), () {
-      if (query.trim().isNotEmpty) {
-        context.read<SearchCourseCubit>().searchCourses(query);
-      } else {
-        context.read<SearchCourseCubit>().reset();
-      }
-    });
+    if (query.trim().isEmpty) {
+      context.read<SearchCourseCubit>().reset();
+      return;
+    }
+
+    context.read<SearchCourseCubit>().getAutocompleteSuggestions(query);
   }
 
   @override
@@ -124,6 +120,48 @@ class _SearchCourseScreenState extends State<SearchCourseScreen> {
                         ),
                       ],
                     ),
+                  );
+                }
+
+                if (state is AutocompleteSuggestionsLoaded) {
+                  final suggestions = state.suggestions;
+
+                  if (suggestions.isEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.search_off,
+                            size: 80,
+                            color: AppColors.colorB8B8D2.withAlpha(128),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'search.no_suggestions'.tr(),
+                            style: AppTextStyles.text.copyWith(
+                              color: AppColors.colorB8B8D2,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  return ListView.separated(
+                    padding: const EdgeInsets.only(left: 24, right: 24, top: 12, bottom: 16),
+                    itemCount: suggestions.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 8),
+                    itemBuilder: (context, index) {
+                      final suggestion = suggestions[index] as AutocompleteSuggestion;
+                      return _SuggestionItem(
+                        keyword: suggestion.keyword ?? '',
+                        onTap: () {
+                          _textController.text = suggestion.keyword ?? '';
+                          context.read<SearchCourseCubit>().searchCourses(suggestion.keyword ?? '');
+                        },
+                      );
+                    },
                   );
                 }
 
@@ -399,6 +437,52 @@ class _SearchResultCard extends StatelessWidget {
                     ),
                   ],
                 ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SuggestionItem extends StatelessWidget {
+  final String keyword;
+  final VoidCallback onTap;
+
+  const _SuggestionItem({
+    required this.keyword,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: AppPad.h16v12,
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: AppColors.colorF4F3FD,
+            width: 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            const Icon(
+              Icons.search,
+              color: AppColors.colorB8B8D2,
+              size: 20,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                keyword,
+                style: AppTextStyles.text,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],

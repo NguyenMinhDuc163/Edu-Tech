@@ -27,3 +27,9 @@ class SearchHistoryLoaded extends SearchCourseState {
 
   SearchHistoryLoaded({required this.historyList});
 }
+
+class AutocompleteSuggestionsLoaded extends SearchCourseState {
+  final List suggestions;
+
+  AutocompleteSuggestionsLoaded({required this.suggestions});
+}

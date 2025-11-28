@@ -23,12 +23,12 @@ class CourseScreen extends StatefulWidget {
 
 class _CourseScreenState extends State<CourseScreen> {
   static const List<String> _categories = [
-    'Design',
-    'Coding',
-    'Painting',
-    'Music',
-    'Visual identity',
-    'Mathematics',
+    'python',
+    'reactjs',
+    'nestjs',
+    'flutter',
+    'java',
+    'javascript',
   ];
   static const List<String> _durations = [
     '3-8 Hours',

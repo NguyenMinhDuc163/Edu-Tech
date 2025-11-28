@@ -3,6 +3,7 @@ import 'package:ed_tech/data/api_client.dart';
 import 'package:ed_tech/data/models/request_method.dart';
 import 'package:ed_tech/modules/course/model/search_course_result.dart';
 import 'package:ed_tech/modules/course/model/search_history.dart';
+import 'package:ed_tech/modules/course/model/autocomplete_suggestion.dart';
 
 class SearchCourseRepo {
   final ApiClient apiClient;
@@ -93,5 +94,19 @@ class SearchCourseRepo {
     if (res.code != 200) {
       throw Exception('Failed to delete search history: ${res.message}');
     }
+  }
+
+  Future<List<AutocompleteSuggestion>> getAutocompleteSuggestions(String query) async {
+    final res = await apiClient.fetch(
+      '${ApiPath.searchAutocomplete}?q=$query',
+      RequestMethod.get,
+    );
+
+    if (res.code != 200) {
+      throw Exception('Failed to get autocomplete suggestions: ${res.message}');
+    }
+
+    final List<dynamic> dataList = res.dataArray;
+    return dataList.map((json) => AutocompleteSuggestion.fromJson(json)).toList();
   }
 }
