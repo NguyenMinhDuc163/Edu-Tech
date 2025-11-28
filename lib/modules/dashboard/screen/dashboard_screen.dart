@@ -9,6 +9,10 @@ import 'package:ed_tech/modules/assessment/bloc/list_quiz_cubit.dart';
 import 'package:ed_tech/modules/assessment/repository/quiz_repo.dart';
 import 'package:ed_tech/modules/assessment/screen/quiz_list_screen.dart';
 import 'package:ed_tech/modules/course/bloc/course_controller.dart';
+import 'package:ed_tech/modules/course/bloc/course_cubit.dart';
+import 'package:ed_tech/modules/course/bloc/filter_course_cubit.dart';
+import 'package:ed_tech/modules/course/repository/course_repo.dart';
+import 'package:ed_tech/modules/course/repository/search_course_repo.dart';
 import 'package:ed_tech/modules/course/screen/course_screen.dart';
 import 'package:ed_tech/modules/home/bloc/home_controller.dart';
 import 'package:ed_tech/modules/home/bloc/home_cubit.dart';
@@ -60,9 +64,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
       ),
     ),
-    DisposableProvider(
-      create: (_) => CourseController(),
-      child: CourseScreen(),
+    MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider(
+          create: (context) => CourseRepo(apiClient: ApiClient()),
+        ),
+        RepositoryProvider(
+          create: (context) => SearchCourseRepo(apiClient: ApiClient()),
+        ),
+      ],
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (context) => CourseCubit(repo: context.read<CourseRepo>()),
+          ),
+          BlocProvider(
+            create: (context) => FilterCourseCubit(repo: context.read<SearchCourseRepo>()),
+          ),
+        ],
+        child: DisposableProvider(
+          create: (_) => CourseController(),
+          child: const CourseScreen(),
+        ),
+      ),
     ),
     RepositoryProvider(
       create: (context) => ChatBotRepo(apiClient: ApiClient()),

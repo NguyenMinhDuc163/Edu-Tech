@@ -6,10 +6,11 @@ class CourseController extends Disposable {
   final BoolVs isSearchVisible = BoolVs(false);
 
   final BoolVs isFilterVisible = BoolVs(false);
+  final BoolVs isFiltering = BoolVs(false);
   final ListVs<String> selectedCategories = ListVs<String>([]);
   final ListVs<String> selectedDurations = ListVs<String>([]);
   final DoubleVs selectedMinPrice = DoubleVs(0.0);
-  final DoubleVs selectedMaxPrice = DoubleVs(500.0);
+  final DoubleVs selectedMaxPrice = DoubleVs(500000.0);
 
   final StringVs selectedCategory = StringVs('All');
 
@@ -51,7 +52,12 @@ class CourseController extends Disposable {
     selectedCategories.value = [];
     selectedDurations.value = [];
     selectedMinPrice.value = 0.0;
-    selectedMaxPrice.value = 500.0;
+    selectedMaxPrice.value = 500000.0;
+    isFiltering.value = false;
+  }
+
+  void setFilteringMode(bool value) {
+    isFiltering.value = value;
   }
 
   void toggleGridView() {
@@ -67,6 +73,7 @@ class CourseController extends Disposable {
     searchQuery.dispose();
     isSearchVisible.dispose();
     isFilterVisible.dispose();
+    isFiltering.dispose();
     selectedCategories.dispose();
     selectedDurations.dispose();
     selectedMinPrice.dispose();

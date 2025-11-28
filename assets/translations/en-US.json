@@ -176,6 +176,22 @@
     "recent_searches": "Recent Searches",
     "no_history": "No search history"
   },
+  "filter": {
+    "title": "Search Filter",
+    "categories": "Categories",
+    "price": "Price (VND)",
+    "duration": "Duration",
+    "min_price": "Min",
+    "max_price": "Max",
+    "clear": "Clear",
+    "clear_filter": "Clear Filter",
+    "apply_filter": "Apply Filter",
+    "courses_found": "courses found",
+    "no_courses_found": "No courses found",
+    "back_to_courses": "Back to Courses",
+    "apply_filters_instruction": "Apply filters to see results",
+    "filter_results": "Filter Results"
+  },
   "course": {
     "course_content": "Course Content",
     "lessons": "Lessons",

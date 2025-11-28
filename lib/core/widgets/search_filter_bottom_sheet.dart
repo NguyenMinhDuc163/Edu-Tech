@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:ed_tech/core/theme/app_colors.dart';
 import 'package:ed_tech/core/theme/app_text_styles.dart';
 
@@ -44,6 +46,8 @@ class _SearchFilterBottomSheetState extends State<SearchFilterBottomSheet> {
   late List<String> _selectedDurations;
   late double _currentMinPrice;
   late double _currentMaxPrice;
+  late TextEditingController _minPriceController;
+  late TextEditingController _maxPriceController;
 
   @override
   void initState() {
@@ -52,6 +56,15 @@ class _SearchFilterBottomSheetState extends State<SearchFilterBottomSheet> {
     _selectedDurations = List.from(widget.selectedDurations);
     _currentMinPrice = widget.selectedMinPrice;
     _currentMaxPrice = widget.selectedMaxPrice;
+    _minPriceController = TextEditingController(text: _currentMinPrice.toInt().toString());
+    _maxPriceController = TextEditingController(text: _currentMaxPrice.toInt().toString());
+  }
+
+  @override
+  void dispose() {
+    _minPriceController.dispose();
+    _maxPriceController.dispose();
+    super.dispose();
   }
 
   void _toggleCategory(String category) {
@@ -74,21 +87,16 @@ class _SearchFilterBottomSheetState extends State<SearchFilterBottomSheet> {
     });
   }
 
-  void _onPriceRangeChanged(double min, double max) {
-    setState(() {
-      _currentMinPrice = min;
-      _currentMaxPrice = max;
-    });
-  }
-
   void _applyFilter() {
+    final minPrice = double.tryParse(_minPriceController.text) ?? widget.minPrice;
+    final maxPrice = double.tryParse(_maxPriceController.text) ?? widget.maxPrice;
+
     widget.onApplyFilter(
       _selectedCategories,
       _selectedDurations,
-      _currentMinPrice,
-      _currentMaxPrice,
+      minPrice,
+      maxPrice,
     );
-    Navigator.of(context).pop();
   }
 
   void _clearFilter() {
@@ -97,6 +105,8 @@ class _SearchFilterBottomSheetState extends State<SearchFilterBottomSheet> {
       _selectedDurations.clear();
       _currentMinPrice = widget.minPrice;
       _currentMaxPrice = widget.maxPrice;
+      _minPriceController.text = _currentMinPrice.toInt().toString();
+      _maxPriceController.text = _currentMaxPrice.toInt().toString();
     });
     if (widget.onClearFilter != null) {
       widget.onClearFilter!();
@@ -124,7 +134,7 @@ class _SearchFilterBottomSheetState extends State<SearchFilterBottomSheet> {
               children: [
                 const Icon(Icons.close, color: AppColors.text),
                 Text(
-                  'Search Filter',
+                  "filter.title".tr(),
                   style: AppTextStyles.textHeader3.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -141,19 +151,19 @@ class _SearchFilterBottomSheetState extends State<SearchFilterBottomSheet> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Categories Section
-                _buildSectionTitle('Categories'),
+                _buildSectionTitle("filter.categories".tr()),
                 const SizedBox(height: 12),
                 _buildCategoryTags(),
                 const SizedBox(height: 24),
 
                 // Price Section
-                _buildSectionTitle('Price'),
+                _buildSectionTitle("filter.price".tr()),
                 const SizedBox(height: 12),
-                _buildPriceRangeSlider(),
+                _buildPriceInputs(),
                 const SizedBox(height: 24),
 
                 // Duration Section
-                _buildSectionTitle('Duration'),
+                _buildSectionTitle("filter.duration".tr()),
                 const SizedBox(height: 12),
                 _buildDurationTags(),
                 const SizedBox(height: 32),
@@ -239,37 +249,63 @@ class _SearchFilterBottomSheetState extends State<SearchFilterBottomSheet> {
     );
   }
 
-  Widget _buildPriceRangeSlider() {
-    return Column(
+  Widget _buildPriceInputs() {
+    return Row(
       children: [
-        RangeSlider(
-          values: RangeValues(_currentMinPrice, _currentMaxPrice),
-          min: widget.minPrice,
-          max: widget.maxPrice,
-          activeColor: AppColors.primary,
-          inactiveColor: AppColors.lightGray,
-          onChanged: (values) {
-            _onPriceRangeChanged(values.start, values.end);
-          },
+        Expanded(
+          child: _buildPriceTextField(
+            controller: _minPriceController,
+            label: 'Min',
+          ),
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              '\$${_currentMinPrice.toInt()}',
-              style: AppTextStyles.textContent3.copyWith(
-                color: AppColors.text,
-                fontWeight: FontWeight.w500,
+        const SizedBox(width: 16),
+        Expanded(
+          child: _buildPriceTextField(
+            controller: _maxPriceController,
+            label: 'Max',
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPriceTextField({
+    required TextEditingController controller,
+    required String label,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label == 'Min' ? "filter.min_price".tr() : "filter.max_price".tr(),
+          style: AppTextStyles.textContent3.copyWith(
+            color: AppColors.color8F959E,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.lightGray,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: TextField(
+            controller: controller,
+            keyboardType: TextInputType.number,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              hintText: '0',
+              hintStyle: AppTextStyles.textContent3.copyWith(
+                color: AppColors.color8F959E,
               ),
             ),
-            Text(
-              '\$${_currentMaxPrice.toInt()}',
-              style: AppTextStyles.textContent3.copyWith(
-                color: AppColors.text,
-                fontWeight: FontWeight.w500,
-              ),
+            style: AppTextStyles.textContent2.copyWith(
+              color: AppColors.text,
+              fontWeight: FontWeight.w500,
             ),
-          ],
+          ),
         ),
       ],
     );
@@ -285,7 +321,7 @@ class _SearchFilterBottomSheetState extends State<SearchFilterBottomSheet> {
       child: TextButton(
         onPressed: _clearFilter,
         child: Text(
-          'Clear',
+          "filter.clear".tr(),
           style: AppTextStyles.textButton.copyWith(color: AppColors.primary),
         ),
       ),
@@ -301,7 +337,7 @@ class _SearchFilterBottomSheetState extends State<SearchFilterBottomSheet> {
       ),
       child: TextButton(
         onPressed: _applyFilter,
-        child: Text('Apply Filter', style: AppTextStyles.button),
+        child: Text("filter.apply_filter".tr(), style: AppTextStyles.button),
       ),
     );
   }

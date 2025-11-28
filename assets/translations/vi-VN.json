@@ -176,6 +176,22 @@
     "recent_searches": "Tìm kiếm gần đây",
     "no_history": "Chưa có lịch sử tìm kiếm"
   },
+  "filter": {
+    "title": "Bộ lọc tìm kiếm",
+    "categories": "Danh mục",
+    "price": "Giá (VND)",
+    "duration": "Thời lượng",
+    "min_price": "Tối thiểu",
+    "max_price": "Tối đa",
+    "clear": "Xóa",
+    "clear_filter": "Xóa bộ lọc",
+    "apply_filter": "Áp dụng",
+    "courses_found": "khóa học",
+    "no_courses_found": "Không tìm thấy khóa học",
+    "back_to_courses": "Quay lại khóa học",
+    "apply_filters_instruction": "Áp dụng bộ lọc để xem kết quả",
+    "filter_results": "Kết quả lọc"
+  },
   "course": {
     "course_content": "Nội dung khóa học",
     "lessons": "Bài học",

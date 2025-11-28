@@ -1,11 +1,16 @@
 import 'package:disposable_provider/disposable_provider.dart';
 import 'package:ed_tech/init.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:ed_tech/modules/course/widgets/course_card_widget.dart';
 import 'package:ed_tech/modules/course/widgets/course_category_tabs_widget.dart';
 import 'package:ed_tech/modules/course/widgets/course_list_widget.dart';
 import 'package:ed_tech/modules/course/bloc/course_controller.dart';
+import 'package:ed_tech/modules/course/bloc/filter_course_cubit.dart';
+import 'package:ed_tech/modules/course/model/search_course_result.dart';
 import 'package:ed_tech/modules/course/screen/search_course_screen.dart';
+import 'package:ed_tech/modules/course/screen/course_detail_screen.dart';
 import 'package:ed_tech/core/widgets/search_filter_bottom_sheet.dart';
 
 class CourseScreen extends StatefulWidget {
@@ -33,7 +38,7 @@ class _CourseScreenState extends State<CourseScreen> {
     '24-30 Hours',
   ];
   static const double _minPrice = 0;
-  static const double _maxPrice = 500;
+  static const double _maxPrice = 500000;
 
   void _showFilterBottomSheet(BuildContext context) {
     final CourseController controller = DisposableProvider.of<CourseController>(
@@ -57,13 +62,20 @@ class _CourseScreenState extends State<CourseScreen> {
           maxPrice: maxPrice,
         );
 
-        print(
-          'Applied filter: Categories: $categories, Durations: $durations, Price: \$${minPrice.toInt()} - \$${maxPrice.toInt()}',
-        );
+        Navigator.pop(context);
+
+        controller.setFilteringMode(true);
+
+        context.read<FilterCourseCubit>().filterCourses(
+              categories: categories,
+              durations: durations,
+              minPrice: minPrice,
+              maxPrice: maxPrice,
+            );
       },
       onClearFilter: () {
         controller.clearFilter();
-        print('Filter cleared');
+        Navigator.pop(context);
       },
     );
   }
@@ -77,39 +89,217 @@ class _CourseScreenState extends State<CourseScreen> {
     return FunctionScreenTemplate(
       isShowAppBar: false,
       isShowBottomButton: false,
-      screen: SingleChildScrollView(
-        child: Column(
-          children: [
-            Padding(
-              padding: AppPad.h24.add(AppPad.t24),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text('Course', style: AppTextStyles.textHeader2),
-                  CircleAvatar(
-                    radius: 22,
-                    child: SvgPicture.asset(IconPath.iconAvatar),
+      screen: ValueListenableBuilder<bool>(
+        valueListenable: controller.isFiltering,
+        builder: (context, isFiltering, _) {
+          if (isFiltering) {
+            return Column(
+              children: [
+                Padding(
+                  padding: AppPad.h24.add(AppPad.t24),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text("home_screen.course".tr(), style: AppTextStyles.textHeader2),
+                      CircleAvatar(
+                        radius: 22,
+                        child: SvgPicture.asset(IconPath.iconAvatar),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+                Padding(
+                  padding: AppPad.h24.add(AppPad.v12),
+                  child: _SearchBar(
+                    controller: controller,
+                    onFilterTap: () => _showFilterBottomSheet(context),
+                  ),
+                ),
+                Expanded(
+                  child: BlocBuilder<FilterCourseCubit, FilterCourseState>(
+                    builder: (context, state) {
+                      if (state is FilterCourseProgress) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+
+                      if (state is FilterCourseSuccess) {
+                        final results = state.results;
+
+                        if (results.isEmpty) {
+                          return Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.search_off,
+                                  size: 80,
+                                  color: AppColors.colorB8B8D2.withAlpha(128),
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  "filter.no_courses_found".tr(),
+                                  style: AppTextStyles.text.copyWith(
+                                    color: AppColors.colorB8B8D2,
+                                  ),
+                                ),
+                                const SizedBox(height: 24),
+                                TextButton(
+                                  onPressed: () {
+                                    controller.clearFilter();
+                                  },
+                                  child: Text(
+                                    "filter.clear_filter".tr(),
+                                    style: AppTextStyles.textButton.copyWith(
+                                      color: AppColors.primary,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: AppPad.h24v12,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    '${results.length} ${"filter.courses_found".tr()}',
+                                    style: AppTextStyles.textMedium.copyWith(
+                                      color: AppColors.colorB8B8D2,
+                                    ),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      controller.clearFilter();
+                                    },
+                                    child: Text(
+                                      "filter.clear".tr(),
+                                      style: AppTextStyles.textButton.copyWith(
+                                        color: AppColors.primary,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Expanded(
+                              child: ListView.separated(
+                                padding: const EdgeInsets.only(left: 24, right: 24, bottom: 16),
+                                itemCount: results.length,
+                                separatorBuilder: (_, __) => const SizedBox(height: 16),
+                                itemBuilder: (context, index) {
+                                  final result = results[index];
+                                  return _FilterResultCard(
+                                    result: result,
+                                    onTap: () => _navigateToCourseDetail(context, result),
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
+                        );
+                      }
+
+                      if (state is FilterCourseError) {
+                        return Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.error_outline,
+                                size: 80,
+                                color: AppColors.colorB8B8D2.withAlpha(128),
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                state.message,
+                                style: AppTextStyles.text.copyWith(
+                                  color: AppColors.colorB8B8D2,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 24),
+                              TextButton(
+                                onPressed: () {
+                                  controller.clearFilter();
+                                },
+                                child: Text(
+                                  "filter.back_to_courses".tr(),
+                                  style: AppTextStyles.textButton.copyWith(
+                                    color: AppColors.primary,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+
+                      return const SizedBox.shrink();
+                    },
+                  ),
+                ),
+              ],
+            );
+          }
+
+          return SingleChildScrollView(
+            child: Column(
+              children: [
+                Padding(
+                  padding: AppPad.h24.add(AppPad.t24),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text("home_screen.course".tr(), style: AppTextStyles.textHeader2),
+                      CircleAvatar(
+                        radius: 22,
+                        child: SvgPicture.asset(IconPath.iconAvatar),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: AppPad.h24.add(AppPad.v12),
+                  child: _SearchBar(
+                    controller: controller,
+                    onFilterTap: () => _showFilterBottomSheet(context),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                const CourseCardsCarousel(),
+                const CourseCategoryTabsWidget(),
+                const SizedBox(height: 20),
+                const CourseListWidget(),
+                const SizedBox(height: 20),
+              ],
             ),
-            Padding(
-              padding: AppPad.h24.add(AppPad.v12),
-              child: _SearchBar(
-                controller: controller,
-                onFilterTap: () => _showFilterBottomSheet(context),
-              ),
-            ),
-            const SizedBox(height: 20),
-            const CourseCardsCarousel(),
-            const CourseCategoryTabsWidget(),
-            const SizedBox(height: 20),
-            const CourseListWidget(),
-            const SizedBox(height: 20),
-          ],
-        ),
+          );
+        },
       ),
+    );
+  }
+
+  void _navigateToCourseDetail(BuildContext context, SearchCourseResult result) {
+    Navigator.pushNamed(
+      context,
+      CourseDetailScreen.routeName,
+      arguments: {
+        'courseId': result.courseId ?? '',
+        'title': result.title ?? 'Untitled Course',
+        'instructor': 'Unknown Teacher',
+        'price': result.price ?? '0',
+        'duration': '0h 0m',
+        'imageUrl': result.thumbnailUrl,
+        'description': result.description,
+      },
     );
   }
 }
@@ -161,6 +351,120 @@ class _SearchBar extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _FilterResultCard extends StatelessWidget {
+  final SearchCourseResult result;
+  final VoidCallback onTap;
+
+  const _FilterResultCard({
+    required this.result,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: const [
+            BoxShadow(
+              offset: Offset(0, 1),
+              blurRadius: 2,
+              color: Color.fromRGBO(0, 0, 0, 0.06),
+            ),
+            BoxShadow(
+              offset: Offset(0, 10),
+              blurRadius: 20,
+              color: AppColors.shadowBlack15,
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 120,
+              height: 120,
+              decoration: BoxDecoration(
+                color: AppColors.colorF4F3FD,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(16),
+                  bottomLeft: Radius.circular(16),
+                ),
+              ),
+              child: ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(16),
+                  bottomLeft: Radius.circular(16),
+                ),
+                child: result.thumbnailUrl != null
+                    ? Image.network(
+                        result.thumbnailUrl!,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Icon(
+                            Icons.image_not_supported,
+                            color: AppColors.colorB8B8D2,
+                            size: 40,
+                          );
+                        },
+                      )
+                    : const Icon(
+                        Icons.image_not_supported,
+                        color: AppColors.colorB8B8D2,
+                        size: 40,
+                      ),
+              ),
+            ),
+            Expanded(
+              child: Padding(
+                padding: AppPad.a16,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      result.title ?? 'Untitled Course',
+                      style: AppTextStyles.textMedium,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 8),
+                    if (result.description != null) ...[
+                      Text(
+                        result.description!,
+                        style: AppTextStyles.text.copyWith(
+                          color: AppColors.coolGray,
+                          fontSize: 12,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 8),
+                    ],
+                    Row(
+                      children: [
+                        Text(
+                          result.price != null
+                              ? '${NumberFormat('#,###').format(double.tryParse(result.price!) ?? 0)} VND'
+                              : 'Free',
+                          style: AppTextStyles.textMedium.copyWith(
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

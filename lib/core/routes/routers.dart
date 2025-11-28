@@ -39,6 +39,7 @@ import 'package:ed_tech/modules/course/bloc/course_controller.dart';
 import 'package:ed_tech/modules/course/bloc/course_cubit.dart';
 import 'package:ed_tech/modules/course/bloc/search_course_controller.dart';
 import 'package:ed_tech/modules/course/bloc/search_course_cubit.dart';
+import 'package:ed_tech/modules/course/bloc/filter_course_cubit.dart';
 import 'package:ed_tech/modules/course/repository/course_repo.dart';
 import 'package:ed_tech/modules/course/repository/search_course_repo.dart';
 import 'package:ed_tech/modules/dashboard/screen/dashboard_screen.dart';
@@ -217,12 +218,28 @@ class Routers {
         return MaterialPageRoute(
           settings: settings,
           builder:
-              (context) => RepositoryProvider(
-                create: (context) => CourseRepo(apiClient: ApiClient()),
-                child: BlocProvider(
-                  create:
-                      (context) =>
-                          CourseCubit(repo: context.read<CourseRepo>()),
+              (context) => MultiRepositoryProvider(
+                providers: [
+                  RepositoryProvider(
+                    create: (context) => CourseRepo(apiClient: ApiClient()),
+                  ),
+                  RepositoryProvider(
+                    create: (context) => SearchCourseRepo(apiClient: ApiClient()),
+                  ),
+                ],
+                child: MultiBlocProvider(
+                  providers: [
+                    BlocProvider(
+                      create:
+                          (context) =>
+                              CourseCubit(repo: context.read<CourseRepo>()),
+                    ),
+                    BlocProvider(
+                      create:
+                          (context) =>
+                              FilterCourseCubit(repo: context.read<SearchCourseRepo>()),
+                    ),
+                  ],
                   child: DisposableProvider(
                     create: (_) => CourseController(),
                     child: const CourseScreen(),
