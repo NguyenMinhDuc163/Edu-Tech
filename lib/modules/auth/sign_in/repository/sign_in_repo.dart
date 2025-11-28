@@ -3,6 +3,7 @@ import 'package:ed_tech/common/app_event_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:ed_tech/core/constants/api_path.dart';
+import 'package:ed_tech/core/constants/app_constants.dart';
 import 'package:ed_tech/data/api_client.dart';
 import 'package:ed_tech/data/models/request_method.dart';
 import 'package:ed_tech/data/services/auth_service.dart';
@@ -28,7 +29,16 @@ class SignInRepo {
     }
 
     LoginResponse loginResponse = LoginResponse.fromJson(res.json);
-    authService.saveToken(accessToken: loginResponse.data!.accessToken!, refreshToken: loginResponse.data!.refreshToken!);
+
+    // Tính thời điểm hết hạn = hiện tại + thời gian cố định
+    final currentTimeSeconds = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+    final expiresTime = currentTimeSeconds + AppConst.tokenExpirationSeconds;
+
+    authService.saveToken(
+      accessToken: loginResponse.data!.accessToken!,
+      refreshToken: loginResponse.data!.refreshToken!,
+      tokenExpiresTime: expiresTime,
+    );
 
     if (loginResponse.data?.user != null) {
       final user = loginResponse.data!.user!;
@@ -59,9 +69,14 @@ class SignInRepo {
     }
     final authService = AuthService.instance;
 
+    // Tính thời điểm hết hạn = hiện tại + thời gian cố định
+    final currentTimeSeconds = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+    final expiresTime = currentTimeSeconds + AppConst.tokenExpirationSeconds;
+
     authService.saveToken(
       accessToken: loginSocialResponse.accessToken!,
       refreshToken: loginSocialResponse.refreshToken!,
+      tokenExpiresTime: expiresTime,
     );
 
     return res.code == 200;

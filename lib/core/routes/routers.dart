@@ -60,6 +60,9 @@ import 'package:ed_tech/modules/payment/screen/order_confirmation_screen.dart';
 import 'package:ed_tech/modules/payment/screen/payment_webview_screen.dart';
 import 'package:ed_tech/modules/payment/bloc/payment_cubit.dart';
 import 'package:ed_tech/modules/payment/repository/payment_repo.dart';
+import 'package:ed_tech/modules/purchased_courses/screen/purchased_courses_screen.dart';
+import 'package:ed_tech/modules/purchased_courses/bloc/purchased_course_cubit.dart';
+import 'package:ed_tech/modules/purchased_courses/repository/purchased_course_repo.dart';
 import 'package:ed_tech/modules/ranking/screen/ranking_screen.dart';
 import 'package:ed_tech/modules/reviews/screen/add_review_screen.dart';
 import 'package:ed_tech/modules/reviews/screen/review_screen.dart';
@@ -394,6 +397,20 @@ class Routers {
         return MaterialPageRoute(
           settings: settings,
           builder: (_) => RankingScreen(),
+        );
+      case PurchasedCoursesScreen.routeName:
+        return MaterialPageRoute(
+          settings: settings,
+          builder:
+              (context) => RepositoryProvider(
+                create: (context) => PurchasedCourseRepo(apiClient: ApiClient()),
+                child: BlocProvider(
+                  create:
+                      (context) =>
+                          PurchasedCourseCubit(repo: context.read<PurchasedCourseRepo>()),
+                  child: const PurchasedCoursesScreen(),
+                ),
+              ),
         );
       default:
         return MaterialPageRoute(

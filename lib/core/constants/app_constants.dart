@@ -21,6 +21,8 @@ abstract final class AppConst {
 
   static const int refetchApiThreshold = 3;
 
+  static const int tokenExpirationSeconds = 800; // 1 giờ
+
   static const int limitOfItemsForPeekRequest = 5;
 
   static const int limitOfItemsForEachRequest = 10;

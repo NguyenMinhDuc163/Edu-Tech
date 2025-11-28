@@ -220,6 +220,18 @@
     "cancel_success": "Course cancelled successfully",
     "cancel_failed": "Failed to cancel course"
   },
+  "purchased_courses": {
+    "title": "My Courses",
+    "no_courses": "You haven't purchased any courses yet",
+    "loading": "Loading courses...",
+    "error": "Failed to load courses",
+    "progress": "Progress",
+    "continue_learning": "Continue Learning",
+    "purchased_on": "Purchased on",
+    "amount_paid": "Amount Paid",
+    "completed": "Completed",
+    "in_progress": "In Progress"
+  },
   "assessment": {
     "no_quizzes": "No quizzes available",
     "all_quizzes": "All quizzes",

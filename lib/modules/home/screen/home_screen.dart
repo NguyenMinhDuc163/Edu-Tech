@@ -9,6 +9,7 @@ import 'package:ed_tech/modules/home/widgets/home_header.dart';
 import 'package:ed_tech/modules/home/widgets/home_promo_carousel.dart';
 import 'package:ed_tech/modules/home/widgets/learning_plan_widget.dart';
 import 'package:ed_tech/modules/home/widgets/course_suggestions_widget.dart';
+import 'package:ed_tech/modules/purchased_courses/screen/purchased_courses_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   final VoidCallback? onNavigateToQuizTab;
@@ -62,7 +63,12 @@ class HomeScreen extends StatelessWidget {
                   ],
 
                   GestureDetector(
-                    onTap: () => {},
+                    onTap: () {
+                      Navigator.pushNamed(
+                        context,
+                        PurchasedCoursesScreen.routeName,
+                      );
+                    },
                     child: SvgPicture.asset(
                       IconPath.iconBag,
                       color: AppColors.black50,

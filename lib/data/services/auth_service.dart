@@ -9,6 +9,7 @@ import 'package:sp_util/sp_util.dart';
 import '../../common/app_status.dart';
 import '../../core/app_authentication.dart';
 import '../../core/constants/api_path.dart';
+import '../../core/constants/app_constants.dart';
 import '../api_client.dart';
 import '../models/request_method.dart';
 import '../secure_storage.dart';
@@ -180,6 +181,11 @@ final class AuthService {
       }
 
       await saveAccessToken(newAccessToken);
+
+      // Cập nhật thời điểm hết hạn mới cho token vừa refresh
+      final currentTimeSeconds = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+      await saveExpiresTime(currentTimeSeconds + AppConst.tokenExpirationSeconds);
+
       _isRefreshTokenInvalid = false;
     } catch (e) {
       _isRefreshTokenInvalid = true;

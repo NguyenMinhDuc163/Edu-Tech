@@ -1,5 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:ed_tech/core/app_authentication.dart';
 import 'package:ed_tech/modules/auth/initial/screen/onboarding_screen.dart';
+import 'package:ed_tech/modules/auth/login/screen/login_screen.dart';
 import 'package:ed_tech/modules/dashboard/screen/dashboard_screen.dart';
 import 'package:ed_tech/modules/home/screen/home_screen.dart';
 import 'package:flutter/material.dart';
@@ -19,9 +21,70 @@ import 'package:ed_tech/modules/auth/sign_in/use_case/social_login.dart';
 
 import 'auth/sign_in/repository/sign_in_repo.dart';
 
-class App extends StatelessWidget {
+class App extends StatefulWidget {
   const App({super.key, required this.authService});
   final AuthService authService;
+
+  @override
+  State<App> createState() => _AppState();
+}
+
+class _AppState extends State<App> implements AppAuthenticationBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    // Register observer để listen auth events
+    AppAuthenticationBinding.instance?.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    // Unregister observer khi widget dispose
+    AppAuthenticationBinding.instance?.removeObserver(this);
+    super.dispose();
+  }
+
+  // Callback khi refresh token hết hạn hoặc authentication failed
+  @override
+  void didRefershTokenExpired() {
+    _navigateToLogin();
+  }
+
+  @override
+  void didAuthenticationFailed() {
+    _navigateToLogin();
+  }
+
+  @override
+  void didLock() {
+    _navigateToLogin();
+  }
+
+  @override
+  void didAuthenticated() {
+    // Không cần xử lý
+  }
+
+  @override
+  void didUnauthenticated() {
+    _navigateToLogin();
+  }
+
+  @override
+  void didChangeAccessToken() {
+    // Không cần xử lý
+  }
+
+  void _navigateToLogin() {
+    // Clear token
+    widget.authService.clearToken();
+
+    // Navigate về login screen
+    NavigationService.navigatorKey.currentState?.pushNamedAndRemoveUntil(
+      LoginScreen.routeName,
+      (route) => false, // Remove tất cả routes
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +92,7 @@ class App extends StatelessWidget {
       create:
           (context) => SignInRepo(
         apiClient: ApiClient(),
-        authService: authService,
+        authService: widget.authService,
       ),
       child: MultiBlocProvider(
         providers: [

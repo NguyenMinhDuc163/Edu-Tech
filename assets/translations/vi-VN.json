@@ -220,6 +220,18 @@
     "cancel_success": "Hủy khóa học thành công",
     "cancel_failed": "Hủy khóa học thất bại"
   },
+  "purchased_courses": {
+    "title": "Khóa học của tôi",
+    "no_courses": "Bạn chưa mua khóa học nào",
+    "loading": "Đang tải khóa học...",
+    "error": "Không thể tải khóa học",
+    "progress": "Tiến độ",
+    "continue_learning": "Tiếp tục học",
+    "purchased_on": "Ngày mua",
+    "amount_paid": "Số tiền đã trả",
+    "completed": "Hoàn thành",
+    "in_progress": "Đang học"
+  },
   "assessment": {
     "no_quizzes": "Chưa có bài kiểm tra nào",
     "all_quizzes": "Tất cả bài kiểm tra",
