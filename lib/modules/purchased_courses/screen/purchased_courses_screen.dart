@@ -409,89 +409,76 @@ class _PurchasedCourseCard extends StatelessWidget {
                   Divider(color: AppColors.silverGray, height: 1),
                   const SizedBox(height: 12),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Expanded(
-                        child: Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(6),
-                              decoration: BoxDecoration(
-                                color: AppColors.primary.withAlpha(26),
-                                borderRadius: BorderRadius.circular(6),
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary.withAlpha(26),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Icon(
+                              Icons.calendar_today,
+                              size: 16,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'purchased_courses.purchased_on'.tr(),
+                                style: AppTextStyles.textContent4.copyWith(
+                                  color: AppColors.coolGray,
+                                ),
                               ),
-                              child: const Icon(
-                                Icons.calendar_today,
+                              const SizedBox(height: 3),
+                              Text(
+                                _formatDate(course.purchaseDate),
+                                style: AppTextStyles.textContent2.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.text,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      if (course.category != null)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            color: _getColorForCategory(course.category),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: AppColors.primary.withAlpha(50),
+                              width: 1,
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.category_outlined,
                                 size: 14,
                                 color: AppColors.primary,
                               ),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'purchased_courses.purchased_on'.tr(),
-                                    style: AppTextStyles.textContent4.copyWith(
-                                      color: AppColors.coolGray,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    _formatDate(course.purchaseDate),
-                                    style: AppTextStyles.textContent3.copyWith(
-                                      fontWeight: FontWeight.w600,
-                                      color: AppColors.text,
-                                    ),
-                                  ),
-                                ],
+                              const SizedBox(width: 6),
+                              Text(
+                                course.category!,
+                                style: AppTextStyles.textContent3.copyWith(
+                                  color: AppColors.primary,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
-                        ),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              AppColors.colorFF7043,
-                              AppColors.colorFF7043.withAlpha(230),
                             ],
                           ),
-                          borderRadius: BorderRadius.circular(10),
-                          boxShadow: [
-                            BoxShadow(
-                              offset: const Offset(0, 2),
-                              blurRadius: 8,
-                              color: AppColors.colorFF7043.withAlpha(60),
-                            ),
-                          ],
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              'purchased_courses.amount_paid'.tr(),
-                              style: AppTextStyles.textContent4.copyWith(
-                                color: AppColors.white.withAlpha(230),
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              _formatCurrency(course.amountPaid),
-                              style: AppTextStyles.textContent2.copyWith(
-                                color: AppColors.white,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
                     ],
                   ),
                 ],

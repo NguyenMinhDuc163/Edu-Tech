@@ -6,6 +6,8 @@ import 'package:ed_tech/init.dart';
 import 'package:ed_tech/modules/course/widgets/course_lesson_bottom_sheet.dart';
 import 'package:ed_tech/modules/course/bloc/course_cubit.dart';
 import 'package:ed_tech/modules/course/screen/course_cancellation_screen.dart';
+import 'package:ed_tech/modules/assessment/screen/quiz_taking_screen.dart';
+import 'package:ed_tech/modules/assessment/models/quiz_model.dart';
 import 'package:video_player/video_player.dart';
 import 'package:chewie/chewie.dart';
 
@@ -1042,11 +1044,31 @@ class _SectionItemState extends State<_SectionItem> {
                   }
 
                   final hasVideo = videoUrl != null && videoUrl.isNotEmpty;
+                  final hasQuiz = content.quiz != null;
 
                   return InkWell(
-                    onTap: hasVideo
-                        ? () => widget.onPlayVideo(videoUrl!, content.title ?? '')
-                        : null,
+                    onTap: hasQuiz
+                        ? () {
+                            final quiz = content.quiz!;
+                            final quizModel = QuizModel(
+                              id: quiz.questionBankId ?? '',
+                              title: quiz.quizTitle ?? '',
+                              type: 'ASSIGNMENT',
+                              timeLimit: 0,
+                              questionCount: 0,
+                              status: QuizStatus.notTaken,
+                              attempts: 0,
+                              subject: '',
+                            );
+                            Navigator.pushNamed(
+                              context,
+                              QuizTakingScreen.routeName,
+                              arguments: {'quiz': quizModel},
+                            );
+                          }
+                        : hasVideo
+                            ? () => widget.onPlayVideo(videoUrl!, content.title ?? '')
+                            : null,
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       decoration: BoxDecoration(
@@ -1056,7 +1078,13 @@ class _SectionItemState extends State<_SectionItem> {
                       ),
                       child: Row(
                         children: [
-                          if (hasVideo)
+                          if (hasQuiz)
+                            Icon(
+                              Icons.quiz_outlined,
+                              color: AppColors.success,
+                              size: 24,
+                            )
+                          else if (hasVideo)
                             Icon(
                               Icons.play_circle_outline,
                               color: AppColors.primary,
@@ -1077,7 +1105,7 @@ class _SectionItemState extends State<_SectionItem> {
                                   content.title ?? '',
                                   style: AppTextStyles.textContent2.copyWith(
                                     color: AppColors.text,
-                                    fontWeight: hasVideo ? FontWeight.w500 : FontWeight.normal,
+                                    fontWeight: hasVideo || hasQuiz ? FontWeight.w500 : FontWeight.normal,
                                   ),
                                 ),
                                 if (content.description != null && content.description!.isNotEmpty) ...[

@@ -187,6 +187,7 @@ class Content {
     required this.description,
     required this.isPreview,
     required this.files,
+    this.quiz,
   });
 
   final String? contentId;
@@ -194,6 +195,7 @@ class Content {
   final String? description;
   final bool? isPreview;
   final List<FileElement> files;
+  final Quiz? quiz;
 
   factory Content.fromJson(Map<String, dynamic> json){
     return Content(
@@ -202,6 +204,7 @@ class Content {
       description: json["description"],
       isPreview: json["isPreview"],
       files: json["files"] == null ? [] : List<FileElement>.from(json["files"]!.map((x) => FileElement.fromJson(x))),
+      quiz: json["quiz"] == null ? null : Quiz.fromJson(json["quiz"]),
     );
   }
 
@@ -211,11 +214,12 @@ class Content {
     "description": description,
     "isPreview": isPreview,
     "files": files.map((x) => x?.toJson()).toList(),
+    "quiz": quiz?.toJson(),
   };
 
   @override
   String toString(){
-    return "$contentId, $title, $description, $isPreview, $files, ";
+    return "$contentId, $title, $description, $isPreview, $files, $quiz, ";
   }
 }
 
@@ -255,5 +259,32 @@ class FileElement {
   @override
   String toString(){
     return "$fileId, $title, $fileType, $isPreview, $url, ";
+  }
+}
+
+class Quiz {
+  Quiz({
+    required this.questionBankId,
+    required this.quizTitle,
+  });
+
+  final String? questionBankId;
+  final String? quizTitle;
+
+  factory Quiz.fromJson(Map<String, dynamic> json){
+    return Quiz(
+      questionBankId: json["questionBankId"],
+      quizTitle: json["quizTitle"],
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    "questionBankId": questionBankId,
+    "quizTitle": quizTitle,
+  };
+
+  @override
+  String toString(){
+    return "$questionBankId, $quizTitle, ";
   }
 }

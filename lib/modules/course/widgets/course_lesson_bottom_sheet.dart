@@ -1,6 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:ed_tech/init.dart';
 import 'package:ed_tech/modules/course/model/detail_course.dart';
+import 'package:ed_tech/modules/assessment/screen/quiz_taking_screen.dart';
+import 'package:ed_tech/modules/assessment/models/quiz_model.dart';
 import 'package:video_player/video_player.dart';
 import 'package:chewie/chewie.dart';
 
@@ -312,6 +314,10 @@ class _ContentItemState extends State<_ContentItem> {
     return !(widget.content.isPreview ?? false);
   }
 
+  bool get _hasQuiz {
+    return widget.content.quiz != null;
+  }
+
   void _handleTap() {
     if (_isLocked) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -320,6 +326,26 @@ class _ContentItemState extends State<_ContentItem> {
           backgroundColor: AppColors.colorFF6905,
           duration: const Duration(seconds: 2),
         ),
+      );
+      return;
+    }
+
+    if (_hasQuiz) {
+      final quiz = widget.content.quiz!;
+      final quizModel = QuizModel(
+        id: quiz.questionBankId ?? '',
+        title: quiz.quizTitle ?? '',
+        type: 'ASSIGNMENT',
+        timeLimit: 0,
+        questionCount: 0,
+        status: QuizStatus.notTaken,
+        attempts: 0,
+        subject: '',
+      );
+      Navigator.pushNamed(
+        context,
+        QuizTakingScreen.routeName,
+        arguments: {'quiz': quizModel},
       );
       return;
     }
@@ -372,23 +398,29 @@ class _ContentItemState extends State<_ContentItem> {
                   decoration: BoxDecoration(
                     color: _isLocked
                         ? AppColors.lightGray.withOpacity(0.5)
-                        : hasVideo
-                            ? AppColors.primary.withOpacity(0.1)
-                            : AppColors.colorFF6905.withOpacity(0.1),
+                        : _hasQuiz
+                            ? AppColors.success.withOpacity(0.1)
+                            : hasVideo
+                                ? AppColors.primary.withOpacity(0.1)
+                                : AppColors.colorFF6905.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
                     _isLocked
                         ? Icons.lock
-                        : hasVideo
-                            ? Icons.play_circle_outline
-                            : Icons.description_outlined,
+                        : _hasQuiz
+                            ? Icons.quiz_outlined
+                            : hasVideo
+                                ? Icons.play_circle_outline
+                                : Icons.description_outlined,
                     size: 20,
                     color: _isLocked
                         ? AppColors.color8F959E
-                        : hasVideo
-                            ? AppColors.primary
-                            : AppColors.colorFF6905,
+                        : _hasQuiz
+                            ? AppColors.success
+                            : hasVideo
+                                ? AppColors.primary
+                                : AppColors.colorFF6905,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -400,7 +432,7 @@ class _ContentItemState extends State<_ContentItem> {
                         widget.content.title ?? '',
                         style: AppTextStyles.textContent2.copyWith(
                           color: _isLocked ? AppColors.color8F959E : AppColors.text,
-                          fontWeight: hasVideo ? FontWeight.w500 : FontWeight.normal,
+                          fontWeight: hasVideo || _hasQuiz ? FontWeight.w500 : FontWeight.normal,
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -435,6 +467,12 @@ class _ContentItemState extends State<_ContentItem> {
                       ),
                     ),
                   )
+                else if (_hasQuiz)
+                  Icon(
+                    Icons.chevron_right,
+                    color: AppColors.success,
+                    size: 20,
+                  )
                 else if (hasVideo)
                   Icon(
                     Icons.chevron_right,
@@ -451,7 +489,7 @@ class _ContentItemState extends State<_ContentItem> {
             ),
           ),
         ),
-        if (_isExpanded && hasDescription && !hasVideo)
+        if (_isExpanded && hasDescription && !hasVideo && !_hasQuiz)
           Container(
             width: double.infinity,
             padding: const EdgeInsets.fromLTRB(68, 0, 16, 12),
