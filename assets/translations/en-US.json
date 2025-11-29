@@ -368,7 +368,15 @@
     "section_1": "Section 1. MULTIPLE CHOICE",
     "section_2": "Section 2. ESSAY",
     "question_header": "Question",
-    "points_label": "points"
+    "points_label": "points",
+    "leaderboard_title": "Leaderboard",
+    "leaderboard_rank": "Rank",
+    "leaderboard_student": "Student",
+    "leaderboard_total_score": "Total Score",
+    "leaderboard_avg_score": "Avg Score",
+    "leaderboard_completed_quizzes": "Completed Quizzes",
+    "leaderboard_no_data": "No leaderboard data available",
+    "leaderboard_error": "Failed to load leaderboard"
   },
   "chat": {
     "title": "Chat Bot",

@@ -6,6 +6,7 @@ import 'package:ed_tech/modules/assessment/models/list_quiz_model.dart';
 import 'package:ed_tech/modules/assessment/models/detail_quiz_model.dart';
 import 'package:ed_tech/modules/assessment/models/submit_quiz_model.dart';
 import 'package:ed_tech/modules/assessment/models/quiz_history_model.dart';
+import 'package:ed_tech/modules/assessment/models/leaderboard_model.dart';
 
 class QuizRepo {
   final ApiClient apiClient;
@@ -85,6 +86,24 @@ class QuizRepo {
 
     if (response.status != 200) {
       throw response.message ?? 'assessment.get_quiz_history_failed'.tr();
+    }
+
+    return response;
+  }
+
+  Future<LeaderboardModel> getLeaderboard({
+    int page = 1,
+    int limit = 20,
+  }) async {
+    final res = await apiClient.fetch(
+      '${ApiPath.leaderboard}?page=$page&limit=$limit',
+      RequestMethod.get,
+    );
+
+    final response = LeaderboardModel.fromJson(res.json);
+
+    if (response.status != 200) {
+      throw Exception(response.message);
     }
 
     return response;

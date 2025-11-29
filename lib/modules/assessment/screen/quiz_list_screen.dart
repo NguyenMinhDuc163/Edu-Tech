@@ -4,6 +4,7 @@ import 'package:ed_tech/core/theme/app_colors.dart';
 import 'package:ed_tech/core/theme/app_text_styles.dart';
 import 'package:ed_tech/core/theme/app_pad.dart';
 import 'package:ed_tech/modules/assessment/screen/quiz_detail_screen.dart';
+import 'package:ed_tech/modules/assessment/screen/leaderboard_screen.dart';
 import 'package:ed_tech/modules/assessment/bloc/list_quiz_controller.dart';
 import 'package:ed_tech/modules/assessment/bloc/list_quiz_cubit.dart';
 import 'package:ed_tech/modules/assessment/models/quiz_model.dart';
@@ -53,13 +54,27 @@ class _QuizListScreenState extends State<QuizListScreen> {
         } else if (state is ListQuizError || state is ListQuizFailure) {
           controller.setLoading(false);
           final errorMessage =
-              state is ListQuizError ? state.message : (state as ListQuizFailure).message;
+              state is ListQuizError
+                  ? state.message
+                  : (state as ListQuizFailure).message;
           controller.setError(errorMessage);
         }
       },
       child: FunctionScreenTemplate(
         actionsWidget: [
-          SvgPicture.asset(IconPath.iconRanking, width: 25, height: 25, color: AppColors.black50),
+          InkWell(
+            onTap: _onRankingTap,
+            borderRadius: BorderRadius.circular(20),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: SvgPicture.asset(
+                IconPath.iconRanking,
+                width: 25,
+                height: 25,
+                color: AppColors.black50,
+              ),
+            ),
+          ),
         ],
         isShowAppBar: false,
         isShowBottomButton: false,
@@ -75,7 +90,10 @@ class _QuizListScreenState extends State<QuizListScreen> {
               builder: (context, quizzes, child) {
                 if (quizzes.isEmpty) {
                   return Center(
-                    child: Text('assessment.no_quizzes'.tr(), style: AppTextStyles.textStyleDefault),
+                    child: Text(
+                      'assessment.no_quizzes'.tr(),
+                      style: AppTextStyles.textStyleDefault,
+                    ),
                   );
                 }
 
@@ -86,9 +104,14 @@ class _QuizListScreenState extends State<QuizListScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildSectionHeader('${'assessment.all_quizzes'.tr()} (${quizzes.length})'),
+                        _buildSectionHeader(
+                          '${'assessment.all_quizzes'.tr()} (${quizzes.length})',
+                        ),
                         ...quizzes.map(
-                          (quiz) => QuizCardWidget(quiz: quiz, onTap: () => _onQuizTap(quiz)),
+                          (quiz) => QuizCardWidget(
+                            quiz: quiz,
+                            onTap: () => _onQuizTap(quiz),
+                          ),
                         ),
                       ],
                     ),
@@ -115,14 +138,36 @@ class _QuizListScreenState extends State<QuizListScreen> {
               color: AppColors.raisinBlack,
             ),
           ),
-          SvgPicture.asset(IconPath.iconRanking, width: 25, height: 25, color: AppColors.black50),
+          InkWell(
+            onTap: _onRankingTap,
+            borderRadius: BorderRadius.circular(20),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: SvgPicture.asset(
+                IconPath.iconRanking,
+                width: 25,
+                height: 25,
+                color: AppColors.black50,
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
 
   void _onQuizTap(QuizModel quiz) {
-    Navigator.pushNamed(context, QuizDetailScreen.routeName, arguments: {'quiz': quiz});
+    Navigator.pushNamed(
+      context,
+      QuizDetailScreen.routeName,
+      arguments: {'quiz': quiz},
+    );
+  }
+
+  void _onRankingTap() {
+    print('🏆 Ranking icon tapped!');
+    print('🏆 Navigating to: ${LeaderboardScreen.routeName}');
+    Navigator.pushNamed(context, LeaderboardScreen.routeName);
   }
 
   Future<void> _onRefresh() async {

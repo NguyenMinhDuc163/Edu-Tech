@@ -368,7 +368,15 @@
     "section_1": "Phần 1. TRẮC NGHIỆM",
     "section_2": "Phần 2. TỰ LUẬN",
     "question_header": "Câu",
-    "points_label": "điểm"
+    "points_label": "điểm",
+    "leaderboard_title": "Bảng xếp hạng",
+    "leaderboard_rank": "Hạng",
+    "leaderboard_student": "Học viên",
+    "leaderboard_total_score": "Tổng điểm",
+    "leaderboard_avg_score": "Điểm TB",
+    "leaderboard_completed_quizzes": "Bài đã hoàn thành",
+    "leaderboard_no_data": "Chưa có dữ liệu xếp hạng",
+    "leaderboard_error": "Không thể tải bảng xếp hạng"
   },
   "chat": {
     "title": "Chat Bot",

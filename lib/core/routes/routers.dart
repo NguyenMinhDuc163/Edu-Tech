@@ -7,11 +7,14 @@ import 'package:ed_tech/modules/assessment/bloc/quiz_detail_controller.dart';
 import 'package:ed_tech/modules/assessment/bloc/quiz_taking_controller.dart';
 import 'package:ed_tech/modules/assessment/bloc/quiz_taking_cubit.dart';
 import 'package:ed_tech/modules/assessment/bloc/quiz_history_cubit.dart';
+import 'package:ed_tech/modules/assessment/bloc/leaderboard_cubit.dart';
+import 'package:ed_tech/modules/assessment/bloc/leaderboard_controller.dart';
 import 'package:ed_tech/modules/assessment/repository/quiz_repo.dart';
 import 'package:ed_tech/modules/assessment/screen/quiz_detail_screen.dart';
 import 'package:ed_tech/modules/assessment/screen/quiz_result_screen.dart';
 import 'package:ed_tech/modules/assessment/screen/quiz_result_detail_screen.dart';
 import 'package:ed_tech/modules/assessment/screen/quiz_taking_screen.dart';
+import 'package:ed_tech/modules/assessment/screen/leaderboard_screen.dart';
 import 'package:ed_tech/modules/auth/forgot_password/bloc/forgot_pass_controller.dart';
 import 'package:ed_tech/modules/auth/forgot_password/bloc/forgot_pass_cubit.dart';
 import 'package:ed_tech/modules/auth/forgot_password/bloc/reset_pass_controller.dart';
@@ -409,6 +412,23 @@ class Routers {
                       (context) =>
                           PurchasedCourseCubit(repo: context.read<PurchasedCourseRepo>()),
                   child: const PurchasedCoursesScreen(),
+                ),
+              ),
+        );
+      case LeaderboardScreen.routeName:
+        return MaterialPageRoute(
+          settings: settings,
+          builder:
+              (context) => RepositoryProvider(
+                create: (context) => QuizRepo(apiClient: ApiClient()),
+                child: BlocProvider(
+                  create:
+                      (context) =>
+                          LeaderboardCubit(repo: context.read<QuizRepo>()),
+                  child: DisposableProvider(
+                    create: (_) => LeaderboardController(),
+                    child: const LeaderboardScreen(),
+                  ),
                 ),
               ),
         );

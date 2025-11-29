@@ -37,6 +37,7 @@ class ApiPath {
   static const String hybridRecommendations = '/recommendations/hybrid';
   static const String courseStats = '/student/courses/stats';
   static const String purchasedCourses = '/courses/purchased/list';
+  static const String leaderboard = '/courses/leaderboard';
 }
 
 // TODO trong intercepter => ds api can truyen id
