@@ -11,11 +11,24 @@ import 'package:ed_tech/modules/home/widgets/learning_plan_widget.dart';
 import 'package:ed_tech/modules/home/widgets/course_suggestions_widget.dart';
 import 'package:ed_tech/modules/purchased_courses/screen/purchased_courses_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   final VoidCallback? onNavigateToQuizTab;
 
   const HomeScreen({this.onNavigateToQuizTab});
   static const String routeName = '/HomeScreen';
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<HomeCubit>().getProduct();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,10 +36,6 @@ class HomeScreen extends StatelessWidget {
       context,
     );
 
-    // Gọi API khi màn hình được build
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<HomeCubit>().getProduct();
-    });
     return FunctionScreenTemplate(
       isShowBottomButton: false,
       isShowAppBar: true,
@@ -89,7 +98,7 @@ class HomeScreen extends StatelessWidget {
             SizedBox(height: 70),
             Padding(padding: AppPad.h16, child: HomePromoCarousel()),
             const SizedBox(height: 25),
-            LearningPlanWidget(onNavigateToQuizTab: onNavigateToQuizTab),
+            LearningPlanWidget(onNavigateToQuizTab: widget.onNavigateToQuizTab),
             const SizedBox(height: 16),
             const CourseSuggestionsWidget(),
           ],
