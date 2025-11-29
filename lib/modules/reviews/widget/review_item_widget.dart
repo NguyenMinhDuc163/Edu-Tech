@@ -1,15 +1,30 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:ed_tech/core/widgets/app_gap.dart';
-import 'package:ed_tech/modules/reviews/model/review_model.dart';
+import 'package:ed_tech/modules/reviews/model/review_response.dart';
 import 'package:ed_tech/modules/reviews/widget/stars_widget.dart';
 
 import '../../../init.dart';
 
 class ReviewItemWidget extends StatelessWidget {
-  const ReviewItemWidget({super.key, required this.reviewModel});
-  final ReviewModel reviewModel;
+  const ReviewItemWidget({super.key, required this.review});
+  final Review review;
   @override
   Widget build(BuildContext context) {
+    final username = review.user?.username ?? 'Anonymous';
+    final rating = (review.rating ?? 0).toDouble();
+    final content = review.content ?? '';
+    final createdAt = review.createdAt ?? '';
+
+    String formattedDate = '';
+    if (createdAt.isNotEmpty) {
+      try {
+        final dateTime = DateTime.parse(createdAt);
+        formattedDate = DateFormat('dd/MM/yyyy').format(dateTime);
+      } catch (e) {
+        formattedDate = createdAt;
+      }
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       spacing: 12,
@@ -20,14 +35,7 @@ class ReviewItemWidget extends StatelessWidget {
             CircleAvatar(
               radius: 20,
               backgroundColor: AppColors.coolGray.withOpacity(0.3),
-              backgroundImage:
-                  reviewModel.avatarUrl.isNotEmpty
-                      ? NetworkImage(reviewModel.avatarUrl)
-                      : null,
-              child:
-                  reviewModel.avatarUrl.isEmpty
-                      ? Icon(Icons.person, color: AppColors.coolGray)
-                      : null,
+              child: Icon(Icons.person, color: AppColors.coolGray),
             ),
             AppGap.w12,
             Expanded(
@@ -38,7 +46,7 @@ class ReviewItemWidget extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          reviewModel.name,
+                          username,
                           style: AppTextStyles.textContent2.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
@@ -53,7 +61,7 @@ class ReviewItemWidget extends StatelessWidget {
                             ),
                             AppGap.w4,
                             Text(
-                              reviewModel.date,
+                              formattedDate,
                               style: AppTextStyles.textContent3.copyWith(
                                 color: AppColors.coolGray,
                               ),
@@ -69,7 +77,7 @@ class ReviewItemWidget extends StatelessWidget {
                       Row(
                         children: [
                           Text(
-                            reviewModel.rating.toString(),
+                            rating.toStringAsFixed(1),
                             style: AppTextStyles.textContent2.copyWith(
                               fontWeight: FontWeight.bold,
                             ),
@@ -84,7 +92,7 @@ class ReviewItemWidget extends StatelessWidget {
                         ],
                       ),
                       AppGap.h4,
-                      StarsWidget(rating: reviewModel.rating),
+                      StarsWidget(rating: rating),
                     ],
                   ),
                 ],
@@ -93,7 +101,7 @@ class ReviewItemWidget extends StatelessWidget {
           ],
         ),
         Text(
-          reviewModel.content,
+          content,
           style: AppTextStyles.textContent3.copyWith(color: AppColors.coolGray),
         ),
       ],

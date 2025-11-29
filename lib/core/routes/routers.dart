@@ -69,6 +69,8 @@ import 'package:ed_tech/modules/purchased_courses/repository/purchased_course_re
 import 'package:ed_tech/modules/ranking/screen/ranking_screen.dart';
 import 'package:ed_tech/modules/reviews/screen/add_review_screen.dart';
 import 'package:ed_tech/modules/reviews/screen/review_screen.dart';
+import 'package:ed_tech/modules/reviews/bloc/review_cubit.dart';
+import 'package:ed_tech/modules/reviews/repository/review_repo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -287,7 +289,15 @@ class Routers {
       case ReviewScreen.routeName:
         return MaterialPageRoute(
           settings: settings,
-          builder: (_) => ReviewScreen(),
+          builder:
+              (context) => RepositoryProvider(
+                create: (context) => ReviewRepo(apiClient: ApiClient()),
+                child: BlocProvider(
+                  create:
+                      (context) => ReviewCubit(repo: context.read<ReviewRepo>()),
+                  child: const ReviewScreen(),
+                ),
+              ),
         );
       case AddressFormScreen.routeName:
         return MaterialPageRoute(
@@ -328,7 +338,15 @@ class Routers {
       case AddReviewScreen.routeName:
         return MaterialPageRoute(
           settings: settings,
-          builder: (_) => AddReviewScreen(),
+          builder:
+              (context) => RepositoryProvider(
+                create: (context) => ReviewRepo(apiClient: ApiClient()),
+                child: BlocProvider(
+                  create:
+                      (context) => ReviewCubit(repo: context.read<ReviewRepo>()),
+                  child: const AddReviewScreen(),
+                ),
+              ),
         );
       case ChatBotScreen.routeName:
         return MaterialPageRoute(

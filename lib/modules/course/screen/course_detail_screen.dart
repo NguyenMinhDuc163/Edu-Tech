@@ -291,7 +291,11 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
                 children: [
                   GestureDetector(
                     onTap: () {
-                      Navigator.pushNamed(context, ReviewScreen.routeName);
+                      Navigator.pushNamed(
+                        context,
+                        ReviewScreen.routeName,
+                        arguments: {'courseId': widget.courseId},
+                      );
                     },
                     child: Container(
                       width: 60,
@@ -407,14 +411,32 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
         const SizedBox(height: 12),
         Row(
           children: [
-            Expanded(
-              flex: 2,
-              child: _buildEnrolledButton(context),
+            GestureDetector(
+              onTap: () {
+                Navigator.pushNamed(
+                  context,
+                  ReviewScreen.routeName,
+                  arguments: {'courseId': widget.courseId},
+                );
+              },
+              child: Container(
+                width: 50,
+                height: 50,
+                decoration: BoxDecoration(
+                  color: AppColors.colorFFEBF0,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.colorFF6905),
+                ),
+                child: const Icon(Icons.star_border, color: AppColors.colorFF6905, size: 22),
+              ),
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: _buildCancelButton(context, daysLeft),
+              flex: 3,
+              child: _buildEnrolledButton(context),
             ),
+            const SizedBox(width: 12),
+            _buildCancelButton(context, daysLeft),
           ],
         ),
       ],
@@ -423,6 +445,7 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
 
   Widget _buildCancelButton(BuildContext context, int daysLeft) {
     return Container(
+      width: 50,
       height: 50,
       decoration: BoxDecoration(
         color: AppColors.white,
@@ -432,6 +455,7 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
       child: TextButton(
         onPressed: () => _showCancelCourseDialog(context, daysLeft),
         style: TextButton.styleFrom(
+          padding: EdgeInsets.zero,
           backgroundColor: Colors.transparent,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
