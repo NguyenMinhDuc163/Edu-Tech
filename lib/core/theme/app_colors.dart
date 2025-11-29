@@ -96,7 +96,7 @@ class AppColors {
 
   static const Color formRequired = rustyRed;
 
-  static const Color hintText = auroMetalAaurus;
+  static const Color hintText = coolGray;
 
   // Shimmer
 

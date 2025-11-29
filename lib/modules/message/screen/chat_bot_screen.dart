@@ -391,6 +391,7 @@ class _ChatInput extends StatelessWidget {
                   Expanded(
                     child: TextField(
                       controller: controller,
+                      style: AppTextStyles.text,
                       decoration: InputDecoration(
                         hintText: 'chat.input_hint'.tr(),
                         border: InputBorder.none,

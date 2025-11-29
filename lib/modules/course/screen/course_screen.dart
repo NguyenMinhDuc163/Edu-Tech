@@ -347,12 +347,11 @@ class _SearchBar extends StatelessWidget {
               },
               child: AbsorbPointer(
                 child: TextField(
+                  style: AppTextStyles.text,
                   decoration: InputDecoration(
                     isDense: true,
                     hintText: 'course.search_hint_course'.tr(),
-                    hintStyle: AppTextStyles.inputHintText.copyWith(
-                      color: AppColors.colorB8B8D2,
-                    ),
+                    hintStyle: AppTextStyles.inputHintText,
                     border: InputBorder.none,
                   ),
                 ),

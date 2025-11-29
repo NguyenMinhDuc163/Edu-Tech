@@ -55,6 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       width: 110,
                       child: TextField(
                         onChanged: controller.updateSearchQuery,
+                        style: AppTextStyles.text.copyWith(fontSize: 11),
                         decoration: InputDecoration(
                           hintText: 'home_screen.search_hint'.tr(),
                           border: OutlineInputBorder(
@@ -66,7 +67,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           isDense: true,
                         ),
-                        style: TextStyle(fontSize: 11),
                       ),
                     ),
                     const SizedBox(width: 3),

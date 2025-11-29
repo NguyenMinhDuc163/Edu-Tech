@@ -91,6 +91,7 @@ class _TextInputCustomState extends State<TextInputCustom> {
           controller: widget.controller,
           obscureText: widget.isPassword ? obscureText : false,
           maxLines: widget.isPassword ? 1 : widget.maxLines,
+          style: AppTextStyles.text,
           onTapOutside:
               (widget.onTapOutside != null)
                   ? (_) => widget.onTapOutside?.call()
@@ -102,9 +103,7 @@ class _TextInputCustomState extends State<TextInputCustom> {
           onChanged: (widget.onChanged != null) ? widget.onChanged : null,
           decoration: InputDecoration(
             hintText: widget.hintText,
-            hintStyle: AppTextStyles.inputHintText.copyWith(
-              color: AppColors.coolGray,
-            ),
+            hintStyle: AppTextStyles.inputHintText,
             border:
                 !widget.isLineBottom
                     ? InputBorder.none

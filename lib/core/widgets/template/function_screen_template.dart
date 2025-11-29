@@ -160,7 +160,7 @@ class _FunctionScreenTemplateState extends State<FunctionScreenTemplate>
                     },
                   )
                   : IconButton(
-                    icon: const Icon(Icons.arrow_back),
+                    icon: Icon(Icons.arrow_back, color: AppColors.divider,),
                     onPressed: () {
                       if (widget.onBack != null) {
                         widget.onBack!();

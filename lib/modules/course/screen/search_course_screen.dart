@@ -71,12 +71,11 @@ class _SearchCourseScreenState extends State<SearchCourseScreen> {
                       controller: _textController,
                       autofocus: true,
                       onChanged: _onSearchChanged,
+                      style: AppTextStyles.text,
                       decoration: InputDecoration(
                         isDense: true,
                         hintText: 'search.search_placeholder'.tr(),
-                        hintStyle: AppTextStyles.inputHintText.copyWith(
-                          color: AppColors.colorB8B8D2,
-                        ),
+                        hintStyle: AppTextStyles.inputHintText,
                         border: InputBorder.none,
                       ),
                     ),

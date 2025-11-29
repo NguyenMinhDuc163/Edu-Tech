@@ -17,6 +17,10 @@ class AppTheme {
       onError: Colors.white,
       onBackground: AppColors.text,
       onSurface: AppColors.text,
+      // Material 3 colors - fix màu TextField
+      surfaceContainerHighest: AppColors.lightGray,
+      onSurfaceVariant: AppColors.text,
+      outline: AppColors.colorB8B8D2,
     );
 
     return ThemeData(
@@ -36,6 +40,14 @@ class AppTheme {
         bodyMedium: AppTextStyles.text,
         // titleLarge: AppTextStyles.textHeader2,
         // titleMedium: AppTextStyles.textHeader3,
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        hintStyle: TextStyle(
+          color: Color(0xFF6B7280), // Xám đậm - hot reload work
+          fontSize: 15,
+          fontWeight: FontWeight.w400,
+        ),
+        floatingLabelStyle: AppTextStyles.inputFieldLabel,
       ),
       useMaterial3: true,
       extensions: const [
@@ -81,6 +93,10 @@ class AppTheme {
       onError: Colors.white,
       onBackground: text,
       onSurface: text,
+      // Material 3 colors - fix màu TextField dark mode
+      surfaceContainerHighest: Color(0xFF1E293B),
+      onSurfaceVariant: text,
+      outline: Color(0xFF374151),
     );
 
     return ThemeData(
@@ -100,6 +116,14 @@ class AppTheme {
         // titleLarge: AppTextStyles.textHeader2,
         // titleMedium: AppTextStyles.textHeader3,
       ).apply(bodyColor: text, displayColor: text),
+      inputDecorationTheme: InputDecorationTheme(
+        hintStyle: TextStyle(
+          color: Color(0x80E6E8EC), // Xám sáng với opacity - dark mode
+          fontSize: 15,
+          fontWeight: FontWeight.w400,
+        ),
+        floatingLabelStyle: AppTextStyles.inputFieldLabel.copyWith(color: text),
+      ),
       useMaterial3: true,
       extensions: const [
         BrandColors(

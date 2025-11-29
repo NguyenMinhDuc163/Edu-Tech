@@ -297,9 +297,7 @@ class _SearchFilterBottomSheetState extends State<SearchFilterBottomSheet> {
               border: InputBorder.none,
               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               hintText: '0',
-              hintStyle: AppTextStyles.textContent3.copyWith(
-                color: AppColors.color8F959E,
-              ),
+              hintStyle: AppTextStyles.inputHintText,
             ),
             style: AppTextStyles.textContent2.copyWith(
               color: AppColors.text,
