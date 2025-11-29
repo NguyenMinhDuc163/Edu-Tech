@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:ed_tech/init.dart';
 import 'package:ed_tech/modules/message/bloc/chat_controller.dart';
 import 'package:ed_tech/modules/message/bloc/chatbot_cubit.dart';
@@ -26,7 +27,7 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
   @override
   Widget build(BuildContext context) {
     return FunctionScreenTemplate(
-      title: "Chat Bot",
+      title: "chat.title".tr(),
       isShowDrawer: true,
       isShowBottomButton: false,
       actionsWidget: [
@@ -139,9 +140,9 @@ class _MessageCard extends StatelessWidget {
 
     // Hiển thị thông báo copy thành công
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Đã copy vào clipboard'),
-        duration: Duration(seconds: 2),
+      SnackBar(
+        content: Text('chat.copied'.tr()),
+        duration: const Duration(seconds: 2),
       ),
     );
   }
@@ -182,9 +183,9 @@ class _MessageCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (!isUser)
-                    const Text(
-                      'AI Assistant:',
-                      style: TextStyle(
+                    Text(
+                      'chat.assistant_label'.tr(),
+                      style: const TextStyle(
                         fontWeight: FontWeight.w700,
                         color: Color(0xFF1C2439),
                       ),
@@ -230,7 +231,7 @@ class _MessageCard extends StatelessWidget {
                       if (!isUser) ...[
                         _ActionIcon(
                           icon: Icons.copy_outlined,
-                          label: 'Copy Text',
+                          label: 'chat.copy_text'.tr(),
                           onTap:
                               () => _copyToClipboard(context, message.content),
                         ),
@@ -241,7 +242,7 @@ class _MessageCard extends StatelessWidget {
                       ] else ...[
                         _ActionIcon(
                           icon: Icons.copy_outlined,
-                          label: 'Copy Text',
+                          label: 'chat.copy_text'.tr(),
                           isWhite: true,
                           onTap:
                               () => _copyToClipboard(context, message.content),
@@ -292,11 +293,11 @@ class _LoadingMessageCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: const Color(0xFFE7EAF0)),
             ),
-            child: const Padding(
-              padding: EdgeInsets.all(14),
+            child: Padding(
+              padding: const EdgeInsets.all(14),
               child: Row(
                 children: [
-                  SizedBox(
+                  const SizedBox(
                     width: 16,
                     height: 16,
                     child: CircularProgressIndicator(
@@ -306,10 +307,10 @@ class _LoadingMessageCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                  SizedBox(width: 12),
+                  const SizedBox(width: 12),
                   Text(
-                    'AI đang suy nghĩ...',
-                    style: TextStyle(color: Color(0xFF1C2439)),
+                    'chat.thinking'.tr(),
+                    style: const TextStyle(color: Color(0xFF1C2439)),
                   ),
                 ],
               ),
@@ -390,8 +391,8 @@ class _ChatInput extends StatelessWidget {
                   Expanded(
                     child: TextField(
                       controller: controller,
-                      decoration: const InputDecoration(
-                        hintText: 'Ask ai chat anything',
+                      decoration: InputDecoration(
+                        hintText: 'chat.input_hint'.tr(),
                         border: InputBorder.none,
                       ),
                     ),

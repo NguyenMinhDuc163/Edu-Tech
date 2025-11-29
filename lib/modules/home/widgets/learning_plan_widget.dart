@@ -70,7 +70,7 @@ class _LearningPlanWidgetState extends State<LearningPlanWidget> {
         if (state is StatsSuccess) {
           final stats = state.stats;
           final validCourses = stats.courses
-              .where((course) => course.title?.isNotEmpty ?? false)
+              .where((course) => course.title.isNotEmpty)
               .toList();
 
           if (validCourses.isEmpty && stats.overview.totalResults == 0) {
@@ -305,7 +305,7 @@ class _CoursesSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Khóa học của bạn',
+          'purchased_courses.title'.tr(),
           style: AppTextStyles.textMedium.copyWith(fontSize: 14),
         ),
         const SizedBox(height: 12),

@@ -18,6 +18,14 @@ class ReviewScreen extends StatefulWidget {
 class _ReviewScreenState extends State<ReviewScreen> {
   @override
   Widget build(BuildContext context) {
+    final totalReviews = MockData.reviews.length;
+    final double avgRating = MockData.reviews.isEmpty
+        ? 0.0
+        : MockData.reviews
+                .map((r) => r.rating)
+                .reduce((a, b) => a + b) /
+            MockData.reviews.length;
+
     return FunctionScreenTemplate(
       isShowBottomButton: false,
       title: "review.title".tr(),
@@ -33,7 +41,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "245 ${'review.title'.tr()}",
+                          "$totalReviews ${'review.title'.tr()}",
                           style: AppTextStyles.textContent1.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
@@ -42,12 +50,12 @@ class _ReviewScreenState extends State<ReviewScreen> {
                           spacing: 5,
                           children: [
                             Text(
-                              "4.8",
+                              avgRating.toStringAsFixed(1),
                               style: AppTextStyles.textContent2.copyWith(
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            StarsWidget(rating: 4.8,),
+                            StarsWidget(rating: avgRating),
                           ],
                         ),
                       ],

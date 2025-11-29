@@ -41,7 +41,7 @@ class _AddressFormContent extends StatelessWidget {
               controller: controller.nameController,
               fillColor: true,
               label: 'payment.name'.tr(),
-              hintText: "Hemendra Mali",
+            hintText: "payment.hint_name".tr(),
               titleStyle: AppTextStyles.textContent1.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -56,7 +56,7 @@ class _AddressFormContent extends StatelessWidget {
                     controller: controller.countryController,
                     fillColor: true,
                     label: 'payment.country'.tr(),
-                    hintText: "India",
+                    hintText: "payment.hint_country".tr(),
                     titleStyle: AppTextStyles.textContent1.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -68,7 +68,7 @@ class _AddressFormContent extends StatelessWidget {
                     controller: controller.cityController,
                     fillColor: true,
                     label: 'payment.city'.tr(),
-                    hintText: "Bangalore",
+                    hintText: "payment.hint_city".tr(),
                     titleStyle: AppTextStyles.textContent1.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -81,7 +81,7 @@ class _AddressFormContent extends StatelessWidget {
               controller: controller.phoneController,
               fillColor: true,
               label: 'payment.phone_number'.tr(),
-              hintText: "+91-800 301 0108",
+            hintText: "payment.hint_phone".tr(),
               titleStyle: AppTextStyles.textContent1.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -91,7 +91,7 @@ class _AddressFormContent extends StatelessWidget {
               controller: controller.addressController,
               fillColor: true,
               label: 'payment.address'.tr(),
-              hintText: "43, Electronics City Phase 1, Electronic City",
+            hintText: "payment.hint_address".tr(),
               titleStyle: AppTextStyles.textContent1.copyWith(
                 fontWeight: FontWeight.bold,
               ),

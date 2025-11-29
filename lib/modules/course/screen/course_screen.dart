@@ -67,11 +67,11 @@ class _CourseScreenState extends State<CourseScreen> {
         controller.setFilteringMode(true);
 
         context.read<FilterCourseCubit>().filterCourses(
-              categories: categories,
-              durations: durations,
-              minPrice: minPrice,
-              maxPrice: maxPrice,
-            );
+          categories: categories,
+          durations: durations,
+          minPrice: minPrice,
+          maxPrice: maxPrice,
+        );
       },
       onClearFilter: () {
         controller.clearFilter();
@@ -101,7 +101,10 @@ class _CourseScreenState extends State<CourseScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Text("home_screen.course".tr(), style: AppTextStyles.textHeader2),
+                      Text(
+                        "home_screen.course".tr(),
+                        style: AppTextStyles.textHeader2,
+                      ),
                       CircleAvatar(
                         radius: 22,
                         child: SvgPicture.asset(IconPath.iconAvatar),
@@ -166,7 +169,8 @@ class _CourseScreenState extends State<CourseScreen> {
                             Padding(
                               padding: AppPad.h24v12,
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     '${results.length} ${"filter.courses_found".tr()}',
@@ -190,14 +194,23 @@ class _CourseScreenState extends State<CourseScreen> {
                             ),
                             Expanded(
                               child: ListView.separated(
-                                padding: const EdgeInsets.only(left: 24, right: 24, bottom: 16),
+                                padding: const EdgeInsets.only(
+                                  left: 24,
+                                  right: 24,
+                                  bottom: 16,
+                                ),
                                 itemCount: results.length,
-                                separatorBuilder: (_, __) => const SizedBox(height: 16),
+                                separatorBuilder:
+                                    (_, __) => const SizedBox(height: 16),
                                 itemBuilder: (context, index) {
                                   final result = results[index];
                                   return _FilterResultCard(
                                     result: result,
-                                    onTap: () => _navigateToCourseDetail(context, result),
+                                    onTap:
+                                        () => _navigateToCourseDetail(
+                                          context,
+                                          result,
+                                        ),
                                   );
                                 },
                               ),
@@ -258,7 +271,10 @@ class _CourseScreenState extends State<CourseScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Text("home_screen.course".tr(), style: AppTextStyles.textHeader2),
+                      Text(
+                        "home_screen.course".tr(),
+                        style: AppTextStyles.textHeader2,
+                      ),
                       CircleAvatar(
                         radius: 22,
                         child: SvgPicture.asset(IconPath.iconAvatar),
@@ -287,14 +303,17 @@ class _CourseScreenState extends State<CourseScreen> {
     );
   }
 
-  void _navigateToCourseDetail(BuildContext context, SearchCourseResult result) {
+  void _navigateToCourseDetail(
+    BuildContext context,
+    SearchCourseResult result,
+  ) {
     Navigator.pushNamed(
       context,
       CourseDetailScreen.routeName,
       arguments: {
         'courseId': result.courseId ?? '',
-        'title': result.title ?? 'Untitled Course',
-        'instructor': 'Unknown Teacher',
+        'title': result.title ?? 'course.untitled'.tr(),
+        'instructor': 'course.unknown_teacher'.tr(),
         'price': result.price ?? '0',
         'duration': '0h 0m',
         'imageUrl': result.thumbnailUrl,
@@ -330,7 +349,7 @@ class _SearchBar extends StatelessWidget {
                 child: TextField(
                   decoration: InputDecoration(
                     isDense: true,
-                    hintText: 'Find Course',
+                    hintText: 'course.search_hint_course'.tr(),
                     hintStyle: AppTextStyles.inputHintText.copyWith(
                       color: AppColors.colorB8B8D2,
                     ),
@@ -360,10 +379,7 @@ class _FilterResultCard extends StatelessWidget {
   final SearchCourseResult result;
   final VoidCallback onTap;
 
-  const _FilterResultCard({
-    required this.result,
-    required this.onTap,
-  });
+  const _FilterResultCard({required this.result, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -403,23 +419,24 @@ class _FilterResultCard extends StatelessWidget {
                   topLeft: Radius.circular(16),
                   bottomLeft: Radius.circular(16),
                 ),
-                child: result.thumbnailUrl != null
-                    ? Image.network(
-                        result.thumbnailUrl!,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return const Icon(
-                            Icons.image_not_supported,
-                            color: AppColors.colorB8B8D2,
-                            size: 40,
-                          );
-                        },
-                      )
-                    : const Icon(
-                        Icons.image_not_supported,
-                        color: AppColors.colorB8B8D2,
-                        size: 40,
-                      ),
+                child:
+                    result.thumbnailUrl != null
+                        ? Image.network(
+                          result.thumbnailUrl!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return const Icon(
+                              Icons.image_not_supported,
+                              color: AppColors.colorB8B8D2,
+                              size: 40,
+                            );
+                          },
+                        )
+                        : const Icon(
+                          Icons.image_not_supported,
+                          color: AppColors.colorB8B8D2,
+                          size: 40,
+                        ),
               ),
             ),
             Expanded(

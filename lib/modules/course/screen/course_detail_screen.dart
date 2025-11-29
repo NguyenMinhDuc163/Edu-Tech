@@ -40,12 +40,12 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
         ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
 
     if (args == null) {
-      return Scaffold(body: Center(child: Text('Không có thông tin khóa học')));
+      return Scaffold(body: Center(child: Text('course.no_course_info'.tr())));
     }
 
     final String courseId = args['courseId'] ?? '';
-    final String title = args['title'] ?? 'Untitled Course';
-    final String instructor = args['instructor'] ?? 'Unknown Teacher';
+    final String title = args['title'] ?? 'course.untitled'.tr();
+    final String instructor = args['instructor'] ?? 'course.unknown_teacher'.tr();
     final String price = args['price'] ?? '0';
     final String duration = args['duration'] ?? '0h 0m';
     final String? imageUrl = args['imageUrl'];
@@ -603,7 +603,7 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'About this course',
+            'course.about_this_course'.tr(),
             style: AppTextStyles.textHeader3.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 12),
@@ -630,7 +630,7 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Lessons', style: AppTextStyles.textHeader3.copyWith(fontWeight: FontWeight.bold)),
+          Text('course.lessons_title'.tr(), style: AppTextStyles.textHeader3.copyWith(fontWeight: FontWeight.bold)),
           const SizedBox(height: 16),
 
           ...sectionsToShow.map((section) => _SectionItem(
@@ -650,7 +650,7 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  'View All Lessons',
+                  'course.view_all_lessons'.tr(),
                   textAlign: TextAlign.center,
                   style: AppTextStyles.textButton.copyWith(color: AppColors.primary),
                 ),

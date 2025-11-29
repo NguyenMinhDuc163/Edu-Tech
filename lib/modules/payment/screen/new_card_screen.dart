@@ -1,5 +1,4 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:ed_tech/core/widgets/template/button_widget.dart';
 import 'package:ed_tech/core/widgets/text_input_custom.dart';
 import 'package:ed_tech/modules/payment/screen/confirm_screen.dart';
@@ -64,7 +63,7 @@ class _NewCardScreenState extends State<NewCardScreen> {
               controller: cardOwnerController,
               fillColor: true,
               label: 'payment.card_owner'.tr(),
-              hintText: "Hemendra Mali",
+              hintText: "payment.hint_card_owner".tr(),
               titleStyle: AppTextStyles.textContent1.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -74,7 +73,7 @@ class _NewCardScreenState extends State<NewCardScreen> {
               controller: cardNumberController,
               fillColor: true,
               label: 'payment.card_number'.tr(),
-              hintText: "5254 7634 8734 7690",
+              hintText: "payment.hint_card_number".tr(),
               titleStyle: AppTextStyles.textContent1.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -90,7 +89,7 @@ class _NewCardScreenState extends State<NewCardScreen> {
                     controller: expController,
                     fillColor: true,
                     label: 'payment.exp'.tr(),
-                    hintText: "07/25",
+                    hintText: "payment.hint_exp".tr(),
                     titleStyle: AppTextStyles.textContent1.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -102,7 +101,7 @@ class _NewCardScreenState extends State<NewCardScreen> {
                     controller: cvvController,
                     fillColor: true,
                     label: 'payment.cvv'.tr(),
-                    hintText: "123",
+                    hintText: "payment.hint_cvv".tr(),
                     titleStyle: AppTextStyles.textContent1.copyWith(
                       fontWeight: FontWeight.bold,
                     ),

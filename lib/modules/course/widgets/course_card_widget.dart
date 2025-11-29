@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:ed_tech/core/constants/image_path.dart';
@@ -65,19 +66,19 @@ class CourseCardsCarousel extends StatelessWidget {
   Widget build(BuildContext context) {
     final List<CourseCardData> courseCards = [
       CourseCardData(
-        title: 'Language',
+        title: 'course_tab.card_language',
         imagePath: ImagePath.persionLanguege,
         backgroundColor: const Color(0xFFE3F2FD),
         textColor: const Color(0xFF1976D2),
       ),
       CourseCardData(
-        title: 'Painting',
+        title: 'course_tab.card_painting',
         imagePath: ImagePath.persionPaint,
         backgroundColor: const Color(0xFFF3E5F5),
         textColor: const Color(0xFF7B1FA2),
       ),
       CourseCardData(
-        title: 'Design',
+        title: 'course_tab.card_design',
         imagePath: ImagePath.persionLanguege,
         backgroundColor: const Color(0xFFE8F5E8),
         textColor: const Color(0xFF2E7D32),
@@ -92,7 +93,7 @@ class CourseCardsCarousel extends StatelessWidget {
         itemBuilder: (context, index) {
           final card = courseCards[index];
           return CourseCardWidget(
-            title: card.title,
+            title: card.title.tr(),
             imagePath: card.imagePath,
             backgroundColor: card.backgroundColor,
             textColor: card.textColor,

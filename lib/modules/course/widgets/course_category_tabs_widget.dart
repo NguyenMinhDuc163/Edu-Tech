@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:ed_tech/core/theme/app_colors.dart';
 import 'package:ed_tech/core/theme/app_text_styles.dart';
@@ -14,7 +15,11 @@ class CourseCategoryTabsWidget extends StatefulWidget {
 class _CourseCategoryTabsWidgetState extends State<CourseCategoryTabsWidget> {
   int selectedIndex = 0;
 
-  final List<String> categories = ['All', 'Popular', 'New'];
+  final List<String> categories = [
+    'course_tab.category_all',
+    'course_tab.category_popular',
+    'course_tab.category_new',
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +28,7 @@ class _CourseCategoryTabsWidgetState extends State<CourseCategoryTabsWidget> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Choice your course', style: AppTextStyles.textHeader3),
+          Text('course_tab.choice_your_course'.tr(), style: AppTextStyles.textHeader3),
           const SizedBox(height: 16),
           Row(
             children:
@@ -52,7 +57,7 @@ class _CourseCategoryTabsWidgetState extends State<CourseCategoryTabsWidget> {
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
-                        category,
+                        category.tr(),
                         style: AppTextStyles.textMedium.copyWith(
                           color:
                               isSelected ? AppColors.white : AppColors.coolGray,

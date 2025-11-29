@@ -321,8 +321,8 @@ class _SearchCourseScreenState extends State<SearchCourseScreen> {
       CourseDetailScreen.routeName,
       arguments: {
         'courseId': result.courseId ?? '',
-        'title': result.title ?? 'Untitled Course',
-        'instructor': 'Unknown Teacher',
+        'title': result.title ?? 'course.untitled'.tr(),
+        'instructor': 'course.unknown_teacher'.tr(),
         'price': result.price ?? '0',
         'duration': '0h 0m',
         'imageUrl': result.thumbnailUrl,
@@ -405,7 +405,7 @@ class _SearchResultCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      result.title ?? 'Untitled Course',
+                      result.title ?? 'course.untitled'.tr(),
                       style: AppTextStyles.textMedium,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -428,7 +428,7 @@ class _SearchResultCard extends StatelessWidget {
                         Text(
                           result.price != null
                               ? '${NumberFormat('#,###').format(double.tryParse(result.price!) ?? 0)} VND'
-                              : 'Free',
+                              : 'course.free'.tr(),
                           style: AppTextStyles.textMedium.copyWith(
                             color: AppColors.primary,
                           ),

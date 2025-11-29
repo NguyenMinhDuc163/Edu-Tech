@@ -1,4 +1,5 @@
 import 'package:disposable_provider/disposable_provider.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -55,7 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: TextField(
                         onChanged: controller.updateSearchQuery,
                         decoration: InputDecoration(
-                          hintText: "Tìm kiếm...",
+                          hintText: 'home_screen.search_hint'.tr(),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(20),
                           ),

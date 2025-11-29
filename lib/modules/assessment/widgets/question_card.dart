@@ -72,7 +72,7 @@ class QuestionCard extends StatelessWidget {
                       Icon(Icons.access_time, size: 14, color: AppColors.error),
                       const SizedBox(width: 4),
                       Text(
-                        '${question.timeLimit}s',
+                        '${question.timeLimit} ${'assessment.seconds'.tr()}',
                         style: AppTextStyles.textContent4.copyWith(
                           color: AppColors.error,
                           fontWeight: FontWeight.w500,

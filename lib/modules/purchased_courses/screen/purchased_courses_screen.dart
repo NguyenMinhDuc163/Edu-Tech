@@ -150,8 +150,8 @@ class _PurchasedCoursesScreenState extends State<PurchasedCoursesScreen> {
       CourseDetailScreen.routeName,
       arguments: {
         'courseId': course.courseId ?? '',
-        'title': course.title ?? 'Untitled Course',
-        'instructor': course.teacher ?? 'Unknown Teacher',
+        'title': course.title ?? 'course.untitled'.tr(),
+        'instructor': course.teacher ?? 'course.unknown_teacher'.tr(),
         'price': course.price ?? '0',
         'duration': course.courseDuration ?? '0h 0m',
         'imageUrl': course.thumbnailUrl,
@@ -281,7 +281,7 @@ class _PurchasedCourseCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    course.title ?? 'Untitled Course',
+                    course.title ?? 'course.untitled'.tr(),
                     style: AppTextStyles.textHeader3.copyWith(
                       fontSize: 17,
                       height: 1.3,
@@ -307,7 +307,7 @@ class _PurchasedCourseCard extends StatelessWidget {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          course.teacher ?? 'Unknown',
+                          course.teacher ?? 'course.unknown_teacher'.tr(),
                           style: AppTextStyles.textContent2.copyWith(
                             color: AppColors.text,
                             fontWeight: FontWeight.w500,
@@ -493,26 +493,26 @@ class _PurchasedCourseCard extends StatelessWidget {
   Widget _buildThumbnail() {
     final url = course.thumbnailUrl ?? '';
     if (url.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.school_outlined,
-              color: AppColors.primary.withAlpha(100),
-              size: 60,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              course.category ?? 'Course',
-              style: AppTextStyles.textContent2.copyWith(
-                color: AppColors.primary,
-                fontWeight: FontWeight.w600,
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.school_outlined,
+                    color: AppColors.primary.withAlpha(100),
+                    size: 60,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    course.category ?? 'home_screen.course'.tr(),
+                    style: AppTextStyles.textContent2.copyWith(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ],
-        ),
-      );
+            );
     }
 
     return Stack(
@@ -551,7 +551,7 @@ class _PurchasedCourseCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Image unavailable',
+                    'course.image_unavailable'.tr(),
                     style: AppTextStyles.textContent3.copyWith(
                       color: AppColors.coolGray,
                     ),

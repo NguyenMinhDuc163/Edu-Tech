@@ -1,6 +1,5 @@
 import 'package:disposable_provider/disposable_provider.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:ed_tech/core/constants/mock_data.dart';
 import 'package:ed_tech/core/widgets/app_gap.dart';
 import 'package:ed_tech/core/widgets/switch_botton_widget.dart';
 import 'package:ed_tech/core/widgets/template/button_widget.dart';
@@ -8,7 +7,6 @@ import 'package:ed_tech/core/widgets/text_input_custom.dart';
 import 'package:ed_tech/modules/payment/bloc/payment_method_controller.dart';
 import 'package:ed_tech/modules/payment/screen/new_card_screen.dart';
 import 'package:ed_tech/modules/payment/widget/card_widget.dart';
-import 'package:u_credit_card/u_credit_card.dart';
 
 import '../../../init.dart';
 
@@ -76,7 +74,7 @@ class _PaymentMethodContent extends StatelessWidget {
                   controller: controller.cardOwnerController.value,
                   fillColor: true,
                   label: 'payment.card_owner'.tr(),
-                  hintText: "Hemendra Mali",
+                  hintText: "payment.hint_card_owner".tr(),
                   titleStyle: AppTextStyles.textContent1.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -87,7 +85,7 @@ class _PaymentMethodContent extends StatelessWidget {
                   controller: controller.cardNumberController.value,
                   fillColor: true,
                   label: 'payment.card_number'.tr(),
-                  hintText: "5254 7634 8734 7690",
+                  hintText: "payment.hint_card_number".tr(),
                   titleStyle: AppTextStyles.textContent1.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -102,7 +100,7 @@ class _PaymentMethodContent extends StatelessWidget {
                         controller: controller.expController.value,
                         fillColor: true,
                         label: 'payment.exp'.tr(),
-                        hintText: "07/25",
+                        hintText: "payment.hint_exp".tr(),
                         titleStyle: AppTextStyles.textContent1.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -114,7 +112,7 @@ class _PaymentMethodContent extends StatelessWidget {
                         controller: controller.cvvController.value,
                         fillColor: true,
                         label: 'payment.cvv'.tr(),
-                        hintText: "123",
+                        hintText: "payment.hint_cvv".tr(),
                         titleStyle: AppTextStyles.textContent1.copyWith(
                           fontWeight: FontWeight.bold,
                         ),

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:ed_tech/init.dart';
 import 'package:ed_tech/data/services/user_service.dart';
 
@@ -25,14 +26,14 @@ class HomeHeaderWidget extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Hi, ${UserService.instance.displayName}',
+                    '${'home_screen.hi'.tr()} ${UserService.instance.displayName}',
                     style: AppTextStyles.textHeader2.copyWith(
                       color: AppColors.white,
                     ),
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    "Let's start learning",
+                    'home_screen.lets_start_learning'.tr(),
                     style: AppTextStyles.text.copyWith(
                       color: AppColors.offWhite,
                     ),
@@ -92,20 +93,20 @@ class _ProgressCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Learned today',
+                'home_screen.learned_today'.tr(),
                 style: AppTextStyles.textMedium.copyWith(
                   color: AppColors.coolGray,
                 ),
               ),
-              Text('My courses', style: AppTextStyles.textButton),
+              Text('home_screen.my_courses_short'.tr(), style: AppTextStyles.textButton),
             ],
           ),
           const SizedBox(height: 10),
           Row(
             children: [
-              Text('${learnedMinutes}min', style: AppTextStyles.textHeader3),
+              Text('${learnedMinutes}${'common.min_short'.tr()}', style: AppTextStyles.textHeader3),
               Text(
-                ' / ${totalMinutes}min',
+                ' / ${totalMinutes}${'common.min_short'.tr()}',
                 style: AppTextStyles.text.copyWith(color: AppColors.coolGray),
               ),
             ],

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:ed_tech/core/widgets/app_gap.dart';
 import 'package:ed_tech/init.dart';
 import 'package:ed_tech/modules/home/bloc/home_cubit.dart';
@@ -15,8 +16,8 @@ class CourseSuggestionsWidget extends StatelessWidget {
       CourseDetailScreen.routeName,
       arguments: {
         'courseId': course.courseId ?? '',
-        'title': course.title ?? 'Untitled Course',
-        'instructor': course.teacher?.toString() ?? 'Unknown Teacher',
+        'title': course.title ?? 'course.untitled'.tr(),
+        'instructor': course.teacher?.toString() ?? 'course.unknown_teacher'.tr(),
         'price': course.price ?? '0',
         'duration': course.courseDuration?.toString() ?? '0h 0m',
         'imageUrl': course.thumbnailUrl,
@@ -39,12 +40,12 @@ class CourseSuggestionsWidget extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Recommended for you',
+                      'home_screen.recommended_for_you'.tr(),
                       style: AppTextStyles.textHeader3,
                     ),
                     TextButton(
                       onPressed: () {},
-                      child: Text('See all', style: AppTextStyles.textButton),
+                      child: Text('home_screen.see_all'.tr(), style: AppTextStyles.textButton),
                     ),
                   ],
                 ),
@@ -70,20 +71,20 @@ class CourseSuggestionsWidget extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Recommended for you',
+                        'home_screen.recommended_for_you'.tr(),
                         style: AppTextStyles.textHeader3,
                       ),
                       TextButton(
                         onPressed: () {},
-                        child: Text('See all', style: AppTextStyles.textButton),
+                        child: Text('home_screen.see_all'.tr(), style: AppTextStyles.textButton),
                       ),
                     ],
                   ),
                   AppGap.h16,
-                  const SizedBox(
-                    height: 140,
-                    child: Center(child: Text('Không có khóa học nào')),
-                  ),
+                  SizedBox(
+                  height: 140,
+                  child: Center(child: Text('home_screen.no_courses'.tr())),
+                ),
                 ],
               ),
             );
@@ -98,12 +99,12 @@ class CourseSuggestionsWidget extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Recommended for you',
+                      'home_screen.recommended_for_you'.tr(),
                       style: AppTextStyles.textHeader3,
                     ),
                     TextButton(
                       onPressed: () {},
-                      child: Text('See all', style: AppTextStyles.textButton),
+                      child: Text('home_screen.see_all'.tr(), style: AppTextStyles.textButton),
                     ),
                   ],
                 ),
@@ -135,17 +136,17 @@ class CourseSuggestionsWidget extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Recommended for you', style: AppTextStyles.textHeader3),
+                  Text('home_screen.recommended_for_you'.tr(), style: AppTextStyles.textHeader3),
                   TextButton(
                     onPressed: () {},
-                    child: Text('See all', style: AppTextStyles.textButton),
+                    child: Text('home_screen.see_all'.tr(), style: AppTextStyles.textButton),
                   ),
                 ],
               ),
               AppGap.h16,
-              const SizedBox(
+              SizedBox(
                 height: 140,
-                child: Center(child: Text('Không thể tải dữ liệu')),
+                child: Center(child: Text('home_screen.cannot_load_courses'.tr())),
               ),
             ],
           ),
@@ -248,7 +249,7 @@ class _CourseCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    course.title ?? 'Untitled Course',
+                    course.title ?? 'course.untitled'.tr(),
                     style: AppTextStyles.textMedium,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -279,7 +280,7 @@ class _CourseCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    course.teacher?.toString() ?? 'Unknown Teacher',
+                    course.teacher?.toString() ?? 'course.unknown_teacher'.tr(),
                     style: AppTextStyles.text.copyWith(
                       color: AppColors.coolGray,
                     ),

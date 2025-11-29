@@ -10,7 +10,11 @@
     "settings": "Settings",
     "logout": "Logout",
     "verified_profile": "Verified Profile",
-    "orders": "Orders"
+    "orders": "Orders",
+    "language": "Language",
+    "lang_en_short": "EN",
+    "lang_vi_short": "VI",
+    "min_short": "min"
   },
   "home_screen": {
     "title": "Home Screen",
@@ -25,7 +29,22 @@
     "recent_results": "Recent Results",
     "passed": "Passed",
     "failed": "Failed",
-    "no_stats": "No learning progress yet"
+    "no_stats": "No learning progress yet",
+    "search_hint": "Search...",
+    "hi": "Hi,",
+    "lets_start_learning": "Let's start learning",
+    "learned_today": "Learned today",
+    "my_courses_short": "My courses",
+    "promo_1_title": "What do you want to learn today?",
+    "promo_1_cta": "Get Started",
+    "promo_2_title": "Practice with curated quizzes",
+    "promo_2_cta": "Try Now",
+    "promo_3_title": "Track your daily progress",
+    "promo_3_cta": "View",
+    "recommended_for_you": "Recommended for you",
+    "see_all": "See all",
+    "no_courses": "No courses available",
+    "cannot_load_courses": "Cannot load courses"
   },
   "login_screen": {
     "title": "Login Screen",
@@ -149,7 +168,16 @@
     "payment_cancelled": "Payment Cancelled",
     "payment_success": "Payment Successful",
     "payment_failed": "Payment Failed",
-    "processing_order": "Processing your order..."
+    "processing_order": "Processing your order...",
+    "hint_name": "John Doe",
+    "hint_card_owner": "John Doe",
+    "hint_card_number": "5254 7634 8734 7690",
+    "hint_exp": "07/25",
+    "hint_cvv": "123",
+    "hint_country": "United States",
+    "hint_city": "New York",
+    "hint_phone": "+1 800 123 4567",
+    "hint_address": "123 Main Street, City"
   },
   "review": {
     "title": "Reviews",
@@ -218,7 +246,25 @@
     "back": "Back",
     "cancelling_course": "Cancelling course...",
     "cancel_success": "Course cancelled successfully",
-    "cancel_failed": "Failed to cancel course"
+    "cancel_failed": "Failed to cancel course",
+    "untitled": "Untitled Course",
+    "unknown_teacher": "Unknown Teacher",
+    "about_this_course": "About this course",
+    "lessons_title": "Lessons",
+    "view_all_lessons": "View All Lessons",
+    "no_course_info": "No course information",
+    "search_hint_course": "Find Course",
+    "free": "Free",
+    "image_unavailable": "Image unavailable"
+  },
+  "course_tab": {
+    "choice_your_course": "Choose your course",
+    "category_all": "All",
+    "category_popular": "Popular",
+    "category_new": "New",
+    "card_language": "Language",
+    "card_painting": "Painting",
+    "card_design": "Design"
   },
   "purchased_courses": {
     "title": "My Courses",
@@ -323,5 +369,13 @@
     "section_2": "Section 2. ESSAY",
     "question_header": "Question",
     "points_label": "points"
+  },
+  "chat": {
+    "title": "Chat Bot",
+    "copied": "Copied to clipboard",
+    "assistant_label": "AI Assistant:",
+    "copy_text": "Copy Text",
+    "thinking": "AI is thinking...",
+    "input_hint": "Ask AI chat anything"
   }
 }

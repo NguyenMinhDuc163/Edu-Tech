@@ -10,7 +10,11 @@
     "settings": "Cài đặt",
     "logout": "Đăng xuất",
     "verified_profile": "Hồ sơ đã xác minh",
-    "orders": "Đơn"
+    "orders": "Đơn",
+    "language": "Ngôn ngữ",
+    "lang_en_short": "EN",
+    "lang_vi_short": "VI",
+    "min_short": "phút"
   },
   "home_screen": {
     "title": "trang chủ",
@@ -25,7 +29,22 @@
     "recent_results": "Kết quả gần đây",
     "passed": "Đạt",
     "failed": "Không đạt",
-    "no_stats": "Chưa có tiến độ học tập"
+    "no_stats": "Chưa có tiến độ học tập",
+    "search_hint": "Tìm kiếm...",
+    "hi": "Xin chào,",
+    "lets_start_learning": "Hãy bắt đầu học tập",
+    "learned_today": "Đã học hôm nay",
+    "my_courses_short": "Khóa học của tôi",
+    "promo_1_title": "Hôm nay bạn muốn học gì?",
+    "promo_1_cta": "Bắt đầu",
+    "promo_2_title": "Luyện tập với các bài quiz được chọn lọc",
+    "promo_2_cta": "Thử ngay",
+    "promo_3_title": "Theo dõi tiến độ học tập mỗi ngày",
+    "promo_3_cta": "Xem",
+    "recommended_for_you": "Khóa học gợi ý cho bạn",
+    "see_all": "Xem tất cả",
+    "no_courses": "Không có khóa học nào",
+    "cannot_load_courses": "Không thể tải dữ liệu"
   },
   "login_screen": {
     "title": "Đăng nhập",
@@ -149,7 +168,16 @@
     "payment_cancelled": "Đã hủy thanh toán",
     "payment_success": "Thanh toán thành công",
     "payment_failed": "Thanh toán thất bại",
-    "processing_order": "Đang xử lý đơn hàng..."
+    "processing_order": "Đang xử lý đơn hàng...",
+    "hint_name": "Nguyễn Văn A",
+    "hint_card_owner": "Nguyễn Văn A",
+    "hint_card_number": "5254 7634 8734 7690",
+    "hint_exp": "07/25",
+    "hint_cvv": "123",
+    "hint_country": "Việt Nam",
+    "hint_city": "Hà Nội",
+    "hint_phone": "+84 912 345 678",
+    "hint_address": "43, Khu phố, Quận/Huyện"
   },
   "review": {
     "title": "Đánh giá",
@@ -218,7 +246,25 @@
     "back": "Quay lại",
     "cancelling_course": "Đang hủy khóa học...",
     "cancel_success": "Hủy khóa học thành công",
-    "cancel_failed": "Hủy khóa học thất bại"
+    "cancel_failed": "Hủy khóa học thất bại",
+    "untitled": "Khóa học chưa có tên",
+    "unknown_teacher": "Giảng viên chưa xác định",
+    "about_this_course": "Giới thiệu khóa học",
+    "lessons_title": "Các bài học",
+    "view_all_lessons": "Xem tất cả bài học",
+    "no_course_info": "Không có thông tin khóa học",
+    "search_hint_course": "Tìm khóa học",
+    "free": "Miễn phí",
+    "image_unavailable": "Hình ảnh không khả dụng"
+  },
+  "course_tab": {
+    "choice_your_course": "Chọn khóa học của bạn",
+    "category_all": "Tất cả",
+    "category_popular": "Phổ biến",
+    "category_new": "Mới",
+    "card_language": "Ngôn ngữ",
+    "card_painting": "Hội họa",
+    "card_design": "Thiết kế"
   },
   "purchased_courses": {
     "title": "Khóa học của tôi",
@@ -323,5 +369,13 @@
     "section_2": "Phần 2. TỰ LUẬN",
     "question_header": "Câu",
     "points_label": "điểm"
+  },
+  "chat": {
+    "title": "Chat Bot",
+    "copied": "Đã copy vào clipboard",
+    "assistant_label": "Trợ lý AI:",
+    "copy_text": "Sao chép",
+    "thinking": "AI đang suy nghĩ...",
+    "input_hint": "Hỏi AI bất cứ điều gì"
   }
 }

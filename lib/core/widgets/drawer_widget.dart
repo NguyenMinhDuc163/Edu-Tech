@@ -5,9 +5,7 @@ import 'package:ed_tech/core/widgets/switch_botton_widget.dart';
 import 'package:ed_tech/core/widgets/template/button_widget.dart';
 import 'package:ed_tech/core/theme/locale_cubit.dart';
 import 'package:ed_tech/core/theme/theme_cubit.dart';
-import 'package:ed_tech/core/theme/theme_extensions.dart';
 import 'package:ed_tech/init.dart';
-import 'package:ed_tech/modules/auth/login/screen/login_screen.dart';
 import 'package:ed_tech/modules/auth/sign_in/repository/sign_in_repo.dart';
 import 'package:ed_tech/modules/auth/sign_in/screen/sign_in_screen.dart';
 import 'package:ed_tech/common/app_event_service.dart';
@@ -96,7 +94,7 @@ class DrawerWidget extends StatelessWidget {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
-                            isEnglish ? 'EN' : 'VI',
+                            isEnglish ? 'common.lang_en_short'.tr() : 'common.lang_vi_short'.tr(),
                             style: AppTextStyles.textContent3.copyWith(
                               color: AppColors.coolGray,
                               fontWeight: FontWeight.bold,

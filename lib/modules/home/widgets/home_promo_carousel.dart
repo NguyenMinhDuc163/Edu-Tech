@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:ed_tech/init.dart';
 import 'package:ed_tech/core/widgets/template/button_widget.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -14,20 +15,20 @@ class _HomePromoCarouselState extends State<HomePromoCarousel> {
 
   final List<_PromoItem> _items = const [
     _PromoItem(
-      title: 'What do you want to learn today?',
-      cta: 'Get Started',
+      title: 'home_screen.promo_1_title',
+      cta: 'home_screen.promo_1_cta',
       asset: 'assets/images/intro_step_1.svg',
       background: Color(0xFFE9F1FF),
     ),
     _PromoItem(
-      title: 'Practice with curated quizzes',
-      cta: 'Try Now',
+      title: 'home_screen.promo_2_title',
+      cta: 'home_screen.promo_2_cta',
       asset: 'assets/images/intro_step_2.svg',
       background: Color(0xFFEFF7FF),
     ),
     _PromoItem(
-      title: 'Track your daily progress',
-      cta: 'View',
+      title: 'home_screen.promo_3_title',
+      cta: 'home_screen.promo_3_cta',
       asset: 'assets/images/intro_step_3.svg',
       background: Color(0xFFEFF7FF),
     ),
@@ -104,14 +105,14 @@ class _PromoCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          item.title,
+                          item.title.tr(),
                           style: AppTextStyles.textHeader3.copyWith(
                             color: AppColors.raisinBlack,
                           ),
                         ),
                         const SizedBox(height: 16),
                         ButtonWidget(
-                          title: item.cta,
+                          title: item.cta.tr(),
                           backgroundColor: AppColors.colorFF7043,
                           padding: AppPad.h16v10,
                           boderRadius: BorderRadius.circular(10),

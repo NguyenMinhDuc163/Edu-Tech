@@ -55,7 +55,7 @@ class _QuizResultScreenState extends State<QuizResultScreen> {
       appBar: AppBar(
         backgroundColor: AppColors.white,
         elevation: 0,
-        title: Text('Kết quả bài thi', style: AppTextStyles.appbarTitle),
+        title: Text('assessment.quiz_result_title'.tr(), style: AppTextStyles.appbarTitle),
         centerTitle: true,
         leading: IconButton(
           icon: Icon(Icons.close, color: AppColors.primary),
