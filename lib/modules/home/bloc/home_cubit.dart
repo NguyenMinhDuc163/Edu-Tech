@@ -27,4 +27,14 @@ class HomeCubit extends Cubit<HomeState> {
       emit(StatsError(message: AppErrorState.getFriendlyErrorString(e)));
     }
   }
+
+  Future getLearningProgress() async {
+    emit(ProgressLoading());
+    try {
+      final progress = await repo.getLearningProgress();
+      emit(ProgressSuccess(progress: progress));
+    } catch (e) {
+      emit(ProgressError(message: AppErrorState.getFriendlyErrorString(e)));
+    }
+  }
 }

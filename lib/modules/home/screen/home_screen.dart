@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:ed_tech/init.dart';
+import 'package:ed_tech/core/widgets/app_gap.dart';
 import 'package:ed_tech/modules/home/bloc/home_controller.dart';
 import 'package:ed_tech/modules/home/bloc/home_cubit.dart';
 import 'package:ed_tech/modules/home/widgets/home_header.dart';
@@ -97,18 +98,19 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           children: [
             const HomeHeaderWidget(),
-            SizedBox(height: 70),
+            AppGap.h80,
             Padding(
-              padding: AppPad.h16,
+              padding: AppPad.h20,
               child: HomePromoCarousel(
                 onNavigateToCourseTab: widget.onNavigateToCourseTab,
                 onNavigateToQuizTab: widget.onNavigateToQuizTab,
               ),
             ),
-            const SizedBox(height: 25),
+            AppGap.h32,
             LearningPlanWidget(onNavigateToQuizTab: widget.onNavigateToQuizTab),
-            const SizedBox(height: 16),
+            AppGap.h28,
             const CourseSuggestionsWidget(),
+            AppGap.h24,
           ],
         ),
       ),

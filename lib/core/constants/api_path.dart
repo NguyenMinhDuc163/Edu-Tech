@@ -9,7 +9,7 @@ class ApiPath {
   /// Base URL
   @EnviedField(varName: 'BASE_URL', obfuscate: true)
   static String baseUrl = _ApiPath.baseUrl;
-  // static String baseUrl = "http://172.17.53.17:3000";
+  // static String baseUrl = "http://172.17.0.41:3000";
   @EnviedField(varName: 'REGISTER_ID', obfuscate: true)
   static String registerId = _ApiPath.registerId;
 
@@ -20,7 +20,7 @@ class ApiPath {
   static const String forgotPassword = '/auth/password/forgot';
   static const String changePassword = '/auth/password/change';
   static const String publicCourse = '/student/courses';
-  static const String verifyOtp = '/auth/verify-otp';
+  static const String verifyOtp = '/auth/verif11y-otp';
   static const String resetPassword = '/auth/reset-password';
   static const String loginSocial = '/auth/login-social';
   static const String checkUserName = '/auth/check-username-exist';
@@ -41,6 +41,7 @@ class ApiPath {
   static const String leaderboard = '/courses/leaderboard';
   static const String courseReviews = '/courses';
   static const String coursesList = '/courses/list';
+  static const String learningProgress = '/learning/progress';
 }
 
 // TODO trong intercepter => ds api can truyen id

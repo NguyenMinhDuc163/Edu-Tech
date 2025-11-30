@@ -3,6 +3,7 @@ import 'package:ed_tech/data/api_client.dart';
 import 'package:ed_tech/data/models/request_method.dart';
 import 'package:ed_tech/modules/home/model/course_response.dart';
 import 'package:ed_tech/modules/home/model/course_stats_response.dart';
+import 'package:ed_tech/modules/home/model/learning_progress_response.dart';
 import 'package:ed_tech/data/services/user_service.dart';
 
 class HomeRepo {
@@ -42,5 +43,18 @@ class HomeRepo {
     }
 
     return CourseStatsData.fromJson(res.data);
+  }
+
+  Future<LearningProgressData> getLearningProgress() async {
+    final res = await apiClient.fetch(
+      ApiPath.learningProgress,
+      RequestMethod.get,
+    );
+
+    if (res.code != 200) {
+      throw Exception('Failed to fetch learning progress: ${res.message}');
+    }
+
+    return LearningProgressData.fromJson(res.data);
   }
 }
