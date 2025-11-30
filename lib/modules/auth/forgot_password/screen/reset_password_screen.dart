@@ -47,36 +47,34 @@ class _ResetPasswordContent extends StatelessWidget {
             spacing: height_30,
             children: [
               Text(
-                'forgot_password.new_password'.tr(),
+                'Đổi mật khẩu',
                 style: AppTextStyles.textHeader1,
               ),
-              AppGap.h100,
+              AppGap.g2,
               TextInputCustom(
-                label: 'sign_up.password'.tr(),
+                label: 'Mật khẩu cũ',
+                controller: controller.oldPasswordController,
+                hintText: "Nhập mật khẩu cũ",
+              ),
+              TextInputCustom(
+                label: 'Mật khẩu mới',
                 controller: controller.passwordController,
-                hintText: "sign_up.enter_password".tr(),
-                suffixIcon: Text(
-                  "sign_up.strong".tr(),
-                  style: AppTextStyles.textContent3.copyWith(
-                    color: AppColors.limeGreen,
-                  ),
-                ),
+                hintText: "Nhập mật khẩu mới",
                 validator: (text) {
-                  return text.length >= 8;
+                  return text.length >= 6;
                 },
               ),
               TextInputCustom(
-                label: 'forgot_password.confirm_password'.tr(),
+                label: 'Xác nhận mật khẩu',
                 controller: controller.confirmPasswordController,
-                hintText: "forgot_password.enter_new_password".tr(),
+                hintText: "Nhập lại mật khẩu mới",
                 validator: (text) {
-                  return text.length >= 4;
+                  return text.length >= 6 && text == controller.passwordController.text;
                 },
               ),
-
-              AppGap.h100,
+              AppGap.h50,
               Text(
-                'forgot_password.enter_new_password'.tr(),
+                'Mật khẩu mới phải có ít nhất 6 ký tự',
                 textAlign: TextAlign.center,
                 style: AppTextStyles.textContent3.copyWith(
                   color: AppColors.coolGray,
@@ -92,9 +90,9 @@ class _ResetPasswordContent extends StatelessWidget {
     return Stack(
       children: [
         FunctionScreenTemplate(
-          titleButtonBottom: 'forgot_password.reset_password'.tr(),
+          titleButtonBottom: 'Đổi mật khẩu',
           onClickBottomButton: () {
-            controller.onResetPassword(context);
+            controller.onChangePassword(context);
           },
           screen: contentWidget,
         ),

@@ -17,10 +17,11 @@ class ApiPath {
   static const String refreshToken = '/auth/refresh';
   static const String logout = '/auth/logout';
   static const String register = '/auth/register';
+  static const String forgotPassword = '/auth/password/forgot';
+  static const String changePassword = '/auth/password/change';
   static const String publicCourse = '/student/courses';
   static const String verifyOtp = '/auth/verify-otp';
   static const String resetPassword = '/auth/reset-password';
-  static const String forgotPassword = '/auth/forgot-password';
   static const String loginSocial = '/auth/login-social';
   static const String checkUserName = '/auth/check-username-exist';
   static const String checkMail = '/auth/check-email-exist';

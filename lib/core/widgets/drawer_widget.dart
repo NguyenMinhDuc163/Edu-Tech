@@ -108,6 +108,15 @@ class DrawerWidget extends StatelessWidget {
               ],
             ),
             _buildDrawerItem(
+              icon: IconPath.iconSetting,
+              title: 'Đổi mật khẩu',
+              iconSize: 20,
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/changePassword');
+              },
+            ),
+            _buildDrawerItem(
               icon: IconPath.iconLogout,
               title: 'common.logout'.tr(),
               iconColor: Colors.red,
@@ -173,9 +182,19 @@ class DrawerWidget extends StatelessWidget {
     required VoidCallback onTap,
     TextStyle? textStyle,
     Color? iconColor,
+    double? iconSize,
   }) {
     return ListTile(
-      leading: SvgPicture.asset(icon, color: iconColor ?? Colors.grey[700]),
+      leading: SizedBox(
+        width: iconSize ?? 24,
+        height: iconSize ?? 24,
+        child: SvgPicture.asset(
+          icon,
+          color: iconColor ?? Colors.grey[700],
+          width: iconSize ?? 24,
+          height: iconSize ?? 24,
+        ),
+      ),
       title: Text(title, style: textStyle ?? AppTextStyles.textContent2),
       onTap: onTap,
       contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),

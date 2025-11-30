@@ -73,26 +73,14 @@ class _ForgotPasswordContent extends StatelessWidget {
               Text("forgot_password.title".tr(), style: AppTextStyles.textHeader1),
               SvgPicture.asset(ImagePath.imgForgotPassword),
               AppGap.g2,
-              BlocSelector<ForgotPassCubit, ForgotPassState, bool>(
-                selector: (state) {
-                  if (state is CheckUsernameSuccess) {
-                    return state.isAvailable;
-                  }
-                  return false;
-                },
-                builder: (context, isAvailable) {
-                  return TextInputCustom(
-                    label: 'sign_up.username'.tr(),
-                    controller: controller.userNameController,
-                    hintText: "sign_up.enter_username".tr(),
-                    validator: (text) => isAvailable,
-                    onChanged: (text) => context.read<ForgotPassCubit>().onUsernameChanged(text),
-                  );
-                },
+              TextInputCustom(
+                label: 'Email',
+                controller: controller.emailController,
+                hintText: "Nhập email của bạn",
               ),
               AppGap.h100,
               Text(
-                'forgot_password.enter_email_for_confirmation'.tr(),
+                'Nhập email để nhận liên kết đặt lại mật khẩu',
                 textAlign: TextAlign.center,
                 style: AppTextStyles.textContent3.copyWith(color: AppColors.coolGray),
               ),
@@ -104,9 +92,9 @@ class _ForgotPasswordContent extends StatelessWidget {
     );
 
     return FunctionScreenTemplate(
-      titleButtonBottom: "forgot_password.confirm_mail".tr(),
+      titleButtonBottom: "Xác nhận",
       onClickBottomButton: () {
-        controller.onSendOpt(context);
+        controller.onSendResetPasswordEmail(context);
       },
       screen: content,
     );

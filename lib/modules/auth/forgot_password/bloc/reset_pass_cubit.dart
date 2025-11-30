@@ -21,4 +21,20 @@ class ResetPassCubit extends Cubit<ResetPassState> {
       throw Exception(e);
     }
   }
+
+  Future<void> changePassword({
+    required String oldPassword,
+    required String newPassword,
+  }) async {
+    emit(ResetPassInProgress());
+    try {
+      final message = await repo.changePassword(
+        oldPassword: oldPassword,
+        newPassword: newPassword,
+      );
+      emit(ResetPassSuccess(message: message));
+    } catch (e) {
+      emit(ResetPassError(message: AppErrorState.getFriendlyErrorString(e)));
+    }
+  }
 }

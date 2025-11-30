@@ -4,7 +4,11 @@ class ResetPassInitial extends ResetPassState {}
 
 class ResetPassInProgress extends ResetPassState {}
 
-class ResetPassSuccess extends ResetPassState {}
+class ResetPassSuccess extends ResetPassState {
+  final String message;
+
+  ResetPassSuccess({this.message = 'Đổi mật khẩu thành công'});
+}
 
 class ResetPassFailure extends ResetPassState {
   final String message;

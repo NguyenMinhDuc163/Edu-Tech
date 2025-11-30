@@ -4,7 +4,11 @@ class ForgotPassInitial extends ForgotPassState {}
 
 class ForgotPassInProgress extends ForgotPassState {}
 
-class ForgotPassSuccess extends ForgotPassState {}
+class ForgotPassSuccess extends ForgotPassState {
+  final String message;
+
+  ForgotPassSuccess({this.message = 'Đã gửi email đặt lại mật khẩu'});
+}
 
 class ForgotPassFailure extends ForgotPassState {
   final String message;
