@@ -51,4 +51,25 @@ class CourseRepo {
 
     return res.data['courseId'] as String? ?? courseId;
   }
+
+  Future<List<DataCourse>> getCoursesByType({
+    required String type,
+    int limit = 50,
+  }) async {
+    final res = await apiClient.fetch(
+      ApiPath.coursesList,
+      RequestMethod.post,
+      rawData: {
+        'type': type,
+        'limit': limit,
+      },
+    );
+
+    if (res.code != 200) {
+      throw Exception('Failed to fetch courses: ${res.message}');
+    }
+
+    final List<dynamic> dataList = res.dataArray;
+    return dataList.map((json) => DataCourse.fromJson(json)).toList();
+  }
 }

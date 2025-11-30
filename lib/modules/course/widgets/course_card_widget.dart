@@ -1,4 +1,3 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:ed_tech/core/constants/image_path.dart';
@@ -12,21 +11,25 @@ class CourseCardWidget extends StatelessWidget {
     required this.imagePath,
     required this.backgroundColor,
     required this.textColor,
+    this.onTap,
   });
 
   final String title;
   final String imagePath;
   final Color backgroundColor;
   final Color textColor;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 80,
-      width: MediaQuery.of(context).size.width * 0.45,
-      margin: const EdgeInsets.symmetric(horizontal: 8),
-      decoration: BoxDecoration(color: backgroundColor, borderRadius: BorderRadius.circular(16)),
-      child: Stack(
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 80,
+        width: MediaQuery.of(context).size.width * 0.45,
+        margin: const EdgeInsets.symmetric(horizontal: 8),
+        decoration: BoxDecoration(color: backgroundColor, borderRadius: BorderRadius.circular(16)),
+        child: Stack(
         children: [
           Positioned.fill(
             child: ClipRRect(
@@ -54,6 +57,7 @@ class CourseCardWidget extends StatelessWidget {
             ),
           ),
         ],
+        ),
       ),
     );
   }
@@ -66,19 +70,22 @@ class CourseCardsCarousel extends StatelessWidget {
   Widget build(BuildContext context) {
     final List<CourseCardData> courseCards = [
       CourseCardData(
-        title: 'course_tab.card_language',
+        title: 'NestJS',
+        searchQuery: 'nestjs',
         imagePath: ImagePath.persionLanguege,
         backgroundColor: const Color(0xFFE3F2FD),
         textColor: const Color(0xFF1976D2),
       ),
       CourseCardData(
-        title: 'course_tab.card_painting',
+        title: 'Python',
+        searchQuery: 'python',
         imagePath: ImagePath.persionPaint,
         backgroundColor: const Color(0xFFF3E5F5),
         textColor: const Color(0xFF7B1FA2),
       ),
       CourseCardData(
-        title: 'course_tab.card_design',
+        title: 'Flutter',
+        searchQuery: 'flutter',
         imagePath: ImagePath.persionLanguege,
         backgroundColor: const Color(0xFFE8F5E8),
         textColor: const Color(0xFF2E7D32),
@@ -93,10 +100,17 @@ class CourseCardsCarousel extends StatelessWidget {
         itemBuilder: (context, index) {
           final card = courseCards[index];
           return CourseCardWidget(
-            title: card.title.tr(),
+            title: card.title,
             imagePath: card.imagePath,
             backgroundColor: card.backgroundColor,
             textColor: card.textColor,
+            onTap: () {
+              Navigator.pushNamed(
+                context,
+                '/SearchCourseScreen',
+                arguments: {'initialQuery': card.searchQuery},
+              );
+            },
           );
         },
       ),
@@ -106,12 +120,14 @@ class CourseCardsCarousel extends StatelessWidget {
 
 class CourseCardData {
   final String title;
+  final String searchQuery;
   final String imagePath;
   final Color backgroundColor;
   final Color textColor;
 
   CourseCardData({
     required this.title,
+    required this.searchQuery,
     required this.imagePath,
     required this.backgroundColor,
     required this.textColor,

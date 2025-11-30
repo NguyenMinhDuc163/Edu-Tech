@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:ed_tech/core/theme/app_colors.dart';
 import 'package:ed_tech/core/theme/app_text_styles.dart';
 import 'package:ed_tech/core/theme/app_pad.dart';
 import 'package:ed_tech/modules/course/screen/course_detail_screen.dart';
+import 'package:ed_tech/modules/course/bloc/course_cubit.dart';
+import 'package:ed_tech/modules/home/model/course_response.dart';
 
 class CourseListItem extends StatelessWidget {
   const CourseListItem({
@@ -13,6 +17,8 @@ class CourseListItem extends StatelessWidget {
     required this.duration,
     this.imageUrl,
     this.onTap,
+    this.rating,
+    this.discountAmount,
   });
 
   final String title;
@@ -21,66 +27,108 @@ class CourseListItem extends StatelessWidget {
   final String duration;
   final String? imageUrl;
   final VoidCallback? onTap;
+  final double? rating;
+  final String? discountAmount;
 
   @override
   Widget build(BuildContext context) {
+    final hasDiscount = discountAmount != null &&
+        double.tryParse(discountAmount!) != null &&
+        double.parse(discountAmount!) > 0;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
-        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: AppColors.white,
           borderRadius: BorderRadius.circular(16),
           boxShadow: const [
             BoxShadow(
-              offset: Offset(0, 2),
-              blurRadius: 8,
-              color: Color.fromRGBO(0, 0, 0, 0.1),
+              offset: Offset(0, 4),
+              blurRadius: 12,
+              color: Color.fromRGBO(0, 0, 0, 0.08),
             ),
           ],
         ),
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: AppColors.silverGray,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child:
-                  imageUrl != null
-                      ? ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Image.network(
-                          imageUrl!,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return const Icon(
-                              Icons.image,
-                              color: AppColors.coolGray,
-                              size: 32,
-                            );
-                          },
-                        ),
-                      )
-                      : const Icon(
-                        Icons.image,
-                        color: AppColors.coolGray,
-                        size: 32,
+            Stack(
+              children: [
+                Container(
+                  height: 140,
+                  decoration: BoxDecoration(
+                    color: AppColors.colorF4F3FD,
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(16),
+                      topRight: Radius.circular(16),
+                    ),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(16),
+                      topRight: Radius.circular(16),
+                    ),
+                    child: imageUrl != null
+                        ? Image.network(
+                            imageUrl!,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Center(
+                                child: Icon(
+                                  Icons.image_outlined,
+                                  color: AppColors.colorB8B8D2,
+                                  size: 48,
+                                ),
+                              );
+                            },
+                          )
+                        : Center(
+                            child: Icon(
+                              Icons.image_outlined,
+                              color: AppColors.colorB8B8D2,
+                              size: 48,
+                            ),
+                          ),
+                  ),
+                ),
+                if (hasDiscount)
+                  Positioned(
+                    top: 12,
+                    right: 12,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
                       ),
+                      decoration: BoxDecoration(
+                        color: AppColors.colorFF6905,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        '-${NumberFormat('#,###').format(double.parse(discountAmount!))} VND',
+                        style: AppTextStyles.textContent4.copyWith(
+                          color: AppColors.white,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 11,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
             ),
-            const SizedBox(width: 16),
-
-            Expanded(
+            Padding(
+              padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     title,
-                    style: AppTextStyles.textContent1.copyWith(
-                      fontWeight: FontWeight.bold,
+                    style: AppTextStyles.textMedium.copyWith(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -89,16 +137,17 @@ class CourseListItem extends StatelessWidget {
                   Row(
                     children: [
                       const Icon(
-                        Icons.person,
+                        Icons.person_outline,
                         size: 16,
-                        color: AppColors.coolGray,
+                        color: AppColors.colorB8B8D2,
                       ),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: 6),
                       Expanded(
                         child: Text(
                           instructor,
                           style: AppTextStyles.text.copyWith(
-                            color: AppColors.coolGray,
+                            color: AppColors.colorB8B8D2,
+                            fontSize: 13,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -106,31 +155,63 @@ class CourseListItem extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 12),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
+                      Row(
+                        children: [
+                          if (rating != null && rating! > 0) ...[
+                            const Icon(
+                              Icons.star,
+                              size: 16,
+                              color: Color(0xFFFFA927),
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              rating!.toStringAsFixed(1),
+                              style: AppTextStyles.textMedium.copyWith(
+                                fontSize: 14,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                          ],
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.colorFFEBF0,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(
+                                  Icons.access_time,
+                                  size: 12,
+                                  color: AppColors.colorFF6905,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  duration,
+                                  style: AppTextStyles.textContent4.copyWith(
+                                    color: AppColors.colorFF6905,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                       Text(
                         price,
-                        style: AppTextStyles.textHeader3.copyWith(
+                        style: AppTextStyles.textMedium.copyWith(
                           color: AppColors.primary,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.colorFFEBF0,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          duration,
-                          style: AppTextStyles.textContent4.copyWith(
-                            color: AppColors.colorFF6905,
-                            fontWeight: FontWeight.w500,
-                          ),
+                          fontWeight: FontWeight.w700,
+                          fontSize: 16,
                         ),
                       ),
                     ],
@@ -150,71 +231,86 @@ class CourseListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<CourseData> courses = [
-      CourseData(
-        title: 'Product Design v1.0',
-        instructor: 'Robertson Connie',
-        price: '\$190',
-        duration: '16 hours',
-      ),
-      CourseData(
-        title: 'Java Development',
-        instructor: 'Nguyen Shane',
-        price: '\$190',
-        duration: '16 hours',
-      ),
-      CourseData(
-        title: 'Visual Design',
-        instructor: 'Bert Pullman',
-        price: '\$250',
-        duration: '14 hours',
-      ),
-    ];
+    return BlocBuilder<CourseCubit, CourseState>(
+      builder: (context, state) {
+        if (state is CourseListProgress) {
+          return const Padding(
+            padding: EdgeInsets.all(32),
+            child: Center(child: CircularProgressIndicator()),
+          );
+        }
 
-    return Padding(
-      padding: AppPad.h24,
-      child: Column(
-        children:
-            courses.map((course) {
-              return CourseListItem(
-                title: course.title,
-                instructor: course.instructor,
-                price: course.price,
-                duration: course.duration,
-                onTap: () => _navigateToCourseDetail(context, course),
-              );
-            }).toList(),
-      ),
+        if (state is CourseListError) {
+          return Padding(
+            padding: AppPad.h24,
+            child: Center(
+              child: Text(
+                state.message,
+                style: AppTextStyles.text.copyWith(color: AppColors.coolGray),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          );
+        }
+
+        if (state is CourseListSuccess) {
+          final courses = state.courses;
+
+          if (courses.isEmpty) {
+            return Padding(
+              padding: AppPad.h24,
+              child: Center(
+                child: Text(
+                  'course.no_courses'.tr(),
+                  style: AppTextStyles.text.copyWith(color: AppColors.coolGray),
+                ),
+              ),
+            );
+          }
+
+          return Padding(
+            padding: AppPad.h24,
+            child: Column(
+              children: courses.map((course) {
+                return CourseListItem(
+                  title: course.title ?? 'Untitled Course',
+                  instructor: course.teacher?.toString() ?? 'Unknown',
+                  price: course.price != null
+                      ? '${NumberFormat('#,###').format(double.tryParse(course.price!) ?? 0)} VND'
+                      : 'Free',
+                  duration: course.courseDuration != null
+                      ? '${course.courseDuration} hours'
+                      : '0 hours',
+                  imageUrl: course.thumbnailUrl?.toString(),
+                  rating: course.rating,
+                  discountAmount: course.discountAmount,
+                  onTap: () => _navigateToCourseDetail(context, course),
+                );
+              }).toList(),
+            ),
+          );
+        }
+
+        return const SizedBox.shrink();
+      },
     );
   }
 
-  void _navigateToCourseDetail(BuildContext context, CourseData course) {
+  void _navigateToCourseDetail(BuildContext context, DataCourse course) {
     Navigator.pushNamed(
       context,
       CourseDetailScreen.routeName,
       arguments: {
-        'courseId': course.title.toLowerCase().replaceAll(' ', '_'),
-        'title': course.title,
-        'instructor': course.instructor,
-        'price': course.price,
-        'duration': course.duration,
-        'description':
-            'Learn ${course.title} with ${course.instructor}. This comprehensive course covers all the essential topics you need to master.',
+        'courseId': course.courseId ?? '',
+        'title': course.title ?? 'Untitled Course',
+        'instructor': course.teacher?.toString() ?? 'Unknown',
+        'price': course.price ?? '0',
+        'duration': course.courseDuration != null
+            ? '${course.courseDuration}h'
+            : '0h',
+        'imageUrl': course.thumbnailUrl?.toString(),
+        'description': course.courseDescription?.toString() ?? course.description,
       },
     );
   }
-}
-
-class CourseData {
-  final String title;
-  final String instructor;
-  final String price;
-  final String duration;
-
-  CourseData({
-    required this.title,
-    required this.instructor,
-    required this.price,
-    required this.duration,
-  });
 }

@@ -49,4 +49,14 @@ class CourseCubit extends Cubit<CourseState> {
   void reset() {
     emit(CourseInitial());
   }
+
+  Future<void> loadCoursesByType(String type, {int limit = 50}) async {
+    emit(CourseListProgress());
+    try {
+      final courses = await repo.getCoursesByType(type: type, limit: limit);
+      emit(CourseListSuccess(courses: courses, type: type));
+    } catch (e) {
+      emit(CourseListError(message: AppErrorState.getFriendlyErrorString(e)));
+    }
+  }
 }

@@ -19,6 +19,7 @@ class SearchCourseScreen extends StatefulWidget {
 
 class _SearchCourseScreenState extends State<SearchCourseScreen> {
   final TextEditingController _textController = TextEditingController();
+  bool _hasInitialized = false;
 
   @override
   void initState() {
@@ -26,6 +27,25 @@ class _SearchCourseScreenState extends State<SearchCourseScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<SearchCourseCubit>().loadSearchHistory();
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_hasInitialized) {
+      _hasInitialized = true;
+      final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+      final initialQuery = args?['initialQuery'] as String?;
+
+      if (initialQuery != null && initialQuery.isNotEmpty) {
+        _textController.text = initialQuery;
+        Future.microtask(() {
+          if (mounted) {
+            context.read<SearchCourseCubit>().searchCourses(initialQuery);
+          }
+        });
+      }
+    }
   }
 
   @override

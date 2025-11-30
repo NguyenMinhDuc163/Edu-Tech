@@ -1,8 +1,10 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ed_tech/core/theme/app_colors.dart';
 import 'package:ed_tech/core/theme/app_text_styles.dart';
 import 'package:ed_tech/core/theme/app_pad.dart';
+import 'package:ed_tech/modules/course/bloc/course_cubit.dart';
 
 class CourseCategoryTabsWidget extends StatefulWidget {
   const CourseCategoryTabsWidget({super.key});
@@ -20,6 +22,18 @@ class _CourseCategoryTabsWidgetState extends State<CourseCategoryTabsWidget> {
     'course_tab.category_popular',
     'course_tab.category_new',
   ];
+
+  final List<String> categoryTypes = ['all', 'trend', 'new'];
+
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      if (mounted) {
+        context.read<CourseCubit>().loadCoursesByType('all');
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +56,7 @@ class _CourseCategoryTabsWidgetState extends State<CourseCategoryTabsWidget> {
                       setState(() {
                         selectedIndex = index;
                       });
+                      context.read<CourseCubit>().loadCoursesByType(categoryTypes[index]);
                     },
                     child: Container(
                       margin: EdgeInsets.only(
