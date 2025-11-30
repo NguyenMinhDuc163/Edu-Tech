@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ed_tech/modules/payment/screen/order_confirmation_screen.dart';
 import 'package:ed_tech/modules/reviews/screen/review_screen.dart';
@@ -114,6 +115,7 @@ class _CourseDetailContent extends StatefulWidget {
 
 class _CourseDetailContentState extends State<_CourseDetailContent> {
   bool _showBottomButton = true;
+  bool _isDescriptionExpanded = false;
   final DraggableScrollableController _sheetController = DraggableScrollableController();
 
   @override
@@ -643,24 +645,67 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
   }
 
   Widget _buildAboutSection() {
+    if (widget.description == null || widget.description!.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
     return Padding(
-      padding: AppPad.h24,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'course.about_this_course'.tr(),
-            style: AppTextStyles.textHeader3.copyWith(fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            widget.description ??
-                'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.',
-            style: AppTextStyles.textContent2.copyWith(color: AppColors.color8F959E, height: 1.5),
-          ),
-          const SizedBox(height: 16),
-          const Icon(Icons.visibility_off, color: AppColors.color8F959E, size: 20),
-        ],
+      padding: AppPad.h24.add(const EdgeInsets.only(bottom: 12)),
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: AppColors.lightGray),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            InkWell(
+              onTap: () {
+                setState(() {
+                  _isDescriptionExpanded = !_isDescriptionExpanded;
+                });
+              },
+              borderRadius: BorderRadius.circular(12),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'course.about_this_course'.tr(),
+                      style: AppTextStyles.textHeader3.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Icon(
+                      _isDescriptionExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                      color: AppColors.color8F959E,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            if (_isDescriptionExpanded)
+              Container(
+                decoration: BoxDecoration(
+                  color: AppColors.lightGray.withOpacity(0.3),
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(12),
+                    bottomRight: Radius.circular(12),
+                  ),
+                ),
+                padding: const EdgeInsets.all(16),
+                width: double.infinity,
+                child: Text(
+                  widget.description!,
+                  style: AppTextStyles.textContent2.copyWith(
+                    color: AppColors.text,
+                    height: 1.6,
+                  ),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -792,6 +837,7 @@ class _InlineVideoPlayerState extends State<_InlineVideoPlayer> {
       allowFullScreen: false,
       allowMuting: true,
       showControls: true,
+      playbackSpeeds: [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0],
       materialProgressColors: ChewieProgressColors(
         playedColor: AppColors.colorFF6905,
         handleColor: AppColors.colorFF6905,
@@ -958,6 +1004,11 @@ class _VideoPlayerScreenState extends State<_VideoPlayerScreen> {
   @override
   void initState() {
     super.initState();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     _initializePlayer();
   }
 
@@ -975,6 +1026,7 @@ class _VideoPlayerScreenState extends State<_VideoPlayerScreen> {
       allowFullScreen: true,
       allowMuting: true,
       showControls: true,
+      playbackSpeeds: [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0],
       materialProgressColors: ChewieProgressColors(
         playedColor: AppColors.primary,
         handleColor: AppColors.primary,
@@ -1007,6 +1059,14 @@ class _VideoPlayerScreenState extends State<_VideoPlayerScreen> {
         progressToSave = currentPosition / totalDuration;
       }
     }
+
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 
     _videoPlayerController.dispose();
     _chewieController?.dispose();

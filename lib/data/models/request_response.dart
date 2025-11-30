@@ -37,6 +37,14 @@ class RequestResponse {
     }
   }
 
+  int? get status {
+    try {
+      return json['status'];
+    } catch (e) {
+      return null;
+    }
+  }
+
   Map<String, dynamic> get data {
     try {
       return code == StatusCode.notFound ? {} : json['data'];

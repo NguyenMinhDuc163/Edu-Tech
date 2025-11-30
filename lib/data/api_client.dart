@@ -19,6 +19,7 @@ import 'models/request_method.dart';
 import 'models/request_response.dart';
 import 'models/status_code.dart';
 import 'services/connectivity_service.dart';
+import 'services/error_dialog_service.dart';
 
 /*
 enum ParameterArrayFormat {
@@ -276,7 +277,17 @@ class ApiClient {
       return true;
     }());
 
-    return RequestResponse.fromDioResponse(response);
+    final requestResponse = await RequestResponse.fromDioResponse(response);
+
+    final responseStatus = requestResponse.status;
+    if (responseStatus != null && responseStatus != 200 && responseStatus != 201) {
+      final errorMessage = requestResponse.message.isNotEmpty
+          ? requestResponse.message
+          : 'Đã có lỗi xảy ra vui lòng kiểm tra lại';
+      ErrorDialogService.showError(errorMessage);
+    }
+
+    return requestResponse;
   }
 
   /// [Eng]
