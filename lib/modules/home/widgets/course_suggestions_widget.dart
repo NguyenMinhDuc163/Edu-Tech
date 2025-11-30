@@ -103,7 +103,12 @@ class CourseSuggestionsWidget extends StatelessWidget {
                       style: AppTextStyles.textHeader3,
                     ),
                     TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.pushNamed(
+                          context,
+                          '/RecommendedCoursesScreen',
+                        );
+                      },
                       child: Text('home_screen.see_all'.tr(), style: AppTextStyles.textButton),
                     ),
                   ],
@@ -113,7 +118,7 @@ class CourseSuggestionsWidget extends StatelessWidget {
                   height: 140,
                   child: ListView.separated(
                     scrollDirection: Axis.horizontal,
-                    itemCount: courses.length,
+                    itemCount: courses.length > 5 ? 5 : courses.length,
                     separatorBuilder: (_, __) => const SizedBox(width: 12),
                     itemBuilder:
                         (context, index) => _CourseCard(

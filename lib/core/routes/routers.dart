@@ -50,6 +50,7 @@ import 'package:ed_tech/modules/home/bloc/home_cubit.dart';
 import 'package:ed_tech/modules/home/bloc/home_controller.dart';
 import 'package:ed_tech/modules/home/repository/home_repo.dart';
 import 'package:ed_tech/modules/home/screen/home_screen.dart';
+import 'package:ed_tech/modules/home/screen/recommended_courses_screen.dart';
 import 'package:ed_tech/modules/message/screen/chat_bot_screen.dart';
 import 'package:ed_tech/modules/message/screen/chat_history_screen.dart';
 import 'package:ed_tech/modules/message/bloc/chatbot_cubit.dart';
@@ -447,6 +448,19 @@ class Routers {
                     create: (_) => LeaderboardController(),
                     child: const LeaderboardScreen(),
                   ),
+                ),
+              ),
+        );
+      case RecommendedCoursesScreen.routeName:
+        return MaterialPageRoute(
+          settings: settings,
+          builder:
+              (context) => RepositoryProvider(
+                create: (context) => HomeRepo(apiClient: ApiClient()),
+                child: BlocProvider(
+                  create:
+                      (context) => HomeCubit(repo: context.read<HomeRepo>())..getProduct(),
+                  child: const RecommendedCoursesScreen(),
                 ),
               ),
         );

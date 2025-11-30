@@ -9,6 +9,7 @@ import 'package:ed_tech/core/widgets/text_input_custom.dart';
 import 'package:ed_tech/modules/reviews/widget/stars_widget.dart';
 import 'package:ed_tech/modules/reviews/bloc/review_cubit.dart';
 import 'package:ed_tech/modules/reviews/model/add_review_request.dart';
+import 'package:ed_tech/modules/reviews/model/review_response.dart';
 
 class AddReviewScreen extends StatefulWidget {
   const AddReviewScreen({super.key});
@@ -22,6 +23,7 @@ class _AddReviewScreenState extends State<AddReviewScreen> {
   TextEditingController contentController = TextEditingController();
   double _starValue = 5.0;
   String? _courseId;
+  bool _isEditMode = false;
 
   @override
   void initState() {
@@ -31,6 +33,14 @@ class _AddReviewScreenState extends State<AddReviewScreen> {
       if (args != null) {
         setState(() {
           _courseId = args['courseId'] ?? '';
+
+          final reviewData = args['reviewData'] as Review?;
+          if (reviewData != null) {
+            _isEditMode = true;
+            titleController.text = reviewData.title ?? '';
+            contentController.text = reviewData.content ?? '';
+            _starValue = (reviewData.rating ?? 5).toDouble();
+          }
         });
       }
     });
@@ -84,7 +94,9 @@ class _AddReviewScreenState extends State<AddReviewScreen> {
         if (state is AddReviewSuccess) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('review.success_add_review'.tr()),
+              content: Text(
+                _isEditMode ? 'review.success_update_review'.tr() : 'review.success_add_review'.tr(),
+              ),
               backgroundColor: AppColors.success,
             ),
           );
@@ -103,8 +115,8 @@ class _AddReviewScreenState extends State<AddReviewScreen> {
           final isLoading = state is AddReviewProgress;
 
           return FunctionScreenTemplate(
-            title: 'review.title'.tr(),
-            titleButtonBottom: "review.submit_review".tr(),
+            title: _isEditMode ? 'review.edit_review'.tr() : 'review.add_review'.tr(),
+            titleButtonBottom: _isEditMode ? 'review.update_review'.tr() : 'review.submit_review'.tr(),
             onClickBottomButton: isLoading ? null : _handleSubmit,
             screen: Padding(
               padding: AppPad.h24v10,

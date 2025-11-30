@@ -14,8 +14,9 @@ import 'package:ed_tech/modules/purchased_courses/screen/purchased_courses_scree
 
 class HomeScreen extends StatefulWidget {
   final VoidCallback? onNavigateToQuizTab;
+  final VoidCallback? onNavigateToCourseTab;
 
-  const HomeScreen({this.onNavigateToQuizTab});
+  const HomeScreen({this.onNavigateToQuizTab, this.onNavigateToCourseTab});
   static const String routeName = '/HomeScreen';
 
   @override
@@ -97,7 +98,13 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             const HomeHeaderWidget(),
             SizedBox(height: 70),
-            Padding(padding: AppPad.h16, child: HomePromoCarousel()),
+            Padding(
+              padding: AppPad.h16,
+              child: HomePromoCarousel(
+                onNavigateToCourseTab: widget.onNavigateToCourseTab,
+                onNavigateToQuizTab: widget.onNavigateToQuizTab,
+              ),
+            ),
             const SizedBox(height: 25),
             LearningPlanWidget(onNavigateToQuizTab: widget.onNavigateToQuizTab),
             const SizedBox(height: 16),

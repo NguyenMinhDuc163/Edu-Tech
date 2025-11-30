@@ -60,6 +60,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 _currentIndex = 3;
               });
             },
+            onNavigateToCourseTab: () {
+              setState(() {
+                _currentIndex = 1;
+              });
+            },
           ),
         ),
       ),
@@ -175,7 +180,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   height: 25,
                   color: AppColors.color8F959E,
                 ),
-                title: Text("Exam".tr()),
+                title: Text("assessment.exam".tr()),
                 activeIcon: SizedBox.shrink(),
               ),
             ],

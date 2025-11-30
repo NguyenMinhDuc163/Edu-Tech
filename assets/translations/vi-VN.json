@@ -193,7 +193,15 @@
     "how_was_your_experience": "Trải nghiệm của bạn thế nào?",
     "describe_your_experience": "Mô tả trải nghiệm của bạn?",
     "star": "Sao",
-    "submit_review": "Gửi đánh giá"
+    "submit_review": "Gửi đánh giá",
+    "title_label": "Tiêu đề",
+    "title_hint": "Nhập tiêu đề",
+    "edit_review": "Chỉnh sửa đánh giá",
+    "update_review": "Cập nhật đánh giá",
+    "no_data": "Không có dữ liệu",
+    "no_reviews": "Chưa có đánh giá nào",
+    "success_add_review": "Thêm đánh giá thành công",
+    "success_update_review": "Cập nhật đánh giá thành công"
   },
   "search": {
     "title": "Tìm kiếm khóa học",
@@ -218,7 +226,9 @@
     "no_courses_found": "Không tìm thấy khóa học",
     "back_to_courses": "Quay lại khóa học",
     "apply_filters_instruction": "Áp dụng bộ lọc để xem kết quả",
-    "filter_results": "Kết quả lọc"
+    "filter_results": "Kết quả lọc",
+    "all_courses": "Tất cả khóa học",
+    "filtered_results": "Kết quả lọc"
   },
   "course": {
     "course_content": "Nội dung khóa học",
@@ -249,6 +259,7 @@
     "cancel_failed": "Hủy khóa học thất bại",
     "untitled": "Khóa học chưa có tên",
     "unknown_teacher": "Giảng viên chưa xác định",
+    "no_results_found": "Không tìm thấy kết quả",
     "about_this_course": "Giới thiệu khóa học",
     "lessons_title": "Các bài học",
     "view_all_lessons": "Xem tất cả bài học",
@@ -279,6 +290,7 @@
     "in_progress": "Đang học"
   },
   "assessment": {
+    "exam": "Đề thi",
     "no_quizzes": "Chưa có bài kiểm tra nào",
     "all_quizzes": "Tất cả bài kiểm tra",
     "loading": "Đang tải...",

@@ -4,7 +4,10 @@ import 'package:ed_tech/core/widgets/template/button_widget.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class HomePromoCarousel extends StatefulWidget {
-  const HomePromoCarousel({super.key});
+  final VoidCallback? onNavigateToCourseTab;
+  final VoidCallback? onNavigateToQuizTab;
+
+  const HomePromoCarousel({super.key, this.onNavigateToCourseTab, this.onNavigateToQuizTab});
 
   @override
   State<HomePromoCarousel> createState() => _HomePromoCarouselState();
@@ -57,7 +60,14 @@ class _HomePromoCarouselState extends State<HomePromoCarousel> {
             controller: _controller,
             itemCount: _items.length,
             padEnds: false,
-            itemBuilder: (context, i) => _PromoCard(item: _items[i]),
+            itemBuilder: (context, i) => _PromoCard(
+              item: _items[i],
+              onPressed: i == 0
+                  ? widget.onNavigateToCourseTab
+                  : i == 1
+                      ? widget.onNavigateToQuizTab
+                      : null,
+            ),
           ),
         ),
       ],
@@ -81,7 +91,8 @@ class _PromoItem {
 
 class _PromoCard extends StatelessWidget {
   final _PromoItem item;
-  const _PromoCard({required this.item});
+  final VoidCallback? onPressed;
+  const _PromoCard({required this.item, this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -119,7 +130,7 @@ class _PromoCard extends StatelessWidget {
                           titleStyle: AppTextStyles.textMedium.copyWith(
                             color: AppColors.white,
                           ),
-                          onPressed: () {},
+                          onPressed: onPressed ?? () {},
                         ),
                       ],
                     ),

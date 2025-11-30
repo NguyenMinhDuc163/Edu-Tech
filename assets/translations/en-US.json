@@ -193,7 +193,15 @@
     "how_was_your_experience": "How was your experience ?",
     "describe_your_experience": "Describe your experience?",
     "star": "Star",
-    "submit_review": "Submit Review"
+    "submit_review": "Submit Review",
+    "title_label": "Title",
+    "title_hint": "Enter title",
+    "edit_review": "Edit Review",
+    "update_review": "Update Review",
+    "no_data": "No data",
+    "no_reviews": "No reviews",
+    "success_add_review": "Review added successfully",
+    "success_update_review": "Review updated successfully"
   },
   "search": {
     "title": "Search Courses",
@@ -218,7 +226,9 @@
     "no_courses_found": "No courses found",
     "back_to_courses": "Back to Courses",
     "apply_filters_instruction": "Apply filters to see results",
-    "filter_results": "Filter Results"
+    "filter_results": "Filter Results",
+    "all_courses": "All courses",
+    "filtered_results": "Filtered results"
   },
   "course": {
     "course_content": "Course Content",
@@ -249,6 +259,7 @@
     "cancel_failed": "Failed to cancel course",
     "untitled": "Untitled Course",
     "unknown_teacher": "Unknown Teacher",
+    "no_results_found": "No results found",
     "about_this_course": "About this course",
     "lessons_title": "Lessons",
     "view_all_lessons": "View All Lessons",
@@ -279,6 +290,7 @@
     "in_progress": "In Progress"
   },
   "assessment": {
+    "exam": "Exam",
     "no_quizzes": "No quizzes available",
     "all_quizzes": "All quizzes",
     "loading": "Loading...",

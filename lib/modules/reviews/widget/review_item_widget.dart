@@ -25,86 +25,114 @@ class ReviewItemWidget extends StatelessWidget {
       }
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      spacing: 12,
-      children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            CircleAvatar(
-              radius: 20,
-              backgroundColor: AppColors.coolGray.withOpacity(0.3),
-              child: Icon(Icons.person, color: AppColors.coolGray),
-            ),
-            AppGap.w12,
-            Expanded(
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.lightGray.withOpacity(0.5)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CircleAvatar(
+                radius: 22,
+                backgroundColor: AppColors.colorFFEBF0,
+                child: Icon(Icons.person, color: AppColors.colorFF6905, size: 24),
+              ),
+              AppGap.w12,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          username,
-                          style: AppTextStyles.textContent2.copyWith(
-                            fontWeight: FontWeight.bold,
+                        Expanded(
+                          child: Text(
+                            username,
+                            style: AppTextStyles.textContent1.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        AppGap.h4,
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.access_time,
-                              size: 14,
-                              color: AppColors.coolGray,
-                            ),
-                            AppGap.w4,
-                            Text(
-                              formattedDate,
-                              style: AppTextStyles.textContent3.copyWith(
-                                color: AppColors.coolGray,
+                        AppGap.w8,
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: AppColors.colorFF6905.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.star, size: 14, color: AppColors.colorFF6905),
+                              const SizedBox(width: 4),
+                              Text(
+                                rating.toStringAsFixed(1),
+                                style: AppTextStyles.textContent3.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.colorFF6905,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ],
                     ),
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            rating.toStringAsFixed(1),
-                            style: AppTextStyles.textContent2.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
+                    AppGap.h4,
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.access_time,
+                          size: 13,
+                          color: AppColors.coolGray,
+                        ),
+                        AppGap.w4,
+                        Text(
+                          formattedDate,
+                          style: AppTextStyles.textContent3.copyWith(
+                            color: AppColors.coolGray,
                           ),
-                          AppGap.w4,
-                          Text(
-                            'review.rating'.tr(),
-                            style: AppTextStyles.textContent3.copyWith(
-                              color: AppColors.coolGray,
-                            ),
-                          ),
-                        ],
-                      ),
-                      AppGap.h4,
-                      StarsWidget(rating: rating),
-                    ],
-                  ),
-                ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
+            ],
+          ),
+          AppGap.h12,
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppColors.lightGray.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(8),
             ),
-          ],
-        ),
-        Text(
-          content,
-          style: AppTextStyles.textContent3.copyWith(color: AppColors.coolGray),
-        ),
-      ],
+            child: Text(
+              content,
+              style: AppTextStyles.textContent2.copyWith(
+                color: AppColors.text,
+                height: 1.5,
+              ),
+              textAlign: TextAlign.start,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -6,6 +6,8 @@ import 'package:ed_tech/modules/reviews/screen/add_review_screen.dart';
 import 'package:ed_tech/modules/reviews/widget/review_item_widget.dart';
 import 'package:ed_tech/modules/reviews/widget/stars_widget.dart';
 import 'package:ed_tech/modules/reviews/bloc/review_cubit.dart';
+import 'package:ed_tech/data/services/user_service.dart';
+import 'package:ed_tech/modules/reviews/model/review_response.dart';
 
 import '../../../init.dart';
 
@@ -104,10 +106,26 @@ class _ReviewScreenState extends State<ReviewScreen> {
                         ),
                         ElevatedButton.icon(
                           onPressed: () async {
+                            final currentUserId = UserService.instance.userData?.id;
+                            Review? userReview;
+
+                            if (currentUserId != null) {
+                              try {
+                                userReview = reviews.firstWhere(
+                                  (review) => review.user?.id == currentUserId,
+                                );
+                              } catch (e) {
+                                userReview = null;
+                              }
+                            }
+
                             final result = await Navigator.pushNamed(
                               context,
                               AddReviewScreen.routeName,
-                              arguments: {'courseId': _courseId},
+                              arguments: {
+                                'courseId': _courseId,
+                                if (userReview != null) 'reviewData': userReview,
+                              },
                             );
                             if (result == true && _courseId != null && mounted) {
                               context.read<ReviewCubit>().getReviews(courseId: _courseId!);
