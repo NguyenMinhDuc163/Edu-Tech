@@ -109,7 +109,7 @@ class DrawerWidget extends StatelessWidget {
             ),
             _buildDrawerItem(
               icon: IconPath.iconSetting,
-              title: 'Đổi mật khẩu',
+              title: 'common.change_password'.tr(),
               iconSize: 20,
               onTap: () {
                 Navigator.pop(context);

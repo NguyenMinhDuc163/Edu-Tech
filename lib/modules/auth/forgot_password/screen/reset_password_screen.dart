@@ -47,34 +47,34 @@ class _ResetPasswordContent extends StatelessWidget {
             spacing: height_30,
             children: [
               Text(
-                'Đổi mật khẩu',
+                'common.change_password'.tr(),
                 style: AppTextStyles.textHeader1,
               ),
               AppGap.g2,
               TextInputCustom(
-                label: 'Mật khẩu cũ',
+                label: 'forgot_password.old_password'.tr(),
                 controller: controller.oldPasswordController,
-                hintText: "Nhập mật khẩu cũ",
+                hintText: 'forgot_password.enter_old_password'.tr(),
               ),
               TextInputCustom(
-                label: 'Mật khẩu mới',
+                label: 'forgot_password.new_password'.tr(),
                 controller: controller.passwordController,
-                hintText: "Nhập mật khẩu mới",
+                hintText: 'forgot_password.enter_new_password_hint'.tr(),
                 validator: (text) {
                   return text.length >= 6;
                 },
               ),
               TextInputCustom(
-                label: 'Xác nhận mật khẩu',
+                label: 'forgot_password.confirm_password'.tr(),
                 controller: controller.confirmPasswordController,
-                hintText: "Nhập lại mật khẩu mới",
+                hintText: 'forgot_password.enter_confirm_password'.tr(),
                 validator: (text) {
                   return text.length >= 6 && text == controller.passwordController.text;
                 },
               ),
               AppGap.h50,
               Text(
-                'Mật khẩu mới phải có ít nhất 6 ký tự',
+                'forgot_password.password_requirement'.tr(),
                 textAlign: TextAlign.center,
                 style: AppTextStyles.textContent3.copyWith(
                   color: AppColors.coolGray,
@@ -90,7 +90,7 @@ class _ResetPasswordContent extends StatelessWidget {
     return Stack(
       children: [
         FunctionScreenTemplate(
-          titleButtonBottom: 'Đổi mật khẩu',
+          titleButtonBottom: 'common.change_password'.tr(),
           onClickBottomButton: () {
             controller.onChangePassword(context);
           },

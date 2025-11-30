@@ -44,6 +44,7 @@ class UserService {
   String get displayName => _userData?.username ?? 'User';
   String get email => _userData?.email ?? '';
   String get role => _userData?.role ?? 'student';
+  String? get isPayment => _userData?.isPayment;
 }
 
 class UserData {
@@ -51,12 +52,14 @@ class UserData {
   final String username;
   final String email;
   final String role;
+  final String? isPayment;
 
   UserData({
     required this.id,
     required this.username,
     required this.email,
     required this.role,
+    this.isPayment,
   });
 
   factory UserData.fromJson(Map<String, dynamic> json) {
@@ -65,6 +68,7 @@ class UserData {
       username: json['username'] ?? '',
       email: json['email'] ?? '',
       role: json['role'] ?? 'student',
+      isPayment: json['isPayment'],
     );
   }
 
@@ -74,6 +78,7 @@ class UserData {
       'username': username,
       'email': email,
       'role': role,
+      'isPayment': isPayment,
     };
   }
 }

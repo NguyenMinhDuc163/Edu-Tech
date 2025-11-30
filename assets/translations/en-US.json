@@ -115,7 +115,12 @@
     "success": "Password reset successful",
     "failure": "Password reset failed",
     "enter_password": "Please enter your password",
-    "password_mismatch": "Passwords do not match"
+    "password_mismatch": "Passwords do not match",
+    "old_password": "Old Password",
+    "enter_old_password": "Enter old password",
+    "enter_new_password_hint": "Enter new password",
+    "enter_confirm_password": "Re-enter new password",
+    "password_requirement": "New password must be at least 6 characters"
   },
   "onboarding": {
     "slogan": "Look Good, Feel Good",

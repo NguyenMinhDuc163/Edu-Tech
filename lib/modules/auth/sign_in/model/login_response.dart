@@ -34,17 +34,20 @@ class Data {
     required this.accessToken,
     required this.refreshToken,
     required this.user,
+    required this.isPayment,
   });
 
   final String? accessToken;
   final String? refreshToken;
   final User? user;
+  final String? isPayment;
 
   factory Data.fromJson(Map<String, dynamic> json){
     return Data(
       accessToken: json["access_token"],
       refreshToken: json["refresh_token"],
       user: json["user"] == null ? null : User.fromJson(json["user"]),
+      isPayment: json["isPayment"],
     );
   }
 
@@ -52,11 +55,12 @@ class Data {
     "access_token": accessToken,
     "refresh_token": refreshToken,
     "user": user?.toJson(),
+    "isPayment": isPayment,
   };
 
   @override
   String toString(){
-    return "$accessToken, $refreshToken, $user, ";
+    return "$accessToken, $refreshToken, $user, $isPayment, ";
   }
 }
 

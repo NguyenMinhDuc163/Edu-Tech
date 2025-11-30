@@ -118,32 +118,32 @@ class _SignInContent extends StatelessWidget {
               clickableTextStyle: TextStyle(color: AppColors.electricBlue),
             ),
             
-            Row(
-              children: [
-                Expanded(child: Divider(color: AppColors.divider)),
-                Padding(
-                  padding: AppPad.h20v10,
-                  child: Text(
-                    "login.or_login_with".tr(),
-                    style: AppTextStyles.textContent2.copyWith(color: AppColors.coolGray),
-                  ),
-                ),
-                Expanded(child: Divider(color: AppColors.divider)),
-              ],
-            ),
-            AppGap.h10,
-            ButtonWidget(
-              titleWidget: TitleWidget(
-                title: "login.google".tr(),
-                iconPath: IconPath.iconGoogle,
-              ),
-              onPressed: () {
-                // controller.onLogin(context, LoginType.google);
-              },
-              backgroundColor: AppColors.crimson,
-              padding: AppPad.v14,
-              boderRadius: BorderRadius.all(AppRadius.c16),
-            ),
+            // Row(
+            //   children: [
+            //     Expanded(child: Divider(color: AppColors.divider)),
+            //     Padding(
+            //       padding: AppPad.h20v10,
+            //       child: Text(
+            //         "login.or_login_with".tr(),
+            //         style: AppTextStyles.textContent2.copyWith(color: AppColors.coolGray),
+            //       ),
+            //     ),
+            //     Expanded(child: Divider(color: AppColors.divider)),
+            //   ],
+            // ),
+            // AppGap.h10,
+            // ButtonWidget(
+            //   titleWidget: TitleWidget(
+            //     title: "login.google".tr(),
+            //     iconPath: IconPath.iconGoogle,
+            //   ),
+            //   onPressed: () {
+            //     // controller.onLogin(context, LoginType.google);
+            //   },
+            //   backgroundColor: AppColors.crimson,
+            //   padding: AppPad.v14,
+            //   boderRadius: BorderRadius.all(AppRadius.c16),
+            // ),
           ],
         ),
       ),

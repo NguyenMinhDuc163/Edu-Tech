@@ -11,6 +11,7 @@ import 'package:ed_tech/modules/assessment/screen/quiz_taking_screen.dart';
 import 'package:ed_tech/modules/assessment/models/quiz_model.dart';
 import 'package:ed_tech/modules/home/repository/home_repo.dart';
 import 'package:ed_tech/data/api_client.dart';
+import 'package:ed_tech/data/services/user_service.dart';
 import 'package:video_player/video_player.dart';
 import 'package:chewie/chewie.dart';
 
@@ -117,6 +118,11 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
   bool _showBottomButton = true;
   bool _isDescriptionExpanded = false;
   final DraggableScrollableController _sheetController = DraggableScrollableController();
+
+  bool get _isPaymentEnabled {
+    final isPayment = UserService.instance.isPayment;
+    return isPayment == null || isPayment == 'Y';
+  }
 
   @override
   void initState() {
@@ -288,7 +294,7 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
 
   Widget _buildBottomActionButtons(BuildContext context) {
     final accessLevel = widget.courseDetail?.accessLevel ?? 'FREE';
-    final hasFullAccess = accessLevel == 'FULL';
+    final hasFullAccess = accessLevel == 'FULL' || !_isPaymentEnabled;
     final daysLeftToCancel = widget.courseDetail?.daysLeftToCancel ?? 0;
 
     return AnimatedPositioned(
@@ -309,7 +315,7 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
             ),
           ],
         ),
-        child: hasFullAccess && daysLeftToCancel > 0
+        child: hasFullAccess && daysLeftToCancel > 0 && _isPaymentEnabled
             ? _buildEnrolledWithCancelLayout(context, daysLeftToCancel)
             : Row(
                 children: [
@@ -344,7 +350,7 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
 
   Widget _buildFloatingActionButton(BuildContext context) {
     final accessLevel = widget.courseDetail?.accessLevel ?? 'FREE';
-    final hasFullAccess = accessLevel == 'FULL';
+    final hasFullAccess = accessLevel == 'FULL' || !_isPaymentEnabled;
 
     return Positioned(
       bottom: 24,
@@ -631,14 +637,16 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
               overflow: TextOverflow.ellipsis,
             ),
           ),
-          const SizedBox(width: 16),
-          Text(
-            widget.price,
-            style: AppTextStyles.textHeader2.copyWith(
-              color: AppColors.primary,
-              fontWeight: FontWeight.bold,
+          if (_isPaymentEnabled) ...[
+            const SizedBox(width: 16),
+            Text(
+              widget.price,
+              style: AppTextStyles.textHeader2.copyWith(
+                color: AppColors.primary,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
+          ],
         ],
       ),
     );

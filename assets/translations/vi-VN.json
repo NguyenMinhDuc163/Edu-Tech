@@ -115,7 +115,12 @@
     "success": "Khôi phục mật khẩu thành công",
     "failure": "Khôi phục mật khẩu thất bại",
     "enter_password": "Vui lòng nhập mật khẩu",
-    "password_mismatch": "Mật khẩu không trùng khớp"
+    "password_mismatch": "Mật khẩu không trùng khớp",
+    "old_password": "Mật khẩu cũ",
+    "enter_old_password": "Nhập mật khẩu cũ",
+    "enter_new_password_hint": "Nhập mật khẩu mới",
+    "enter_confirm_password": "Nhập lại mật khẩu mới",
+    "password_requirement": "Mật khẩu mới phải có ít nhất 6 ký tự"
   },
   "onboarding": {
     "slogan": "Trông đẹp, Cảm thấy tuyệt",

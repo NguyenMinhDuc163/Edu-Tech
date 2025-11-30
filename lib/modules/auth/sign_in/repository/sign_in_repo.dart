@@ -48,6 +48,7 @@ class SignInRepo {
           username: user.username ?? '',
           email: user.email ?? '',
           role: user.role ?? 'student',
+          isPayment: loginResponse.data!.isPayment,
         ),
       );
     }
