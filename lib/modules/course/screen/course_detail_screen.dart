@@ -8,6 +8,8 @@ import 'package:ed_tech/modules/course/bloc/course_cubit.dart';
 import 'package:ed_tech/modules/course/screen/course_cancellation_screen.dart';
 import 'package:ed_tech/modules/assessment/screen/quiz_taking_screen.dart';
 import 'package:ed_tech/modules/assessment/models/quiz_model.dart';
+import 'package:ed_tech/modules/home/repository/home_repo.dart';
+import 'package:ed_tech/data/api_client.dart';
 import 'package:video_player/video_player.dart';
 import 'package:chewie/chewie.dart';
 
@@ -149,7 +151,7 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
         courseTitle: widget.title,
         sections: sections,
         accessLevel: accessLevel,
-        onPlayVideo: (videoUrl, title) => _playVideo(context, videoUrl, title),
+        onPlayVideo: (videoUrl, title, contentId) => _playVideo(context, videoUrl, title, contentId),
       ),
     );
   }
@@ -171,13 +173,31 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
     return null;
   }
 
-  void _playVideo(BuildContext context, String videoUrl, String title) {
+  String? _getFirstVideoContentId() {
+    if (widget.courseDetail?.sections == null) return null;
+
+    for (var section in widget.courseDetail.sections) {
+      for (var content in section.contents) {
+        if (content.files.isNotEmpty) {
+          for (var file in content.files) {
+            if (file.fileType == 'video') {
+              return content.contentId;
+            }
+          }
+        }
+      }
+    }
+    return null;
+  }
+
+  void _playVideo(BuildContext context, String videoUrl, String title, String? contentId) {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => _VideoPlayerScreen(
           videoUrl: videoUrl,
           title: title,
+          contentId: contentId,
         ),
       ),
     );
@@ -200,10 +220,12 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
 
   Widget _buildVideoPlayerSection(BuildContext context) {
     String? videoUrl = _getFirstVideoUrl();
+    String? contentId = _getFirstVideoContentId();
     String? thumbnail = widget.courseDetail?.thumbnailUrl ?? widget.imageUrl;
 
     return _InlineVideoPlayer(
       videoUrl: videoUrl,
+      contentId: contentId,
       thumbnail: thumbnail,
       title: widget.title,
       onBack: () => Navigator.of(context).pop(),
@@ -659,7 +681,7 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
 
           ...sectionsToShow.map((section) => _SectionItem(
             section: section,
-            onPlayVideo: (videoUrl, title) => _playVideo(context, videoUrl, title),
+            onPlayVideo: (videoUrl, title, contentId) => _playVideo(context, videoUrl, title, contentId),
           )),
 
           if (hasMore) ...[
@@ -698,12 +720,14 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
 
 class _InlineVideoPlayer extends StatefulWidget {
   final String? videoUrl;
+  final String? contentId;
   final String? thumbnail;
   final String title;
   final VoidCallback onBack;
 
   const _InlineVideoPlayer({
     required this.videoUrl,
+    this.contentId,
     required this.thumbnail,
     required this.title,
     required this.onBack,
@@ -720,9 +744,36 @@ class _InlineVideoPlayerState extends State<_InlineVideoPlayer> {
 
   @override
   void dispose() {
+    String? contentIdToSave;
+    double? progressToSave;
+
+    if (widget.contentId != null && _videoPlayerController != null && _videoPlayerController!.value.isInitialized) {
+      final currentPosition = _videoPlayerController!.value.position.inSeconds;
+      final totalDuration = _videoPlayerController!.value.duration.inSeconds;
+
+      if (totalDuration > 0) {
+        contentIdToSave = widget.contentId;
+        progressToSave = currentPosition / totalDuration;
+      }
+    }
+
     _videoPlayerController?.dispose();
     _chewieController?.dispose();
     super.dispose();
+
+    if (contentIdToSave != null && progressToSave != null) {
+      _saveVideoProgress(contentIdToSave, progressToSave);
+    }
+  }
+
+  void _saveVideoProgress(String contentId, double progressPercentage) {
+    try {
+      final repo = HomeRepo(apiClient: ApiClient());
+      repo.saveVideoProgress(
+        contentId: contentId,
+        progressPercentage: progressPercentage,
+      );
+    } catch (_) {}
   }
 
   Future<void> _initializePlayer() async {
@@ -762,6 +813,7 @@ class _InlineVideoPlayerState extends State<_InlineVideoPlayer> {
         builder: (context) => _VideoPlayerScreen(
           videoUrl: widget.videoUrl!,
           title: widget.title,
+          contentId: widget.contentId,
         ),
       ),
     );
@@ -887,10 +939,12 @@ class _InlineVideoPlayerState extends State<_InlineVideoPlayer> {
 class _VideoPlayerScreen extends StatefulWidget {
   final String videoUrl;
   final String title;
+  final String? contentId;
 
   const _VideoPlayerScreen({
     required this.videoUrl,
     required this.title,
+    this.contentId,
   });
 
   @override
@@ -941,9 +995,36 @@ class _VideoPlayerScreenState extends State<_VideoPlayerScreen> {
 
   @override
   void dispose() {
+    String? contentIdToSave;
+    double? progressToSave;
+
+    if (widget.contentId != null && _videoPlayerController.value.isInitialized) {
+      final currentPosition = _videoPlayerController.value.position.inSeconds;
+      final totalDuration = _videoPlayerController.value.duration.inSeconds;
+
+      if (totalDuration > 0) {
+        contentIdToSave = widget.contentId;
+        progressToSave = currentPosition / totalDuration;
+      }
+    }
+
     _videoPlayerController.dispose();
     _chewieController?.dispose();
     super.dispose();
+
+    if (contentIdToSave != null && progressToSave != null) {
+      _saveVideoProgress(contentIdToSave, progressToSave);
+    }
+  }
+
+  void _saveVideoProgress(String contentId, double progressPercentage) {
+    try {
+      final repo = HomeRepo(apiClient: ApiClient());
+      repo.saveVideoProgress(
+        contentId: contentId,
+        progressPercentage: progressPercentage,
+      );
+    } catch (_) {}
   }
 
   @override
@@ -975,7 +1056,7 @@ class _VideoPlayerScreenState extends State<_VideoPlayerScreen> {
 
 class _SectionItem extends StatefulWidget {
   final dynamic section;
-  final Function(String videoUrl, String title) onPlayVideo;
+  final Function(String videoUrl, String title, String? contentId) onPlayVideo;
 
   const _SectionItem({
     required this.section,
@@ -1091,7 +1172,7 @@ class _SectionItemState extends State<_SectionItem> {
                             );
                           }
                         : hasVideo
-                            ? () => widget.onPlayVideo(videoUrl!, content.title ?? '')
+                            ? () => widget.onPlayVideo(videoUrl!, content.title ?? '', content.contentId)
                             : null,
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),

@@ -57,4 +57,18 @@ class HomeRepo {
 
     return LearningProgressData.fromJson(res.data);
   }
+
+  Future<void> saveVideoProgress({
+    required String contentId,
+    required double progressPercentage,
+  }) async {
+    await apiClient.fetch(
+      ApiPath.learningProgress,
+      RequestMethod.post,
+      rawData: {
+        'contentId': contentId,
+        'progressPercentage': progressPercentage,
+      },
+    );
+  }
 }

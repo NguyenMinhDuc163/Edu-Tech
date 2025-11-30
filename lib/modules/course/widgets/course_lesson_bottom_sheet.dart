@@ -10,7 +10,7 @@ class CourseLessonBottomSheet extends StatelessWidget {
   final String courseTitle;
   final List<Section> sections;
   final String accessLevel;
-  final Function(String videoUrl, String title)? onPlayVideo;
+  final Function(String videoUrl, String title, String? contentId)? onPlayVideo;
 
   const CourseLessonBottomSheet({
     super.key,
@@ -137,7 +137,7 @@ class _SectionItem extends StatefulWidget {
   final Section section;
   final int sectionIndex;
   final String accessLevel;
-  final Function(String videoUrl, String title)? onPlayVideo;
+  final Function(String videoUrl, String title, String? contentId)? onPlayVideo;
 
   const _SectionItem({
     required this.section,
@@ -283,7 +283,7 @@ class _ContentItem extends StatefulWidget {
   final Content content;
   final int contentIndex;
   final bool hasFullAccess;
-  final Function(String videoUrl, String title)? onPlayVideo;
+  final Function(String videoUrl, String title, String? contentId)? onPlayVideo;
 
   const _ContentItem({
     required this.content,
@@ -353,7 +353,7 @@ class _ContentItemState extends State<_ContentItem> {
     final videoUrl = _getVideoUrl();
     if (videoUrl != null && videoUrl.isNotEmpty) {
       if (widget.onPlayVideo != null) {
-        widget.onPlayVideo!(videoUrl, widget.content.title ?? '');
+        widget.onPlayVideo!(videoUrl, widget.content.title ?? '', widget.content.contentId);
       } else {
         Navigator.push(
           context,
