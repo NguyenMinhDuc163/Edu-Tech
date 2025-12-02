@@ -1,15 +1,16 @@
-<div align="center">
-
 # 🎓 EdTech - Ứng dụng Học tập Trực tuyến Thông minh
 
-[![Google Play](https://img.shields.io/badge/Google_Play-414141?style=for-the-badge&logo=google-play&logoColor=white)](https://play.google.com/store/apps/details?id=com.nguyenduc.edtech.ed_tech)
-[![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)](https://flutter.dev)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
-
-**Ứng dụng AI trong xây dựng hệ thống học tập trực tuyến thông minh, quản lý người dùng**
-
-[📱 Tải xuống trên Google Play](https://play.google.com/store/apps/details?id=com.nguyenduc.edtech.ed_tech) • [📖 Tài liệu](#-tài-liệu) • [🐛 Báo lỗi](https://github.com/your-repo/issues)
-
+<div align="center">
+  <img src="assets/icons/app_icon.png" alt="EdTech Logo" width="120" height="120">
+  
+  **Học tập hiệu quả với hệ thống AI thông minh**
+  
+  [![Flutter](https://img.shields.io/badge/Flutter-3.29.2-blue.svg)](https://flutter.dev/)
+  [![Dart](https://img.shields.io/badge/Dart-3.7.2-blue.svg)](https://dart.dev/)
+  [![Firebase](https://img.shields.io/badge/Firebase-Cloud-orange.svg)](https://firebase.google.com/)
+  [![BLoC](https://img.shields.io/badge/BLoC-Pattern-purple.svg)](https://bloclibrary.dev/)
+  
+  [![Google Play](https://img.shields.io/badge/Google_Play-Download-blue.svg)](https://play.google.com/store/apps/details?id=com.nguyenduc.edtech.ed_tech)
 </div>
 
 ---
