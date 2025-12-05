@@ -53,6 +53,12 @@ class UserData {
   final String email;
   final String role;
   final String? isPayment;
+  final String? fullName;
+  final String? avatarUrl;
+  final String? phone;
+  final String? grade;
+  final String? subjectSpecialty;
+  final List<CertificateData>? certificates;
 
   UserData({
     required this.id,
@@ -60,6 +66,12 @@ class UserData {
     required this.email,
     required this.role,
     this.isPayment,
+    this.fullName,
+    this.avatarUrl,
+    this.phone,
+    this.grade,
+    this.subjectSpecialty,
+    this.certificates,
   });
 
   factory UserData.fromJson(Map<String, dynamic> json) {
@@ -69,6 +81,14 @@ class UserData {
       email: json['email'] ?? '',
       role: json['role'] ?? 'student',
       isPayment: json['isPayment'],
+      fullName: json['fullName'],
+      avatarUrl: json['avatarUrl'],
+      phone: json['phone'],
+      grade: json['grade'],
+      subjectSpecialty: json['subjectSpecialty'],
+      certificates: json['certificates'] == null
+        ? null
+        : List<CertificateData>.from(json['certificates'].map((x) => CertificateData.fromJson(x))),
     );
   }
 
@@ -79,6 +99,64 @@ class UserData {
       'email': email,
       'role': role,
       'isPayment': isPayment,
+      'fullName': fullName,
+      'avatarUrl': avatarUrl,
+      'phone': phone,
+      'grade': grade,
+      'subjectSpecialty': subjectSpecialty,
+      'certificates': certificates?.map((x) => x.toJson()).toList(),
+    };
+  }
+}
+
+class CertificateData {
+  final String? id;
+  final String? title;
+  final String? description;
+  final String? issuedBy;
+  final String? issuedAt;
+  final String? expiresAt;
+  final String? fileUrl;
+  final String? createdAt;
+  final String? updatedAt;
+
+  CertificateData({
+    this.id,
+    this.title,
+    this.description,
+    this.issuedBy,
+    this.issuedAt,
+    this.expiresAt,
+    this.fileUrl,
+    this.createdAt,
+    this.updatedAt,
+  });
+
+  factory CertificateData.fromJson(Map<String, dynamic> json) {
+    return CertificateData(
+      id: json['id'],
+      title: json['title'],
+      description: json['description'],
+      issuedBy: json['issuedBy'],
+      issuedAt: json['issuedAt'],
+      expiresAt: json['expiresAt'],
+      fileUrl: json['fileUrl'],
+      createdAt: json['createdAt'],
+      updatedAt: json['updatedAt'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'description': description,
+      'issuedBy': issuedBy,
+      'issuedAt': issuedAt,
+      'expiresAt': expiresAt,
+      'fileUrl': fileUrl,
+      'createdAt': createdAt,
+      'updatedAt': updatedAt,
     };
   }
 }

@@ -31,6 +31,11 @@ import 'package:ed_tech/modules/auth/login/bloc/login_controller.dart';
 import 'package:ed_tech/modules/auth/login/screen/login_screen.dart';
 import 'package:ed_tech/modules/auth/sign_in/bloc/sign_in_controller.dart';
 import 'package:ed_tech/modules/auth/sign_in/screen/sign_in_screen.dart';
+import 'package:ed_tech/modules/profile/bloc/profile_controller.dart';
+import 'package:ed_tech/modules/profile/bloc/edit_profile_controller.dart';
+import 'package:ed_tech/modules/profile/repository/profile_repo.dart';
+import 'package:ed_tech/modules/profile/screen/profile_screen.dart';
+import 'package:ed_tech/modules/profile/screen/edit_profile_screen.dart';
 import 'package:ed_tech/modules/auth/sign_up/bloc/sign_up_controller.dart';
 import 'package:ed_tech/modules/auth/sign_up/bloc/sign_up_cubit.dart';
 import 'package:ed_tech/modules/auth/sign_up/repository/sign_up_repo.dart';
@@ -153,6 +158,33 @@ class Routers {
                   return SignInController(prefillData: prefillData);
                 },
                 child: SignInScreen(),
+              ),
+        );
+      case ProfileScreen.routeName:
+        return MaterialPageRoute(
+          settings: settings,
+          builder:
+              (_) => DisposableProvider(
+                create: (BuildContext context) {
+                  return ProfileController();
+                },
+                child: ProfileScreen(),
+              ),
+        );
+      case EditProfileScreen.routeName:
+        return MaterialPageRoute(
+          settings: settings,
+          builder:
+              (context) => RepositoryProvider(
+                create: (context) => ProfileRepo(apiClient: ApiClient()),
+                child: DisposableProvider(
+                  create: (BuildContext context) {
+                    return EditProfileController(
+                      profileRepo: context.read<ProfileRepo>(),
+                    );
+                  },
+                  child: EditProfileScreen(),
+                ),
               ),
         );
       case ForgotPasswordScreen.routeName:

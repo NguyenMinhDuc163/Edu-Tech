@@ -49,6 +49,22 @@ class SignInRepo {
           email: user.email ?? '',
           role: user.role ?? 'student',
           isPayment: loginResponse.data!.isPayment,
+          fullName: user.fullName,
+          avatarUrl: user.avatarUrl,
+          phone: user.phone,
+          grade: user.grade,
+          subjectSpecialty: user.subjectSpecialty,
+          certificates: user.certificates?.map((cert) => CertificateData(
+            id: cert.id,
+            title: cert.title,
+            description: cert.description,
+            issuedBy: cert.issuedBy,
+            issuedAt: cert.issuedAt,
+            expiresAt: cert.expiresAt,
+            fileUrl: cert.fileUrl,
+            createdAt: cert.createdAt,
+            updatedAt: cert.updatedAt,
+          )).toList(),
         ),
       );
     }

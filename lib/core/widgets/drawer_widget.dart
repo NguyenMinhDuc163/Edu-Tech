@@ -45,7 +45,9 @@ class DrawerWidget extends StatelessWidget {
                   bottomRight: Radius.circular(30),
                 ),
               ),
-              child: _buildDrawerHeader(),
+              child: Builder(
+                builder: _buildDrawerHeader,
+              ),
             ),
             Row(
               children: [
@@ -136,43 +138,58 @@ class DrawerWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildDrawerHeader() {
+  Widget _buildDrawerHeader(BuildContext context) {
     final username = UserService.instance.displayName;
     final email = UserService.instance.email;
+    final userData = UserService.instance.userData;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          spacing: width_8,
-          children: [
-            CircleAvatar(radius: 25, backgroundColor: Colors.grey[200], child: Icon(Icons.person)),
-
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(username, style: AppTextStyles.textHeader3),
-                  if (email.isNotEmpty)
-                    Text(
-                      email,
-                      style: AppTextStyles.textContent3.copyWith(color: AppColors.coolGray),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                ],
+    return GestureDetector(
+      onTap: () {
+        Navigator.pop(context);
+        Navigator.pushNamed(context, '/profile');
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            spacing: width_8,
+            children: [
+              CircleAvatar(
+                radius: 25,
+                backgroundColor: Colors.grey[200],
+                backgroundImage: userData?.avatarUrl != null && userData!.avatarUrl!.isNotEmpty
+                    ? NetworkImage(userData.avatarUrl!)
+                    : null,
+                child: userData?.avatarUrl == null || userData!.avatarUrl!.isEmpty
+                    ? Icon(Icons.person)
+                    : null,
               ),
-            ),
-            ButtonWidget(
-              title: "common.orders".tr(),
-              boderRadius: AppBorderRadius.a8,
-              padding: AppPad.h10v8,
-              backgroundColor: AppColors.offWhite,
-              titleStyle: AppTextStyles.textContent3.copyWith(color: AppColors.coolGray),
-            ),
-          ],
-        ),
-      ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(username, style: AppTextStyles.textHeader3),
+                    if (email.isNotEmpty)
+                      Text(
+                        email,
+                        style: AppTextStyles.textContent3.copyWith(color: AppColors.coolGray),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                  ],
+                ),
+              ),
+              ButtonWidget(
+                title: "common.orders".tr(),
+                boderRadius: AppBorderRadius.a8,
+                padding: AppPad.h10v8,
+                backgroundColor: AppColors.offWhite,
+                titleStyle: AppTextStyles.textContent3.copyWith(color: AppColors.coolGray),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 

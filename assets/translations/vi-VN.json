@@ -410,5 +410,36 @@
     "copy_text": "Sao chép",
     "thinking": "AI đang suy nghĩ...",
     "input_hint": "Hỏi AI bất cứ điều gì"
+  },
+  "profile": {
+    "title": "Hồ sơ",
+    "no_data": "Chưa có dữ liệu hồ sơ",
+    "personal_info": "Thông tin cá nhân",
+    "email": "Email",
+    "phone": "Số điện thoại",
+    "grade": "Lớp",
+    "subject": "Chuyên môn",
+    "certificates": "Chứng chỉ & Thành tích",
+    "view_certificate": "Xem chứng chỉ"
+  },
+  "edit_profile": {
+    "title": "Chỉnh sửa hồ sơ",
+    "personal_info": "Thông tin cá nhân",
+    "full_name": "Họ và tên",
+    "phone": "Số điện thoại",
+    "grade": "Lớp",
+    "subject": "Chuyên môn",
+    "certificate": "Chứng chỉ",
+    "cert_title": "Tiêu đề chứng chỉ",
+    "cert_description": "Mô tả chứng chỉ",
+    "cert_issued_by": "Cơ quan cấp",
+    "cert_issued_at": "Ngày cấp",
+    "cert_expires_at": "Ngày hết hạn",
+    "add_certificate_image": "Thêm ảnh chứng chỉ",
+    "gallery": "Thư viện",
+    "camera": "Máy ảnh",
+    "save": "Lưu",
+    "success": "Cập nhật hồ sơ thành công",
+    "error": "Cập nhật hồ sơ thất bại"
   }
 }

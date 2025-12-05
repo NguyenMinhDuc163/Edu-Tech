@@ -42,6 +42,7 @@ class ApiPath {
   static const String courseReviews = '/courses';
   static const String coursesList = '/courses/list';
   static const String learningProgress = '/learning/progress';
+  static const String updateProfile = '/users/me/profile';
 }
 
 // TODO trong intercepter => ds api can truyen id

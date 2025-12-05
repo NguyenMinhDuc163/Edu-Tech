@@ -410,5 +410,36 @@
     "copy_text": "Copy Text",
     "thinking": "AI is thinking...",
     "input_hint": "Ask AI chat anything"
+  },
+  "profile": {
+    "title": "Profile",
+    "no_data": "No profile data",
+    "personal_info": "Personal Information",
+    "email": "Email",
+    "phone": "Phone Number",
+    "grade": "Grade",
+    "subject": "Subject Specialty",
+    "certificates": "Certificates & Achievements",
+    "view_certificate": "View Certificate"
+  },
+  "edit_profile": {
+    "title": "Edit Profile",
+    "personal_info": "Personal Information",
+    "full_name": "Full Name",
+    "phone": "Phone Number",
+    "grade": "Grade",
+    "subject": "Subject Specialty",
+    "certificate": "Certificate",
+    "cert_title": "Certificate Title",
+    "cert_description": "Certificate Description",
+    "cert_issued_by": "Issued By",
+    "cert_issued_at": "Issued Date",
+    "cert_expires_at": "Expiry Date",
+    "add_certificate_image": "Add Certificate Image",
+    "gallery": "Gallery",
+    "camera": "Camera",
+    "save": "Save",
+    "success": "Profile updated successfully",
+    "error": "Failed to update profile"
   }
 }
