@@ -24,87 +24,69 @@ class ProfileRepo {
     String? certificateExpiresAt,
     File? certificateFile,
   }) async {
-    final formData = FormData();
-
-    // Add text fields if not null
-    if (fullName != null && fullName.isNotEmpty) {
-      formData.fields.add(MapEntry('full_name', fullName));
-    }
-    if (phone != null && phone.isNotEmpty) {
-      formData.fields.add(MapEntry('phone', phone));
-    }
-    if (grade != null && grade.isNotEmpty) {
-      formData.fields.add(MapEntry('grade', grade));
-    }
-    if (subjectSpecialty != null && subjectSpecialty.isNotEmpty) {
-      formData.fields.add(MapEntry('subject_specialty', subjectSpecialty));
-    }
-
-    // Add certificate fields if not null
-    if (certificateTitle != null && certificateTitle.isNotEmpty) {
-      formData.fields.add(MapEntry('certificate_title', certificateTitle));
-    }
-    if (certificateDescription != null && certificateDescription.isNotEmpty) {
-      formData.fields.add(MapEntry('certificate_description', certificateDescription));
-    }
-    if (certificateIssuedBy != null && certificateIssuedBy.isNotEmpty) {
-      formData.fields.add(MapEntry('certificate_issued_by', certificateIssuedBy));
-    }
-    if (certificateIssuedAt != null && certificateIssuedAt.isNotEmpty) {
-      formData.fields.add(MapEntry('certificate_issued_at', certificateIssuedAt));
-    }
-    if (certificateExpiresAt != null && certificateExpiresAt.isNotEmpty) {
-      formData.fields.add(MapEntry('certificate_expires_at', certificateExpiresAt));
-    }
-
-    // Add files if not null
-    if (avatarFile != null) {
-      final fileName = avatarFile.path.split('/').last;
-      formData.files.add(MapEntry(
-        'avatar',
-        await MultipartFile.fromFile(avatarFile.path, filename: fileName),
-      ));
-    }
-
-    if (certificateFile != null) {
-      final fileName = certificateFile.path.split('/').last;
-      formData.files.add(MapEntry(
-        'certificate_file',
-        await MultipartFile.fromFile(certificateFile.path, filename: fileName),
-      ));
-    }
-
     final res = await apiClient.fetch(
       ApiPath.updateProfile,
       RequestMethod.post,
-      rawData: formData as dynamic,
+      asyncDataGetter: () async {
+        final Map<String, dynamic> data = {};
+
+        if (fullName != null && fullName.isNotEmpty) {
+          data['full_name'] = fullName;
+        }
+        if (phone != null && phone.isNotEmpty) {
+          data['phone'] = phone;
+        }
+        if (grade != null && grade.isNotEmpty) {
+          data['grade'] = grade;
+        }
+        if (subjectSpecialty != null && subjectSpecialty.isNotEmpty) {
+          data['subject_specialty'] = subjectSpecialty;
+        }
+
+        if (certificateTitle != null && certificateTitle.isNotEmpty) {
+          data['certificate_title'] = certificateTitle;
+        }
+        if (certificateDescription != null && certificateDescription.isNotEmpty) {
+          data['certificate_description'] = certificateDescription;
+        }
+        if (certificateIssuedBy != null && certificateIssuedBy.isNotEmpty) {
+          data['certificate_issued_by'] = certificateIssuedBy;
+        }
+        if (certificateIssuedAt != null && certificateIssuedAt.isNotEmpty) {
+          data['certificate_issued_at'] = certificateIssuedAt;
+        }
+        if (certificateExpiresAt != null && certificateExpiresAt.isNotEmpty) {
+          data['certificate_expires_at'] = certificateExpiresAt;
+        }
+
+        if (avatarFile != null) {
+          final fileName = avatarFile.path.split('/').last;
+          data['avatar'] = await MultipartFile.fromFile(avatarFile.path, filename: fileName);
+        }
+
+        if (certificateFile != null) {
+          final fileName = certificateFile.path.split('/').last;
+          data['certificate_file'] = await MultipartFile.fromFile(certificateFile.path, filename: fileName);
+        }
+
+        return data;
+      },
     );
 
     if (res.code != 200) {
       throw res.message;
     }
 
-    // Parse response and update UserService
     final responseData = res.json['data'];
     if (responseData != null) {
       final user = User.fromJson(responseData);
-      final certificates = responseData['certificate'] != null
-          ? [Certificate.fromJson(responseData['certificate'])]
-          : null;
+      final currentUser = UserService.instance.userData;
 
-      await UserService.instance.saveUserData(
-        UserData(
-          id: user.id ?? UserService.instance.userData?.id ?? '',
-          username: user.username ?? UserService.instance.userData?.username ?? '',
-          email: user.email ?? UserService.instance.userData?.email ?? '',
-          role: UserService.instance.userData?.role ?? 'student',
-          isPayment: UserService.instance.userData?.isPayment,
-          fullName: user.fullName,
-          avatarUrl: user.avatarUrl,
-          phone: user.phone,
-          grade: user.grade,
-          subjectSpecialty: user.subjectSpecialty,
-          certificates: certificates?.map((cert) => CertificateData(
+      List<CertificateData>? certificatesData;
+      if (responseData['certificate'] != null) {
+        final cert = Certificate.fromJson(responseData['certificate']);
+        certificatesData = [
+          CertificateData(
             id: cert.id,
             title: cert.title,
             description: cert.description,
@@ -114,7 +96,25 @@ class ProfileRepo {
             fileUrl: cert.fileUrl,
             createdAt: cert.createdAt,
             updatedAt: cert.updatedAt,
-          )).toList(),
+          )
+        ];
+      } else {
+        certificatesData = currentUser?.certificates;
+      }
+
+      await UserService.instance.saveUserData(
+        UserData(
+          id: user.id ?? currentUser?.id ?? '',
+          username: user.username ?? currentUser?.username ?? '',
+          email: user.email ?? currentUser?.email ?? '',
+          role: currentUser?.role ?? 'student',
+          isPayment: currentUser?.isPayment,
+          fullName: user.fullName ?? currentUser?.fullName,
+          avatarUrl: user.avatarUrl ?? currentUser?.avatarUrl,
+          phone: user.phone ?? currentUser?.phone,
+          grade: user.grade ?? currentUser?.grade,
+          subjectSpecialty: user.subjectSpecialty ?? currentUser?.subjectSpecialty,
+          certificates: certificatesData,
         ),
       );
     }

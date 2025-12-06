@@ -24,52 +24,55 @@ class _ProfileContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final userData = controller.userData;
-
-    if (userData == null) {
-      return FunctionScreenTemplate(
-        isShowAppBar: true,
-        title: 'profile.title'.tr(),
-        isShowBottomButton: false,
-        screen: Center(
-          child: Text('profile.no_data'.tr()),
-        ),
-      );
-    }
-
-    return FunctionScreenTemplate(
-      isShowAppBar: true,
-      title: 'profile.title'.tr(),
-      isShowBottomButton: false,
-      actionsWidget: [
-        GestureDetector(
-          onTap: () async {
-            await Navigator.pushNamed(context, EditProfileScreen.routeName);
-          },
-          child: Icon(Icons.edit, color: AppColors.primary, size: 20),
-        ),
-      ],
-      screen: SingleChildScrollView(
-        child: Column(
-          children: [
-            _buildProfileHeader(userData),
-            AppGap.h30,
-            Padding(
-              padding: AppPad.h20,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildPersonalInfo(userData),
-                  AppGap.h30,
-                  if (userData.certificates != null && userData.certificates!.isNotEmpty)
-                    _buildCertificates(userData.certificates!),
-                ],
-              ),
+    return ValueListenableBuilder<UserData?>(
+      valueListenable: UserService.instance.userDataNotifier,
+      builder: (context, userData, _) {
+        if (userData == null) {
+          return FunctionScreenTemplate(
+            isShowAppBar: true,
+            title: 'profile.title'.tr(),
+            isShowBottomButton: false,
+            screen: Center(
+              child: Text('profile.no_data'.tr()),
             ),
-            AppGap.h30,
+          );
+        }
+
+        return FunctionScreenTemplate(
+          isShowAppBar: true,
+          title: 'profile.title'.tr(),
+          isShowBottomButton: false,
+          actionsWidget: [
+            GestureDetector(
+              onTap: () async {
+                await Navigator.pushNamed(context, EditProfileScreen.routeName);
+              },
+              child: Icon(Icons.edit, color: AppColors.primary, size: 20),
+            ),
           ],
-        ),
-      ),
+          screen: SingleChildScrollView(
+            child: Column(
+              children: [
+                _buildProfileHeader(userData),
+                AppGap.h30,
+                Padding(
+                  padding: AppPad.h20,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildPersonalInfo(userData),
+                      AppGap.h30,
+                      if (userData.certificates != null && userData.certificates!.isNotEmpty)
+                        _buildCertificates(userData.certificates!),
+                    ],
+                  ),
+                ),
+                AppGap.h30,
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 

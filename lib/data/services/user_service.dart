@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:sp_util/sp_util.dart';
 
 const String _userDataKey = 'user_data';
@@ -18,26 +19,32 @@ class UserService {
   UserData? _userData;
   UserData? get userData => _userData;
 
+  final userDataNotifier = ValueNotifier<UserData?>(null);
+
   Future<void> _loadUserData() async {
     final String? userJson = SpUtil.getString(_userDataKey);
     if (userJson != null && userJson.isNotEmpty) {
       try {
         final Map<String, dynamic> json = jsonDecode(userJson);
         _userData = UserData.fromJson(json);
+        userDataNotifier.value = _userData;
       } catch (e) {
         _userData = null;
+        userDataNotifier.value = null;
       }
     }
   }
 
   Future<void> saveUserData(UserData user) async {
     _userData = user;
+    userDataNotifier.value = user;
     final String userJson = jsonEncode(user.toJson());
     await SpUtil.putString(_userDataKey, userJson);
   }
 
   Future<void> clearUserData() async {
     _userData = null;
+    userDataNotifier.value = null;
     await SpUtil.remove(_userDataKey);
   }
 

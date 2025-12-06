@@ -9,7 +9,6 @@ class EditProfileController extends Disposable {
 
   EditProfileController({required this.profileRepo});
 
-  // Text controllers
   final fullNameController = TextEditingController();
   final phoneController = TextEditingController();
   final gradeController = TextEditingController();
@@ -20,30 +19,46 @@ class EditProfileController extends Disposable {
   final certIssuedAtController = TextEditingController();
   final certExpiresAtController = TextEditingController();
 
-  // Selected files
   final avatarFile = ValueNotifier<File?>(null);
   final certificateFile = ValueNotifier<File?>(null);
-
-  // Loading state
   final isLoading = ValueNotifier<bool>(false);
 
-  // Initialize with current user data
+  String _initialFullName = '';
+  String _initialPhone = '';
+  String _initialGrade = '';
+  String _initialSubject = '';
+  String _initialCertTitle = '';
+  String _initialCertDescription = '';
+  String _initialCertIssuedBy = '';
+  String _initialCertIssuedAt = '';
+  String _initialCertExpiresAt = '';
+
   void initialize() {
     final userData = UserService.instance.userData;
     if (userData != null) {
-      fullNameController.text = userData.fullName ?? '';
-      phoneController.text = userData.phone ?? '';
-      gradeController.text = userData.grade ?? '';
-      subjectController.text = userData.subjectSpecialty ?? '';
+      _initialFullName = userData.fullName ?? '';
+      _initialPhone = userData.phone ?? '';
+      _initialGrade = userData.grade ?? '';
+      _initialSubject = userData.subjectSpecialty ?? '';
 
-      // If user has certificates, load the first one
+      fullNameController.text = _initialFullName;
+      phoneController.text = _initialPhone;
+      gradeController.text = _initialGrade;
+      subjectController.text = _initialSubject;
+
       if (userData.certificates != null && userData.certificates!.isNotEmpty) {
         final cert = userData.certificates!.first;
-        certTitleController.text = cert.title ?? '';
-        certDescriptionController.text = cert.description ?? '';
-        certIssuedByController.text = cert.issuedBy ?? '';
-        certIssuedAtController.text = cert.issuedAt ?? '';
-        certExpiresAtController.text = cert.expiresAt ?? '';
+        _initialCertTitle = cert.title ?? '';
+        _initialCertDescription = cert.description ?? '';
+        _initialCertIssuedBy = cert.issuedBy ?? '';
+        _initialCertIssuedAt = cert.issuedAt ?? '';
+        _initialCertExpiresAt = cert.expiresAt ?? '';
+
+        certTitleController.text = _initialCertTitle;
+        certDescriptionController.text = _initialCertDescription;
+        certIssuedByController.text = _initialCertIssuedBy;
+        certIssuedAtController.text = _initialCertIssuedAt;
+        certExpiresAtController.text = _initialCertExpiresAt;
       }
     }
   }
@@ -52,17 +67,27 @@ class EditProfileController extends Disposable {
     isLoading.value = true;
 
     try {
+      final currentFullName = fullNameController.text.trim();
+      final currentPhone = phoneController.text.trim();
+      final currentGrade = gradeController.text.trim();
+      final currentSubject = subjectController.text.trim();
+      final currentCertTitle = certTitleController.text.trim();
+      final currentCertDescription = certDescriptionController.text.trim();
+      final currentCertIssuedBy = certIssuedByController.text.trim();
+      final currentCertIssuedAt = certIssuedAtController.text.trim();
+      final currentCertExpiresAt = certExpiresAtController.text.trim();
+
       await profileRepo.updateProfile(
-        fullName: fullNameController.text.trim(),
-        phone: phoneController.text.trim(),
-        grade: gradeController.text.trim(),
-        subjectSpecialty: subjectController.text.trim(),
+        fullName: currentFullName != _initialFullName ? currentFullName : null,
+        phone: currentPhone != _initialPhone ? currentPhone : null,
+        grade: currentGrade != _initialGrade ? currentGrade : null,
+        subjectSpecialty: currentSubject != _initialSubject ? currentSubject : null,
         avatarFile: avatarFile.value,
-        certificateTitle: certTitleController.text.trim(),
-        certificateDescription: certDescriptionController.text.trim(),
-        certificateIssuedBy: certIssuedByController.text.trim(),
-        certificateIssuedAt: certIssuedAtController.text.trim(),
-        certificateExpiresAt: certExpiresAtController.text.trim(),
+        certificateTitle: currentCertTitle != _initialCertTitle ? currentCertTitle : null,
+        certificateDescription: currentCertDescription != _initialCertDescription ? currentCertDescription : null,
+        certificateIssuedBy: currentCertIssuedBy != _initialCertIssuedBy ? currentCertIssuedBy : null,
+        certificateIssuedAt: currentCertIssuedAt != _initialCertIssuedAt ? currentCertIssuedAt : null,
+        certificateExpiresAt: currentCertExpiresAt != _initialCertExpiresAt ? currentCertExpiresAt : null,
         certificateFile: certificateFile.value,
       );
     } finally {

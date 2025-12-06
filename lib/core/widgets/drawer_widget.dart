@@ -139,57 +139,61 @@ class DrawerWidget extends StatelessWidget {
   }
 
   Widget _buildDrawerHeader(BuildContext context) {
-    final username = UserService.instance.displayName;
-    final email = UserService.instance.email;
-    final userData = UserService.instance.userData;
+    return ValueListenableBuilder<UserData?>(
+      valueListenable: UserService.instance.userDataNotifier,
+      builder: (context, userData, _) {
+        final username = userData?.username ?? 'User';
+        final email = userData?.email ?? '';
 
-    return GestureDetector(
-      onTap: () {
-        Navigator.pop(context);
-        Navigator.pushNamed(context, '/profile');
-      },
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            spacing: width_8,
+        return GestureDetector(
+          onTap: () {
+            Navigator.pop(context);
+            Navigator.pushNamed(context, '/profile');
+          },
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              CircleAvatar(
-                radius: 25,
-                backgroundColor: Colors.grey[200],
-                backgroundImage: userData?.avatarUrl != null && userData!.avatarUrl!.isNotEmpty
-                    ? NetworkImage(userData.avatarUrl!)
-                    : null,
-                child: userData?.avatarUrl == null || userData!.avatarUrl!.isEmpty
-                    ? Icon(Icons.person)
-                    : null,
-              ),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(username, style: AppTextStyles.textHeader3),
-                    if (email.isNotEmpty)
-                      Text(
-                        email,
-                        style: AppTextStyles.textContent3.copyWith(color: AppColors.coolGray),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                  ],
-                ),
-              ),
-              ButtonWidget(
-                title: "common.orders".tr(),
-                boderRadius: AppBorderRadius.a8,
-                padding: AppPad.h10v8,
-                backgroundColor: AppColors.offWhite,
-                titleStyle: AppTextStyles.textContent3.copyWith(color: AppColors.coolGray),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                spacing: width_8,
+                children: [
+                  CircleAvatar(
+                    radius: 25,
+                    backgroundColor: Colors.grey[200],
+                    backgroundImage: userData?.avatarUrl != null && userData!.avatarUrl!.isNotEmpty
+                        ? NetworkImage(userData.avatarUrl!)
+                        : null,
+                    child: userData?.avatarUrl == null || userData!.avatarUrl!.isEmpty
+                        ? Icon(Icons.person)
+                        : null,
+                  ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(username, style: AppTextStyles.textHeader3),
+                        if (email.isNotEmpty)
+                          Text(
+                            email,
+                            style: AppTextStyles.textContent3.copyWith(color: AppColors.coolGray),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                      ],
+                    ),
+                  ),
+                  ButtonWidget(
+                    title: "common.orders".tr(),
+                    boderRadius: AppBorderRadius.a8,
+                    padding: AppPad.h10v8,
+                    backgroundColor: AppColors.offWhite,
+                    titleStyle: AppTextStyles.textContent3.copyWith(color: AppColors.coolGray),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 

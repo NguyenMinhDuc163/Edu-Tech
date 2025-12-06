@@ -362,6 +362,7 @@ class _EditProfileContent extends StatelessWidget {
       );
       navigator.pop(true);
     } catch (e) {
+      debugPrint('Update profile error: $e');
       Fluttertoast.showToast(
         msg: 'edit_profile.error'.tr(),
         toastLength: Toast.LENGTH_SHORT,
