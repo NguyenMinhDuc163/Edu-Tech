@@ -5,6 +5,7 @@ import 'package:ed_tech/data/api_client.dart';
 import 'package:ed_tech/data/models/request_method.dart';
 import 'package:ed_tech/data/services/user_service.dart';
 import 'package:ed_tech/modules/auth/sign_in/model/login_response.dart';
+import 'package:ed_tech/modules/profile/bloc/edit_profile_controller.dart';
 
 class ProfileRepo {
   final ApiClient apiClient;
@@ -17,59 +18,70 @@ class ProfileRepo {
     String? grade,
     String? subjectSpecialty,
     File? avatarFile,
-    String? certificateTitle,
-    String? certificateDescription,
-    String? certificateIssuedBy,
-    String? certificateIssuedAt,
-    String? certificateExpiresAt,
-    File? certificateFile,
+    List<CertificateFormData>? certificates,
   }) async {
     final res = await apiClient.fetch(
       ApiPath.updateProfile,
       RequestMethod.post,
-      asyncDataGetter: () async {
-        final Map<String, dynamic> data = {};
+      asyncRawDataGetter: () async {
+        final formData = FormData();
 
         if (fullName != null && fullName.isNotEmpty) {
-          data['full_name'] = fullName;
+          formData.fields.add(MapEntry('full_name', fullName));
         }
         if (phone != null && phone.isNotEmpty) {
-          data['phone'] = phone;
+          formData.fields.add(MapEntry('phone', phone));
         }
         if (grade != null && grade.isNotEmpty) {
-          data['grade'] = grade;
+          formData.fields.add(MapEntry('grade', grade));
         }
         if (subjectSpecialty != null && subjectSpecialty.isNotEmpty) {
-          data['subject_specialty'] = subjectSpecialty;
-        }
-
-        if (certificateTitle != null && certificateTitle.isNotEmpty) {
-          data['certificate_title'] = certificateTitle;
-        }
-        if (certificateDescription != null && certificateDescription.isNotEmpty) {
-          data['certificate_description'] = certificateDescription;
-        }
-        if (certificateIssuedBy != null && certificateIssuedBy.isNotEmpty) {
-          data['certificate_issued_by'] = certificateIssuedBy;
-        }
-        if (certificateIssuedAt != null && certificateIssuedAt.isNotEmpty) {
-          data['certificate_issued_at'] = certificateIssuedAt;
-        }
-        if (certificateExpiresAt != null && certificateExpiresAt.isNotEmpty) {
-          data['certificate_expires_at'] = certificateExpiresAt;
+          formData.fields.add(MapEntry('subject_specialty', subjectSpecialty));
         }
 
         if (avatarFile != null) {
           final fileName = avatarFile.path.split('/').last;
-          data['avatar'] = await MultipartFile.fromFile(avatarFile.path, filename: fileName);
+          formData.files.add(MapEntry(
+            'avatar',
+            await MultipartFile.fromFile(avatarFile.path, filename: fileName),
+          ));
         }
 
-        if (certificateFile != null) {
-          final fileName = certificateFile.path.split('/').last;
-          data['certificate_file'] = await MultipartFile.fromFile(certificateFile.path, filename: fileName);
+        if (certificates != null && certificates.isNotEmpty) {
+          for (var cert in certificates) {
+            final title = cert.titleController.text.trim();
+            final description = cert.descriptionController.text.trim();
+            final issuedBy = cert.issuedByController.text.trim();
+            final issuedAt = cert.issuedAtController.text.trim();
+            final expiresAt = cert.expiresAtController.text.trim();
+
+            if (title.isNotEmpty) {
+              formData.fields.add(MapEntry('certificate_title', title));
+            }
+            if (description.isNotEmpty) {
+              formData.fields.add(MapEntry('certificate_description', description));
+            }
+            if (issuedBy.isNotEmpty) {
+              formData.fields.add(MapEntry('certificate_issued_by', issuedBy));
+            }
+            if (issuedAt.isNotEmpty) {
+              formData.fields.add(MapEntry('certificate_issued_at', issuedAt));
+            }
+            if (expiresAt.isNotEmpty) {
+              formData.fields.add(MapEntry('certificate_expires_at', expiresAt));
+            }
+
+            if (cert.file.value != null) {
+              final fileName = cert.file.value!.path.split('/').last;
+              formData.files.add(MapEntry(
+                'certificate_file',
+                await MultipartFile.fromFile(cert.file.value!.path, filename: fileName),
+              ));
+            }
+          }
         }
 
-        return data;
+        return formData;
       },
     );
 
@@ -83,10 +95,11 @@ class ProfileRepo {
       final currentUser = UserService.instance.userData;
 
       List<CertificateData>? certificatesData;
-      if (responseData['certificate'] != null) {
-        final cert = Certificate.fromJson(responseData['certificate']);
-        certificatesData = [
-          CertificateData(
+      if (responseData['certificates'] != null) {
+        final certList = responseData['certificates'] as List;
+        certificatesData = certList.map((certJson) {
+          final cert = Certificate.fromJson(certJson);
+          return CertificateData(
             id: cert.id,
             title: cert.title,
             description: cert.description,
@@ -96,8 +109,8 @@ class ProfileRepo {
             fileUrl: cert.fileUrl,
             createdAt: cert.createdAt,
             updatedAt: cert.updatedAt,
-          )
-        ];
+          );
+        }).toList();
       } else {
         certificatesData = currentUser?.certificates;
       }

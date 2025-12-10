@@ -148,9 +148,9 @@ class ApiClient {
     final String url,
     final RequestMethod method, {
     final Map<String, dynamic>? data,
-    final Map<String, dynamic>? rawData,
+    final dynamic rawData,
     final Future<Map<String, dynamic>> Function()? asyncDataGetter,
-    final Future<Map<String, dynamic>> Function()? asyncRawDataGetter,
+    final Future<dynamic> Function()? asyncRawDataGetter,
     final Map<String, String>? searchParams,
     Map<String, dynamic>? headers,
     Options? options,

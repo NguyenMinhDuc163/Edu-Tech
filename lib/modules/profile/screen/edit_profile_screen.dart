@@ -66,40 +66,7 @@ class _EditProfileContent extends StatelessWidget {
                 icon: Icons.book_outlined,
               ),
               AppGap.h30,
-              _buildSectionTitle('edit_profile.certificate'.tr()),
-              AppGap.h16,
-              _buildCertificateImageSection(context),
-              AppGap.h16,
-              _buildTextField(
-                controller: controller.certTitleController,
-                label: 'edit_profile.cert_title'.tr(),
-                icon: Icons.workspace_premium,
-              ),
-              AppGap.h16,
-              _buildTextField(
-                controller: controller.certDescriptionController,
-                label: 'edit_profile.cert_description'.tr(),
-                icon: Icons.description_outlined,
-                maxLines: 3,
-              ),
-              AppGap.h16,
-              _buildTextField(
-                controller: controller.certIssuedByController,
-                label: 'edit_profile.cert_issued_by'.tr(),
-                icon: Icons.business,
-              ),
-              AppGap.h16,
-              _buildDateField(
-                context: context,
-                controller: controller.certIssuedAtController,
-                label: 'edit_profile.cert_issued_at'.tr(),
-              ),
-              AppGap.h16,
-              _buildDateField(
-                context: context,
-                controller: controller.certExpiresAtController,
-                label: 'edit_profile.cert_expires_at'.tr(),
-              ),
+              _buildCertificatesSection(context),
               AppGap.h30,
               ValueListenableBuilder<bool>(
                 valueListenable: controller.isLoading,
@@ -187,38 +154,155 @@ class _EditProfileContent extends StatelessWidget {
     );
   }
 
-  Widget _buildCertificateImageSection(BuildContext context) {
-    return ValueListenableBuilder<File?>(
-      valueListenable: controller.certificateFile,
-      builder: (context, file, _) {
-        return GestureDetector(
-          onTap: () => _pickImage(context, isAvatar: false),
-          child: Container(
-            height: 180,
-            decoration: BoxDecoration(
-              color: AppColors.offWhite,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+  Widget _buildCertificatesSection(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _buildSectionTitle('edit_profile.certificate'.tr()),
+            IconButton(
+              onPressed: controller.addCertificate,
+              icon: Icon(Icons.add_circle, color: AppColors.primary),
+              tooltip: 'Thêm chứng chỉ',
             ),
-            child: file != null
-                ? ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.file(file, fit: BoxFit.cover),
-                  )
-                : Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.add_photo_alternate, size: 48, color: AppColors.coolGray),
-                      AppGap.h8,
-                      Text(
-                        'edit_profile.add_certificate_image'.tr(),
-                        style: AppTextStyles.textContent2.copyWith(color: AppColors.coolGray),
-                      ),
-                    ],
+          ],
+        ),
+        AppGap.h16,
+        ValueListenableBuilder<List<CertificateFormData>>(
+          valueListenable: controller.certificates,
+          builder: (context, certificates, _) {
+            if (certificates.isEmpty) {
+              return Center(
+                child: TextButton.icon(
+                  onPressed: controller.addCertificate,
+                  icon: Icon(Icons.add),
+                  label: Text('Thêm chứng chỉ'),
+                ),
+              );
+            }
+            return Column(
+              children: List.generate(certificates.length, (index) {
+                return Padding(
+                  padding: EdgeInsets.only(bottom: 16),
+                  child: _buildCertificateCard(context, certificates[index], index),
+                );
+              }),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCertificateCard(BuildContext context, CertificateFormData cert, int index) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: AppPad.a16,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Chứng chỉ ${index + 1}',
+                  style: AppTextStyles.textContent1.copyWith(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.bold,
                   ),
-          ),
-        );
-      },
+                ),
+                IconButton(
+                  onPressed: () => controller.removeCertificate(index),
+                  icon: Icon(Icons.delete, color: AppColors.crimson),
+                  tooltip: 'Xóa',
+                ),
+              ],
+            ),
+            AppGap.h12,
+            ValueListenableBuilder<File?>(
+              valueListenable: cert.file,
+              builder: (context, file, _) {
+                return GestureDetector(
+                  onTap: () => _pickCertificateImage(context, cert),
+                  child: Container(
+                    height: 150,
+                    decoration: BoxDecoration(
+                      color: AppColors.offWhite,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+                    ),
+                    child: file != null
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.file(file, fit: BoxFit.cover, width: double.infinity),
+                          )
+                        : cert.existingFileUrl != null
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: Image.network(
+                                  cert.existingFileUrl!,
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                  errorBuilder: (_, __, ___) => _buildImagePlaceholder(),
+                                ),
+                              )
+                            : _buildImagePlaceholder(),
+                  ),
+                );
+              },
+            ),
+            AppGap.h12,
+            _buildTextField(
+              controller: cert.titleController,
+              label: 'edit_profile.cert_title'.tr(),
+              icon: Icons.workspace_premium,
+            ),
+            AppGap.h12,
+            _buildTextField(
+              controller: cert.descriptionController,
+              label: 'edit_profile.cert_description'.tr(),
+              icon: Icons.description_outlined,
+              maxLines: 3,
+            ),
+            AppGap.h12,
+            _buildTextField(
+              controller: cert.issuedByController,
+              label: 'edit_profile.cert_issued_by'.tr(),
+              icon: Icons.business,
+            ),
+            AppGap.h12,
+            _buildDateField(
+              context: context,
+              controller: cert.issuedAtController,
+              label: 'edit_profile.cert_issued_at'.tr(),
+            ),
+            AppGap.h12,
+            _buildDateField(
+              context: context,
+              controller: cert.expiresAtController,
+              label: 'edit_profile.cert_expires_at'.tr(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildImagePlaceholder() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(Icons.add_photo_alternate, size: 40, color: AppColors.coolGray),
+        AppGap.h8,
+        Text(
+          'edit_profile.add_certificate_image'.tr(),
+          style: AppTextStyles.textContent2.copyWith(color: AppColors.coolGray),
+        ),
+      ],
     );
   }
 
@@ -338,12 +422,39 @@ class _EditProfileContent extends StatelessWidget {
 
     if (source != null) {
       final XFile? image = await picker.pickImage(source: source);
+      if (image != null && isAvatar) {
+        controller.avatarFile.value = File(image.path);
+      }
+    }
+  }
+
+  Future<void> _pickCertificateImage(BuildContext context, CertificateFormData cert) async {
+    final ImagePicker picker = ImagePicker();
+
+    final ImageSource? source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Wrap(
+          children: [
+            ListTile(
+              leading: Icon(Icons.photo_library, color: AppColors.primary),
+              title: Text('edit_profile.gallery'.tr()),
+              onTap: () => Navigator.pop(context, ImageSource.gallery),
+            ),
+            ListTile(
+              leading: Icon(Icons.camera_alt, color: AppColors.primary),
+              title: Text('edit_profile.camera'.tr()),
+              onTap: () => Navigator.pop(context, ImageSource.camera),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (source != null) {
+      final XFile? image = await picker.pickImage(source: source);
       if (image != null) {
-        if (isAvatar) {
-          controller.avatarFile.value = File(image.path);
-        } else {
-          controller.certificateFile.value = File(image.path);
-        }
+        cert.file.value = File(image.path);
       }
     }
   }

@@ -73,44 +73,6 @@ class _LearningPlanWidgetState extends State<LearningPlanWidget> {
               .where((course) => course.title.isNotEmpty)
               .toList();
 
-          if (validCourses.isEmpty && stats.overview.totalResults == 0) {
-            return Padding(
-              padding: AppPad.h16,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'home_screen.learning_progress'.tr(),
-                    style: AppTextStyles.textHeader3.copyWith(fontSize: 18),
-                  ),
-                  const SizedBox(height: 12),
-                  Container(
-                    padding: AppPad.a16,
-                    decoration: BoxDecoration(
-                      color: AppColors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: const [
-                        BoxShadow(
-                          offset: Offset(0, 2),
-                          blurRadius: 8,
-                          color: Color.fromRGBO(0, 0, 0, 0.08),
-                        ),
-                      ],
-                    ),
-                    child: Center(
-                      child: Text(
-                        'home_screen.no_stats'.tr(),
-                        style: AppTextStyles.text.copyWith(
-                          color: AppColors.colorB8B8D2,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }
-
           return Padding(
             padding: AppPad.h16,
             child: Column(
@@ -125,12 +87,12 @@ class _LearningPlanWidgetState extends State<LearningPlanWidget> {
                   overview: stats.overview,
                   onTap: widget.onNavigateToQuizTab,
                 ),
-                const SizedBox(height: 16),
                 if (validCourses.isNotEmpty) ...[
-                  _CoursesSection(courses: validCourses),
                   const SizedBox(height: 16),
+                  _CoursesSection(courses: validCourses),
                 ],
                 if (stats.recentResults.isNotEmpty) ...[
+                  const SizedBox(height: 16),
                   _RecentActivitySection(
                     recentResults: stats.recentResults.take(3).toList(),
                     onTap: widget.onNavigateToQuizTab,
@@ -595,3 +557,4 @@ class _RecentResultItem extends StatelessWidget {
     );
   }
 }
+

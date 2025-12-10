@@ -4,6 +4,42 @@ import 'package:flutter/material.dart';
 import 'package:ed_tech/data/services/user_service.dart';
 import 'package:ed_tech/modules/profile/repository/profile_repo.dart';
 
+class CertificateFormData {
+  final String? id;
+  final TextEditingController titleController;
+  final TextEditingController descriptionController;
+  final TextEditingController issuedByController;
+  final TextEditingController issuedAtController;
+  final TextEditingController expiresAtController;
+  final ValueNotifier<File?> file;
+  final String? existingFileUrl;
+
+  CertificateFormData({
+    this.id,
+    String? title,
+    String? description,
+    String? issuedBy,
+    String? issuedAt,
+    String? expiresAt,
+    File? fileValue,
+    this.existingFileUrl,
+  })  : titleController = TextEditingController(text: title),
+        descriptionController = TextEditingController(text: description),
+        issuedByController = TextEditingController(text: issuedBy),
+        issuedAtController = TextEditingController(text: issuedAt),
+        expiresAtController = TextEditingController(text: expiresAt),
+        file = ValueNotifier<File?>(fileValue);
+
+  void dispose() {
+    titleController.dispose();
+    descriptionController.dispose();
+    issuedByController.dispose();
+    issuedAtController.dispose();
+    expiresAtController.dispose();
+    file.dispose();
+  }
+}
+
 class EditProfileController extends Disposable {
   final ProfileRepo profileRepo;
 
@@ -13,25 +49,15 @@ class EditProfileController extends Disposable {
   final phoneController = TextEditingController();
   final gradeController = TextEditingController();
   final subjectController = TextEditingController();
-  final certTitleController = TextEditingController();
-  final certDescriptionController = TextEditingController();
-  final certIssuedByController = TextEditingController();
-  final certIssuedAtController = TextEditingController();
-  final certExpiresAtController = TextEditingController();
 
   final avatarFile = ValueNotifier<File?>(null);
-  final certificateFile = ValueNotifier<File?>(null);
+  final certificates = ValueNotifier<List<CertificateFormData>>([]);
   final isLoading = ValueNotifier<bool>(false);
 
   String _initialFullName = '';
   String _initialPhone = '';
   String _initialGrade = '';
   String _initialSubject = '';
-  String _initialCertTitle = '';
-  String _initialCertDescription = '';
-  String _initialCertIssuedBy = '';
-  String _initialCertIssuedAt = '';
-  String _initialCertExpiresAt = '';
 
   void initialize() {
     final userData = UserService.instance.userData;
@@ -47,20 +73,33 @@ class EditProfileController extends Disposable {
       subjectController.text = _initialSubject;
 
       if (userData.certificates != null && userData.certificates!.isNotEmpty) {
-        final cert = userData.certificates!.first;
-        _initialCertTitle = cert.title ?? '';
-        _initialCertDescription = cert.description ?? '';
-        _initialCertIssuedBy = cert.issuedBy ?? '';
-        _initialCertIssuedAt = cert.issuedAt ?? '';
-        _initialCertExpiresAt = cert.expiresAt ?? '';
-
-        certTitleController.text = _initialCertTitle;
-        certDescriptionController.text = _initialCertDescription;
-        certIssuedByController.text = _initialCertIssuedBy;
-        certIssuedAtController.text = _initialCertIssuedAt;
-        certExpiresAtController.text = _initialCertExpiresAt;
+        final certList = userData.certificates!.map((cert) {
+          return CertificateFormData(
+            id: cert.id,
+            title: cert.title,
+            description: cert.description,
+            issuedBy: cert.issuedBy,
+            issuedAt: cert.issuedAt,
+            expiresAt: cert.expiresAt,
+            existingFileUrl: cert.fileUrl,
+          );
+        }).toList();
+        certificates.value = certList;
       }
     }
+  }
+
+  void addCertificate() {
+    final newList = List<CertificateFormData>.from(certificates.value);
+    newList.add(CertificateFormData());
+    certificates.value = newList;
+  }
+
+  void removeCertificate(int index) {
+    final newList = List<CertificateFormData>.from(certificates.value);
+    newList[index].dispose();
+    newList.removeAt(index);
+    certificates.value = newList;
   }
 
   Future<void> updateProfile() async {
@@ -71,11 +110,6 @@ class EditProfileController extends Disposable {
       final currentPhone = phoneController.text.trim();
       final currentGrade = gradeController.text.trim();
       final currentSubject = subjectController.text.trim();
-      final currentCertTitle = certTitleController.text.trim();
-      final currentCertDescription = certDescriptionController.text.trim();
-      final currentCertIssuedBy = certIssuedByController.text.trim();
-      final currentCertIssuedAt = certIssuedAtController.text.trim();
-      final currentCertExpiresAt = certExpiresAtController.text.trim();
 
       await profileRepo.updateProfile(
         fullName: currentFullName != _initialFullName ? currentFullName : null,
@@ -83,12 +117,7 @@ class EditProfileController extends Disposable {
         grade: currentGrade != _initialGrade ? currentGrade : null,
         subjectSpecialty: currentSubject != _initialSubject ? currentSubject : null,
         avatarFile: avatarFile.value,
-        certificateTitle: currentCertTitle != _initialCertTitle ? currentCertTitle : null,
-        certificateDescription: currentCertDescription != _initialCertDescription ? currentCertDescription : null,
-        certificateIssuedBy: currentCertIssuedBy != _initialCertIssuedBy ? currentCertIssuedBy : null,
-        certificateIssuedAt: currentCertIssuedAt != _initialCertIssuedAt ? currentCertIssuedAt : null,
-        certificateExpiresAt: currentCertExpiresAt != _initialCertExpiresAt ? currentCertExpiresAt : null,
-        certificateFile: certificateFile.value,
+        certificates: certificates.value,
       );
     } finally {
       isLoading.value = false;
@@ -101,13 +130,11 @@ class EditProfileController extends Disposable {
     phoneController.dispose();
     gradeController.dispose();
     subjectController.dispose();
-    certTitleController.dispose();
-    certDescriptionController.dispose();
-    certIssuedByController.dispose();
-    certIssuedAtController.dispose();
-    certExpiresAtController.dispose();
     avatarFile.dispose();
-    certificateFile.dispose();
+    for (var cert in certificates.value) {
+      cert.dispose();
+    }
+    certificates.dispose();
     isLoading.dispose();
   }
 }

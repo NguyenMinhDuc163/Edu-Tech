@@ -29,6 +29,12 @@ class CourseSuggestionsWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<HomeCubit, HomeState>(
+      buildWhen: (previous, current) {
+        return current is CourseProgress ||
+            current is CourseSuccess ||
+            current is CourseError ||
+            current is CourseInitial;
+      },
       builder: (context, state) {
         if (state is CourseProgress) {
           return Padding(
