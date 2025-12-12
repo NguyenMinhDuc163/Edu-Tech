@@ -180,6 +180,7 @@
     "payment_success": "Thanh toán thành công",
     "payment_failed": "Thanh toán thất bại",
     "processing_order": "Đang xử lý đơn hàng...",
+    "redirecting": "Đang chuyển hướng...",
     "hint_name": "Nguyễn Văn A",
     "hint_card_owner": "Nguyễn Văn A",
     "hint_card_number": "5254 7634 8734 7690",

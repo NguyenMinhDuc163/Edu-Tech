@@ -3,6 +3,7 @@ import 'package:ed_tech/data/services/user_service.dart';
 import 'package:ed_tech/modules/payment/bloc/payment_cubit.dart';
 import 'package:ed_tech/modules/payment/bloc/payment_state.dart';
 import 'package:ed_tech/modules/payment/screen/payment_webview_screen.dart';
+import 'package:ed_tech/modules/payment/screen/confirm_screen.dart';
 import 'package:ed_tech/init.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -59,7 +60,6 @@ class OrderConfirmationScreen extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Success Icon
                 Container(
                   width: 80,
                   height: 80,
@@ -75,7 +75,6 @@ class OrderConfirmationScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 24),
 
-                // Title
                 Text(
                   'payment.payment_success'.tr(),
                   style: AppTextStyles.textHeader3.copyWith(
@@ -86,24 +85,12 @@ class OrderConfirmationScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
 
-                // Description
                 Text(
-                  'payment.processing_order'.tr(),
+                  'payment.redirecting'.tr(),
                   style: AppTextStyles.textContent2.copyWith(
                     color: AppColors.color8F959E,
                   ),
                   textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 24),
-
-                // Loading indicator
-                const SizedBox(
-                  width: 30,
-                  height: 30,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 3,
-                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
-                  ),
                 ),
               ],
             ),
@@ -112,16 +99,17 @@ class OrderConfirmationScreen extends StatelessWidget {
       ),
     );
 
-    // Delay 3 giây để backend xử lý callback từ VNPay
-    await Future.delayed(const Duration(seconds: 3));
+    await Future.delayed(const Duration(seconds: 2));
 
     if (!context.mounted) return;
 
-    // Đóng dialog
     Navigator.of(context).pop();
 
-    // Đóng OrderConfirmationScreen và trả về true
-    Navigator.of(context).pop(true);
+    Navigator.of(context).pop();
+
+    if (!context.mounted) return;
+
+    Navigator.of(context).pushReplacementNamed(ConfirmScreen.routeName);
   }
 
   @override

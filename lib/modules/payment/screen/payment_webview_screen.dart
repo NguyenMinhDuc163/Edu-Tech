@@ -20,7 +20,7 @@ class _PaymentWebViewScreenState extends State<PaymentWebViewScreen> {
   bool _hasLoadedUrl = false;
 
   void _initializeWebView(String paymentUrl) {
-    if (_controller != null) return; // Already initialized
+    if (_controller != null) return;
 
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
@@ -40,13 +40,20 @@ class _PaymentWebViewScreenState extends State<PaymentWebViewScreen> {
                 _isLoading = true;
               });
             }
-            _checkPaymentCallback(url);
           },
-          onPageFinished: (String url) {
+          onPageFinished: (String url) async {
             if (mounted) {
               setState(() {
                 _isLoading = false;
               });
+            }
+            
+            if (_checkPaymentCallback(url)) {
+              return;
+            }
+            
+            if (url.contains('vnpayment.vn') && url.contains('Transaction/Confirm')) {
+              await _extractPaymentInfoFromPage(url);
             }
           },
           onWebResourceError: (WebResourceError error) {
@@ -58,26 +65,131 @@ class _PaymentWebViewScreenState extends State<PaymentWebViewScreen> {
             }
           },
           onNavigationRequest: (NavigationRequest request) {
-            _checkPaymentCallback(request.url);
             return NavigationDecision.navigate;
           },
         ),
       )
-      ..loadRequest(Uri.parse(paymentUrl)); // Load immediately after init
+      ..loadRequest(Uri.parse(paymentUrl));
 
     _hasLoadedUrl = true;
   }
 
-  void _checkPaymentCallback(String url) {
-    // Check if URL contains payment callback
-    if (url.contains('check-payment-vnpay')) {
-      // Parse URL to get payment result
-      final uri = Uri.parse(url);
+  Future<void> _extractPaymentInfoFromPage(String url) async {
+    if (_controller == null || !mounted) return;
+
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    if (!mounted || _controller == null) return;
+
+    try {
+      final script = '''
+        (function() {
+          try {
+            var urlParams = new URLSearchParams(window.location.search);
+            var responseCode = urlParams.get('vnp_ResponseCode');
+            var transactionStatus = urlParams.get('vnp_TransactionStatus');
+            var orderId = urlParams.get('vnp_TxnRef');
+            
+            if (!responseCode && !transactionStatus) {
+              var hash = window.location.hash;
+              if (hash) {
+                var hashParams = new URLSearchParams(hash.substring(1));
+                responseCode = hashParams.get('vnp_ResponseCode') || responseCode;
+                transactionStatus = hashParams.get('vnp_TransactionStatus') || transactionStatus;
+                orderId = hashParams.get('vnp_TxnRef') || orderId;
+              }
+            }
+            
+            return JSON.stringify({
+              responseCode: responseCode,
+              transactionStatus: transactionStatus,
+              orderId: orderId,
+              url: window.location.href
+            });
+          } catch(e) {
+            return JSON.stringify({error: e.toString()});
+          }
+        })();
+      ''';
+      
+      Object? result;
+      try {
+        result = await _controller!.runJavaScriptReturningResult(script).timeout(
+          const Duration(seconds: 3),
+        );
+      } catch (e) {
+        result = null;
+      }
+      
+      if (result != null && result.toString().isNotEmpty && !result.toString().contains('error')) {
+        final resultStr = result.toString().replaceAll("'", '"');
+        final jsonMatch = RegExp(r'\{.*\}').firstMatch(resultStr);
+        if (jsonMatch != null) {
+          final jsonStr = jsonMatch.group(0);
+          final uri = Uri.parse('?$jsonStr');
+          final responseCode = uri.queryParameters['responseCode'];
+          final transactionStatus = uri.queryParameters['transactionStatus'];
+          final orderId = uri.queryParameters['orderId'];
+          
+          if (responseCode != null || transactionStatus != null) {
+            if (mounted) {
+              Navigator.of(context).pop({
+                'success': responseCode == '00' && transactionStatus == '00',
+                'responseCode': responseCode,
+                'transactionStatus': transactionStatus,
+                'orderId': orderId,
+                'fullUrl': uri.queryParameters['url'] ?? url,
+              });
+            }
+            return;
+          }
+        }
+      }
+      
+      if (url.contains('Transaction/Confirm')) {
+        if (mounted) {
+          Navigator.of(context).pop({
+            'success': true,
+            'responseCode': null,
+            'transactionStatus': null,
+            'orderId': null,
+            'fullUrl': url,
+          });
+        }
+      }
+    } catch (e) {
+      if (url.contains('Transaction/Confirm')) {
+        if (mounted) {
+          Navigator.of(context).pop({
+            'success': true,
+            'responseCode': null,
+            'transactionStatus': null,
+            'orderId': null,
+            'fullUrl': url,
+          });
+        }
+      }
+    }
+  }
+
+  bool _checkPaymentCallback(String url) {
+    if (!url.contains('vnpayment.vn') && !url.contains('check-payment-vnpay')) {
+      return false;
+    }
+
+    final uri = Uri.parse(url);
+    final hasVnpayParams = uri.queryParameters.containsKey('vnp_ResponseCode') ||
+        uri.queryParameters.containsKey('vnp_TransactionStatus') ||
+        uri.queryParameters.containsKey('vnp_TxnRef');
+    
+    final isCallbackUrl = url.contains('check-payment-vnpay') ||
+        (url.contains('Transaction/Confirm') && hasVnpayParams);
+
+    if (isCallbackUrl && hasVnpayParams) {
       final responseCode = uri.queryParameters['vnp_ResponseCode'];
       final transactionStatus = uri.queryParameters['vnp_TransactionStatus'];
       final orderId = uri.queryParameters['vnp_TxnRef'];
 
-      // Close WebView and return result
       if (mounted) {
         Navigator.of(context).pop({
           'success': responseCode == '00' && transactionStatus == '00',
@@ -87,7 +199,9 @@ class _PaymentWebViewScreenState extends State<PaymentWebViewScreen> {
           'fullUrl': url,
         });
       }
+      return true;
     }
+    return false;
   }
 
   @override

@@ -9,7 +9,7 @@ class ApiPath {
   /// Base URL
   @EnviedField(varName: 'BASE_URL', obfuscate: true)
   static String baseUrl = _ApiPath.baseUrl;
-  // static String baseUrl = "http://172.17.0.41:3000";
+  // static String baseUrl = "http://172.17.59.211:3000";
   @EnviedField(varName: 'REGISTER_ID', obfuscate: true)
   static String registerId = _ApiPath.registerId;
 

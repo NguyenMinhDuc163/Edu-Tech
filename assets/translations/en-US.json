@@ -180,6 +180,7 @@
     "payment_success": "Payment Successful",
     "payment_failed": "Payment Failed",
     "processing_order": "Processing your order...",
+    "redirecting": "Redirecting...",
     "hint_name": "John Doe",
     "hint_card_owner": "John Doe",
     "hint_card_number": "5254 7634 8734 7690",
