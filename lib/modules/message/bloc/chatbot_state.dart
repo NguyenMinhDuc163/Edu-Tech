@@ -8,10 +8,10 @@ final class ChatbotInitial extends ChatbotState {}
 final class ChatbotInProgress extends ChatbotState {}
 
 final class ChatbotSuccess extends ChatbotState {
-  final String answer;
-  final String rawAnswer;
+  final String responseHtml;
+  final String responseRaw;
 
-  ChatbotSuccess({required this.answer, required this.rawAnswer});
+  ChatbotSuccess({required this.responseHtml, required this.responseRaw});
 }
 
 final class ChatbotFailure extends ChatbotState {

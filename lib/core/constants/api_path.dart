@@ -25,7 +25,7 @@ class ApiPath {
   static const String loginSocial = '/auth/login-social';
   static const String checkUserName = '/auth/check-username-exist';
   static const String checkMail = '/auth/check-email-exist';
-  static const String chatBot = '/chat';
+  static const String chatBot = '/chat/ai';
   static const String listQuiz = '/student/quiz/list';
   static const String quizDetail = '/student/quiz/detail';
   static const String submitQuiz = '/student/quiz/submit';

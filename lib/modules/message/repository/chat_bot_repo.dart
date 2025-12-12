@@ -12,7 +12,7 @@ class ChatBotRepo {
     final res = await apiClient.fetch(
       ApiPath.chatBot,
       RequestMethod.post,
-      rawData: {"message": message},
+      rawData: {"prompt": message},
     );
 
     if (res.code != 200) {

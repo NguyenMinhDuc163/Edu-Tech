@@ -30,19 +30,32 @@ class ChatResponse {
 }
 
 class ChatData {
-  ChatData({required this.answer, required this.rawAnswer});
+  ChatData({
+    required this.sessionId,
+    required this.responseHtml,
+    required this.responseRaw,
+  });
 
-  final String? answer;
-  final String? rawAnswer;
+  final int? sessionId;
+  final String? responseHtml;
+  final String? responseRaw;
 
   factory ChatData.fromJson(Map<String, dynamic> json) {
-    return ChatData(answer: json["answer"], rawAnswer: json["rawAnswer"]);
+    return ChatData(
+      sessionId: json["session_id"],
+      responseHtml: json["response_html"],
+      responseRaw: json["response_raw"],
+    );
   }
 
-  Map<String, dynamic> toJson() => {"answer": answer, "rawAnswer": rawAnswer};
+  Map<String, dynamic> toJson() => {
+        "session_id": sessionId,
+        "response_html": responseHtml,
+        "response_raw": responseRaw,
+      };
 
   @override
   String toString() {
-    return "$answer, $rawAnswer, ";
+    return "$sessionId, $responseHtml, $responseRaw, ";
   }
 }

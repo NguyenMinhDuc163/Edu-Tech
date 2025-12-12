@@ -18,8 +18,8 @@ class ChatbotCubit extends Cubit<ChatbotState> {
       if (response.status == 200 && response.data != null) {
         emit(
           ChatbotSuccess(
-            answer: response.data!.answer ?? '',
-            rawAnswer: response.data!.rawAnswer ?? '',
+            responseHtml: response.data!.responseHtml ?? '',
+            responseRaw: response.data!.responseRaw ?? '',
           ),
         );
       } else {

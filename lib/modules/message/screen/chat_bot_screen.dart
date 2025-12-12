@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_html/flutter_html.dart';
 
 class ChatBotScreen extends StatefulWidget {
   const ChatBotScreen({super.key});
@@ -43,7 +44,7 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
           if (state is ChatbotSuccess) {
             controller.addMessage(
               ChatMessage(
-                content: state.answer,
+                content: state.responseHtml,
                 isUser: false,
                 timestamp: DateTime.now(),
               ),
@@ -134,7 +135,6 @@ class _MessageCard extends StatelessWidget {
   const _MessageCard({required this.message});
 
   void _copyToClipboard(BuildContext context, String text) {
-    // Loại bỏ HTML tags để copy text thuần
     final cleanText = text.replaceAll(RegExp(r'<[^>]*>'), '');
     Clipboard.setData(ClipboardData(text: cleanText));
 
@@ -191,7 +191,6 @@ class _MessageCard extends StatelessWidget {
                       ),
                     ),
                   if (!isUser) const SizedBox(height: 2),
-                  // Sử dụng flutter_html cho AI, Text cho user
                   if (isUser)
                     Text(
                       message.content,
@@ -202,28 +201,17 @@ class _MessageCard extends StatelessWidget {
                       ),
                     )
                   else
-                    RichText(
-                      text: TextSpan(
-                        style: const TextStyle(
-                          color: Color(0xFF1C2439),
-                          fontSize: 14,
-                          height: 1.4,
+                    Html(
+                      data: message.content,
+                      style: {
+                        "body": Style(
+                          margin: Margins.zero,
+                          padding: HtmlPaddings.zero,
+                          color: const Color(0xFF1C2439),
+                          fontSize: FontSize(14),
+                          lineHeight: LineHeight(1.4),
                         ),
-                        children:
-                            message.content
-                                .split('<br>')
-                                .map(
-                                  (line) => TextSpan(
-                                    text: line,
-                                    children: [
-                                      if (line !=
-                                          message.content.split('<br>').last)
-                                        const TextSpan(text: '\n'),
-                                    ],
-                                  ),
-                                )
-                                .toList(),
-                      ),
+                      },
                     ),
                   const SizedBox(height: 10),
                   Row(
