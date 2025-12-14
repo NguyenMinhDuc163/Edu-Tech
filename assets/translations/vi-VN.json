@@ -420,7 +420,11 @@
     "assistant_label": "Trợ lý AI:",
     "copy_text": "Sao chép",
     "thinking": "AI đang suy nghĩ...",
-    "input_hint": "Hỏi AI bất cứ điều gì"
+    "input_hint": "Hỏi AI bất cứ điều gì",
+    "chat_with_ai": "Chat với AI",
+    "type_message": "Nhập tin nhắn...",
+    "send": "Gửi",
+    "you": "Bạn"
   },
   "profile": {
     "title": "Hồ sơ",

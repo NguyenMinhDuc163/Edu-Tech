@@ -420,7 +420,11 @@
     "assistant_label": "AI Assistant:",
     "copy_text": "Copy Text",
     "thinking": "AI is thinking...",
-    "input_hint": "Ask AI chat anything"
+    "input_hint": "Ask AI chat anything",
+    "chat_with_ai": "Chat with AI",
+    "type_message": "Type a message...",
+    "send": "Send",
+    "you": "You"
   },
   "profile": {
     "title": "Profile",

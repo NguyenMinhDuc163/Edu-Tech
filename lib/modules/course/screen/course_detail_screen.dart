@@ -13,6 +13,7 @@ import 'package:ed_tech/modules/assessment/models/quiz_model.dart';
 import 'package:ed_tech/modules/home/repository/home_repo.dart';
 import 'package:ed_tech/data/api_client.dart';
 import 'package:ed_tech/data/services/user_service.dart';
+import 'package:ed_tech/modules/message/repository/chat_bot_repo.dart';
 import 'package:video_player/video_player.dart';
 import 'package:chewie/chewie.dart';
 
@@ -402,6 +403,17 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
                   },
                 ),
                 SpeedDialChild(
+                  child: const Icon(Icons.chat_bubble_outline, color: AppColors.primary),
+                  backgroundColor: AppColors.white,
+                  foregroundColor: AppColors.primary,
+                  label: 'chat.chat_with_ai'.tr(),
+                  labelStyle: AppTextStyles.textContent2.copyWith(
+                    fontWeight: FontWeight.w500,
+                  ),
+                  labelBackgroundColor: AppColors.white,
+                  onTap: () => _showChatBubble(context),
+                ),
+                SpeedDialChild(
                   child: const Icon(Icons.cancel_outlined, color: AppColors.error),
                   backgroundColor: AppColors.white,
                   foregroundColor: AppColors.error,
@@ -467,6 +479,18 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
     }
   }
 
+
+  void _showChatBubble(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (bottomSheetContext) => _ChatBubbleOverlay(
+        courseId: widget.courseId,
+        courseTitle: widget.title,
+      ),
+    );
+  }
 
   void _showCancelCourseDialog(BuildContext context, int daysLeft) async {
     final courseCubit = context.read<CourseCubit>();
@@ -1274,4 +1298,321 @@ class _SectionItemState extends State<_SectionItem> {
       ),
     );
   }
+}
+
+class _ChatBubbleOverlay extends StatefulWidget {
+  final String courseId;
+  final String courseTitle;
+
+  const _ChatBubbleOverlay({
+    required this.courseId,
+    required this.courseTitle,
+  });
+
+  @override
+  State<_ChatBubbleOverlay> createState() => _ChatBubbleOverlayState();
+}
+
+class _ChatBubbleOverlayState extends State<_ChatBubbleOverlay> {
+  final TextEditingController _messageController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
+  final List<ChatMessage> _messages = [];
+  bool _isLoading = false;
+  late final ChatBotRepo _chatRepo;
+
+  @override
+  void initState() {
+    super.initState();
+    _chatRepo = ChatBotRepo(apiClient: ApiClient());
+  }
+
+  @override
+  void dispose() {
+    _messageController.dispose();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
+  }
+
+  Future<void> _sendMessage() async {
+    final message = _messageController.text.trim();
+    if (message.isEmpty) return;
+
+    setState(() {
+      _messages.add(ChatMessage(
+        text: message,
+        isUser: true,
+        timestamp: DateTime.now(),
+      ));
+      _isLoading = true;
+    });
+
+    _messageController.clear();
+    _scrollToBottom();
+
+    try {
+      final response = await _chatRepo.sendMessage(message: message);
+
+      if (mounted) {
+        setState(() {
+          _messages.add(ChatMessage(
+            text: response.data?.responseRaw ?? 'Không có phản hồi',
+            isUser: false,
+            timestamp: DateTime.now(),
+          ));
+          _isLoading = false;
+        });
+      }
+
+      _scrollToBottom();
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _messages.add(ChatMessage(
+            text: 'Lỗi: ${e.toString()}',
+            isUser: false,
+            timestamp: DateTime.now(),
+          ));
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return DraggableScrollableSheet(
+      initialChildSize: 0.85,
+      minChildSize: 0.5,
+      maxChildSize: 0.95,
+      builder: (context, scrollController) {
+        return Container(
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
+          ),
+          child: Column(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 8),
+                    Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: AppColors.white.withOpacity(0.3),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.smart_toy, color: AppColors.white, size: 24),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              'chat.chat_with_ai'.tr(),
+                              style: AppTextStyles.textHeader3.copyWith(
+                                color: AppColors.white,
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.close, color: AppColors.white),
+                            onPressed: () => Navigator.pop(context),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            Expanded(
+              child: _messages.isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.chat_bubble_outline,
+                            size: 64,
+                            color: AppColors.lightGray,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'chat.input_hint'.tr(),
+                            style: AppTextStyles.textContent2.copyWith(
+                              color: AppColors.coolGray,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : ListView.builder(
+                      controller: _scrollController,
+                      padding: const EdgeInsets.all(16),
+                      itemCount: _messages.length,
+                      itemBuilder: (context, index) {
+                        final message = _messages[index];
+                        return _buildMessageBubble(message);
+                      },
+                    ),
+            ),
+            if (_isLoading)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  children: [
+                    const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'chat.thinking'.tr(),
+                      style: AppTextStyles.textContent3.copyWith(
+                        color: AppColors.coolGray,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppColors.background,
+                border: Border(
+                  top: BorderSide(color: AppColors.lightGray, width: 1),
+                ),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _messageController,
+                      decoration: InputDecoration(
+                        hintText: 'chat.type_message'.tr(),
+                        hintStyle: AppTextStyles.textContent2.copyWith(
+                          color: AppColors.color8F959E,
+                        ),
+                        filled: true,
+                        fillColor: AppColors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(24),
+                          borderSide: BorderSide(color: AppColors.lightGray),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(24),
+                          borderSide: BorderSide(color: AppColors.lightGray),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(24),
+                          borderSide: BorderSide(color: AppColors.primary, width: 2),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 12,
+                        ),
+                      ),
+                      style: AppTextStyles.textContent2,
+                      maxLines: null,
+                      textInputAction: TextInputAction.send,
+                      onSubmitted: (_) => _sendMessage(),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      shape: BoxShape.circle,
+                    ),
+                    child: IconButton(
+                      icon: const Icon(Icons.send, color: AppColors.white, size: 20),
+                      onPressed: _isLoading ? null : _sendMessage,
+                      padding: const EdgeInsets.all(12),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildMessageBubble(ChatMessage message) {
+    return Align(
+      alignment: message.isUser ? Alignment.centerRight : Alignment.centerLeft,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.of(context).size.width * 0.7,
+        ),
+        decoration: BoxDecoration(
+          color: message.isUser ? AppColors.primary : AppColors.background,
+          borderRadius: BorderRadius.only(
+            topLeft: const Radius.circular(16),
+            topRight: const Radius.circular(16),
+            bottomLeft: message.isUser ? const Radius.circular(16) : const Radius.circular(4),
+            bottomRight: message.isUser ? const Radius.circular(4) : const Radius.circular(16),
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              message.text,
+              style: AppTextStyles.textContent2.copyWith(
+                color: message.isUser ? AppColors.white : AppColors.text,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ChatMessage {
+  final String text;
+  final bool isUser;
+  final DateTime timestamp;
+
+  ChatMessage({
+    required this.text,
+    required this.isUser,
+    required this.timestamp,
+  });
 }
