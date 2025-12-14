@@ -16,10 +16,7 @@ class PaymentCubit extends Cubit<PaymentState> {
     emit(PaymentProgress());
 
     try {
-      final request = PaymentRequest(
-        courseId: courseId,
-        amount: amount,
-      );
+      final request = PaymentRequest(courseId: courseId, amount: amount);
 
       final response = await repo.createPayment(request);
 
@@ -30,6 +27,28 @@ class PaymentCubit extends Cubit<PaymentState> {
       }
     } catch (e) {
       emit(PaymentError(message: AppErrorState.getFriendlyErrorString(e)));
+    }
+  }
+
+  Future<void> getMyPayments() async {
+    emit(MyPaymentsProgress());
+    try {
+      final response = await repo.getMyPayments();
+      emit(MyPaymentsSuccess(data: response));
+    } catch (e) {
+      emit(MyPaymentsError(message: AppErrorState.getFriendlyErrorString(e)));
+    }
+  }
+
+  Future<void> getPaymentDetail({required String paymentId}) async {
+    emit(InvoiceDetailProgress());
+    try {
+      final response = await repo.getPaymentDetail(paymentId: paymentId);
+      emit(InvoiceDetailSuccess(data: response));
+    } catch (e) {
+      emit(
+        InvoiceDetailError(message: AppErrorState.getFriendlyErrorString(e)),
+      );
     }
   }
 

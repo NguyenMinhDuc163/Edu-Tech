@@ -34,6 +34,7 @@ class ApiPath {
   static const String searchHistory = '/search/history';
   static const String searchAutocomplete = '/search/autocomplete';
   static const String createPayment = '/api/create-qr';
+  static const String myPayments = '/api/my-payments';
   static const String studentRegistrations = '/student/registrations';
   static const String createRefund = '/api/refund/create';
   static const String hybridRecommendations = '/recommendations/hybrid';

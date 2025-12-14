@@ -67,6 +67,8 @@ import 'package:ed_tech/modules/payment/screen/new_card_screen.dart';
 import 'package:ed_tech/modules/payment/screen/payment_method_screen.dart';
 import 'package:ed_tech/modules/payment/screen/order_confirmation_screen.dart';
 import 'package:ed_tech/modules/payment/screen/payment_webview_screen.dart';
+import 'package:ed_tech/modules/payment/screen/my_payments_screen.dart';
+import 'package:ed_tech/modules/payment/screen/invoice_detail_screen.dart';
 import 'package:ed_tech/modules/payment/bloc/payment_cubit.dart';
 import 'package:ed_tech/modules/payment/repository/payment_repo.dart';
 import 'package:ed_tech/modules/purchased_courses/screen/purchased_courses_screen.dart';
@@ -265,7 +267,8 @@ class Routers {
                     create: (context) => CourseRepo(apiClient: ApiClient()),
                   ),
                   RepositoryProvider(
-                    create: (context) => SearchCourseRepo(apiClient: ApiClient()),
+                    create:
+                        (context) => SearchCourseRepo(apiClient: ApiClient()),
                   ),
                 ],
                 child: MultiBlocProvider(
@@ -277,8 +280,9 @@ class Routers {
                     ),
                     BlocProvider(
                       create:
-                          (context) =>
-                              FilterCourseCubit(repo: context.read<SearchCourseRepo>()),
+                          (context) => FilterCourseCubit(
+                            repo: context.read<SearchCourseRepo>(),
+                          ),
                     ),
                   ],
                   child: DisposableProvider(
@@ -310,8 +314,9 @@ class Routers {
                 create: (context) => SearchCourseRepo(apiClient: ApiClient()),
                 child: BlocProvider(
                   create:
-                      (context) =>
-                          SearchCourseCubit(repo: context.read<SearchCourseRepo>()),
+                      (context) => SearchCourseCubit(
+                        repo: context.read<SearchCourseRepo>(),
+                      ),
                   child: DisposableProvider(
                     create: (_) => SearchCourseController(),
                     child: const SearchCourseScreen(),
@@ -327,7 +332,8 @@ class Routers {
                 create: (context) => ReviewRepo(apiClient: ApiClient()),
                 child: BlocProvider(
                   create:
-                      (context) => ReviewCubit(repo: context.read<ReviewRepo>()),
+                      (context) =>
+                          ReviewCubit(repo: context.read<ReviewRepo>()),
                   child: const ReviewScreen(),
                 ),
               ),
@@ -355,18 +361,59 @@ class Routers {
       case OrderConfirmationScreen.routeName:
         return MaterialPageRoute(
           settings: settings,
-          builder: (context) => RepositoryProvider(
-            create: (context) => PaymentRepo(apiClient: ApiClient()),
-            child: BlocProvider(
-              create: (context) => PaymentCubit(repo: context.read<PaymentRepo>()),
-              child: const OrderConfirmationScreen(),
-            ),
-          ),
+          builder:
+              (context) => RepositoryProvider(
+                create: (context) => PaymentRepo(apiClient: ApiClient()),
+                child: BlocProvider(
+                  create:
+                      (context) =>
+                          PaymentCubit(repo: context.read<PaymentRepo>()),
+                  child: const OrderConfirmationScreen(),
+                ),
+              ),
         );
       case PaymentWebViewScreen.routeName:
         return MaterialPageRoute(
           settings: settings,
           builder: (_) => const PaymentWebViewScreen(),
+        );
+      case MyPaymentsScreen.routeName:
+        return MaterialPageRoute(
+          settings: settings,
+          builder:
+              (context) => RepositoryProvider(
+                create: (context) => PaymentRepo(apiClient: ApiClient()),
+                child: BlocProvider(
+                  create:
+                      (context) =>
+                          PaymentCubit(repo: context.read<PaymentRepo>()),
+                  child: const MyPaymentsScreen(),
+                ),
+              ),
+        );
+      case InvoiceDetailScreen.routeName:
+        final paymentId = settings.arguments as String?;
+        if (paymentId == null) {
+          return MaterialPageRoute(
+            settings: settings,
+            builder:
+                (_) => const Scaffold(
+                  body: Center(child: Text('Payment ID is required')),
+                ),
+          );
+        }
+        return MaterialPageRoute(
+          settings: settings,
+          builder:
+              (context) => RepositoryProvider(
+                create: (context) => PaymentRepo(apiClient: ApiClient()),
+                child: BlocProvider(
+                  create:
+                      (context) =>
+                          PaymentCubit(repo: context.read<PaymentRepo>()),
+                  child: InvoiceDetailScreen(paymentId: paymentId),
+                ),
+              ),
         );
       case AddReviewScreen.routeName:
         return MaterialPageRoute(
@@ -376,7 +423,8 @@ class Routers {
                 create: (context) => ReviewRepo(apiClient: ApiClient()),
                 child: BlocProvider(
                   create:
-                      (context) => ReviewCubit(repo: context.read<ReviewRepo>()),
+                      (context) =>
+                          ReviewCubit(repo: context.read<ReviewRepo>()),
                   child: const AddReviewScreen(),
                 ),
               ),
@@ -457,11 +505,13 @@ class Routers {
           settings: settings,
           builder:
               (context) => RepositoryProvider(
-                create: (context) => PurchasedCourseRepo(apiClient: ApiClient()),
+                create:
+                    (context) => PurchasedCourseRepo(apiClient: ApiClient()),
                 child: BlocProvider(
                   create:
-                      (context) =>
-                          PurchasedCourseCubit(repo: context.read<PurchasedCourseRepo>()),
+                      (context) => PurchasedCourseCubit(
+                        repo: context.read<PurchasedCourseRepo>(),
+                      ),
                   child: const PurchasedCoursesScreen(),
                 ),
               ),
@@ -491,7 +541,9 @@ class Routers {
                 create: (context) => HomeRepo(apiClient: ApiClient()),
                 child: BlocProvider(
                   create:
-                      (context) => HomeCubit(repo: context.read<HomeRepo>())..getProduct(),
+                      (context) =>
+                          HomeCubit(repo: context.read<HomeRepo>())
+                            ..getProduct(),
                   child: const RecommendedCoursesScreen(),
                 ),
               ),
