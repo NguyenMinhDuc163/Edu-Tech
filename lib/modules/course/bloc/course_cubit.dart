@@ -35,13 +35,14 @@ class CourseCubit extends Cubit<CourseState> {
   }
 
 
-  Future<void> cancelCourse(String courseId) async {
-    emit(CourseCancellationProgress());
+  Future<void> createRefundRequest(String courseId, String reason) async {
+    emit(RefundRequestProgress());
     try {
-      final cancelledCourseId = await repo.cancelCourse(courseId: courseId);
-      emit(CourseCancellationSuccess(courseId: cancelledCourseId));
+      final response = await repo.createRefund(courseId: courseId, reason: reason);
+      final message = response.data?.message ?? 'Tạo yêu cầu hoàn tiền thành công';
+      emit(RefundRequestSuccess(message: message));
     } catch (e) {
-      emit(CourseCancellationError(message: AppErrorState.getFriendlyErrorString(e)));
+      emit(RefundRequestError(message: AppErrorState.getFriendlyErrorString(e)));
     }
   }
 

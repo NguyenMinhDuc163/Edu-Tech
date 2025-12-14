@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:ed_tech/modules/payment/screen/order_confirmation_screen.dart';
 import 'package:ed_tech/modules/reviews/screen/review_screen.dart';
 import 'package:ed_tech/init.dart';
@@ -297,6 +298,10 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
     final hasFullAccess = accessLevel == 'FULL' || !_isPaymentEnabled;
     final daysLeftToCancel = widget.courseDetail?.daysLeftToCancel ?? 0;
 
+    if (hasFullAccess && daysLeftToCancel > 0 && _isPaymentEnabled) {
+      return const SizedBox.shrink();
+    }
+
     return AnimatedPositioned(
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
@@ -315,35 +320,33 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
             ),
           ],
         ),
-        child: hasFullAccess && daysLeftToCancel > 0 && _isPaymentEnabled
-            ? _buildEnrolledWithCancelLayout(context, daysLeftToCancel)
-            : Row(
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(
-                        context,
-                        ReviewScreen.routeName,
-                        arguments: {'courseId': widget.courseId},
-                      );
-                    },
-                    child: Container(
-                      width: 60,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        color: AppColors.colorFFEBF0,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: AppColors.colorFF6905),
-                      ),
-                      child: const Icon(Icons.star_border, color: AppColors.colorFF6905, size: 24),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: hasFullAccess ? _buildEnrolledButton(context) : _buildBuyButton(context),
-                  ),
-                ],
+        child: Row(
+          children: [
+            GestureDetector(
+              onTap: () {
+                Navigator.pushNamed(
+                  context,
+                  ReviewScreen.routeName,
+                  arguments: {'courseId': widget.courseId},
+                );
+              },
+              child: Container(
+                width: 60,
+                height: 50,
+                decoration: BoxDecoration(
+                  color: AppColors.colorFFEBF0,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.colorFF6905),
+                ),
+                child: const Icon(Icons.star_border, color: AppColors.colorFF6905, size: 24),
               ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: hasFullAccess ? _buildEnrolledButton(context) : _buildBuyButton(context),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -351,38 +354,97 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
   Widget _buildFloatingActionButton(BuildContext context) {
     final accessLevel = widget.courseDetail?.accessLevel ?? 'FREE';
     final hasFullAccess = accessLevel == 'FULL' || !_isPaymentEnabled;
+    final daysLeftToCancel = widget.courseDetail?.daysLeftToCancel ?? 0;
 
     return Positioned(
       bottom: 24,
       right: 24,
-      child: FloatingActionButton.extended(
-        onPressed: () {
-          if (hasFullAccess) {
-            _showLessonBottomSheet(context);
-          } else {
-            _handleBuyAction(context);
-          }
-        },
-        backgroundColor: hasFullAccess ? AppColors.success : AppColors.primary,
-        elevation: 6,
-        label: Row(
-          children: [
-            Icon(
-              hasFullAccess ? Icons.play_circle_filled : Icons.shopping_cart,
-              color: AppColors.white,
-              size: 20,
-            ),
-            const SizedBox(width: 8),
-            Text(
-              hasFullAccess ? 'course.continue_learning'.tr() : 'course.buy_now'.tr(),
-              style: AppTextStyles.button.copyWith(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
+      child: hasFullAccess && daysLeftToCancel > 0 && _isPaymentEnabled
+          ? SpeedDial(
+              icon: Icons.menu,
+              activeIcon: Icons.close,
+              backgroundColor: AppColors.primary,
+              foregroundColor: AppColors.white,
+              activeBackgroundColor: AppColors.primary,
+              activeForegroundColor: AppColors.white,
+              elevation: 6,
+              overlayOpacity: 0.4,
+              overlayColor: AppColors.text,
+              spacing: 12,
+              spaceBetweenChildren: 12,
+              children: [
+                SpeedDialChild(
+                  child: const Icon(Icons.play_circle_filled, color: AppColors.primary),
+                  backgroundColor: AppColors.white,
+                  foregroundColor: AppColors.primary,
+                  label: 'course.continue_learning_short'.tr(),
+                  labelStyle: AppTextStyles.textContent2.copyWith(
+                    fontWeight: FontWeight.w500,
+                  ),
+                  labelBackgroundColor: AppColors.white,
+                  onTap: () => _showLessonBottomSheet(context),
+                ),
+                SpeedDialChild(
+                  child: const Icon(Icons.star_border, color: AppColors.primary),
+                  backgroundColor: AppColors.white,
+                  foregroundColor: AppColors.primary,
+                  label: 'course.review_course'.tr(),
+                  labelStyle: AppTextStyles.textContent2.copyWith(
+                    fontWeight: FontWeight.w500,
+                  ),
+                  labelBackgroundColor: AppColors.white,
+                  onTap: () {
+                    Navigator.pushNamed(
+                      context,
+                      ReviewScreen.routeName,
+                      arguments: {'courseId': widget.courseId},
+                    );
+                  },
+                ),
+                SpeedDialChild(
+                  child: const Icon(Icons.cancel_outlined, color: AppColors.error),
+                  backgroundColor: AppColors.white,
+                  foregroundColor: AppColors.error,
+                  label: 'course.cancel_course_short'.tr(),
+                  labelStyle: AppTextStyles.textContent2.copyWith(
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.error,
+                  ),
+                  labelBackgroundColor: AppColors.white,
+                  onTap: () => _showCancelCourseDialog(context, daysLeftToCancel),
+                ),
+              ],
+            )
+          : FloatingActionButton.extended(
+              onPressed: () {
+                if (hasFullAccess) {
+                  _showLessonBottomSheet(context);
+                } else {
+                  _handleBuyAction(context);
+                }
+              },
+              backgroundColor: hasFullAccess ? AppColors.success : AppColors.primary,
+              elevation: 6,
+              label: Row(
+                children: [
+                  Icon(
+                    hasFullAccess ? Icons.play_circle_filled : Icons.shopping_cart,
+                    color: AppColors.white,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    hasFullAccess
+                        ? 'course.continue_learning'.tr()
+                        : 'course.buy_now'.tr(),
+                    style: AppTextStyles.button.copyWith(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -405,100 +467,6 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
     }
   }
 
-  Widget _buildEnrolledWithCancelLayout(BuildContext context, int daysLeft) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          decoration: BoxDecoration(
-            color: AppColors.colorFF6905.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: AppColors.colorFF6905.withOpacity(0.3),
-              width: 1,
-            ),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.access_time,
-                color: AppColors.colorFF6905,
-                size: 16,
-              ),
-              const SizedBox(width: 6),
-              Text(
-                'course.days_left_to_cancel'.tr().replaceAll('{days}', daysLeft.toString()),
-                style: AppTextStyles.textContent3.copyWith(
-                  color: AppColors.colorFF6905,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            GestureDetector(
-              onTap: () {
-                Navigator.pushNamed(
-                  context,
-                  ReviewScreen.routeName,
-                  arguments: {'courseId': widget.courseId},
-                );
-              },
-              child: Container(
-                width: 50,
-                height: 50,
-                decoration: BoxDecoration(
-                  color: AppColors.colorFFEBF0,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.colorFF6905),
-                ),
-                child: const Icon(Icons.star_border, color: AppColors.colorFF6905, size: 22),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              flex: 3,
-              child: _buildEnrolledButton(context),
-            ),
-            const SizedBox(width: 12),
-            _buildCancelButton(context, daysLeft),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildCancelButton(BuildContext context, int daysLeft) {
-    return Container(
-      width: 50,
-      height: 50,
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.error, width: 1.5),
-      ),
-      child: TextButton(
-        onPressed: () => _showCancelCourseDialog(context, daysLeft),
-        style: TextButton.styleFrom(
-          padding: EdgeInsets.zero,
-          backgroundColor: Colors.transparent,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-        child: Icon(
-          Icons.cancel_outlined,
-          color: AppColors.error,
-          size: 20,
-        ),
-      ),
-    );
-  }
 
   void _showCancelCourseDialog(BuildContext context, int daysLeft) async {
     final courseCubit = context.read<CourseCubit>();

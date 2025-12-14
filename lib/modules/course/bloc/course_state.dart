@@ -50,18 +50,18 @@ class CourseDetailError extends CourseState {
 }
 
 
-class CourseCancellationProgress extends CourseState {}
+class RefundRequestProgress extends CourseState {}
 
-class CourseCancellationSuccess extends CourseState {
-  final String courseId;
-
-  CourseCancellationSuccess({required this.courseId});
-}
-
-class CourseCancellationError extends CourseState {
+class RefundRequestSuccess extends CourseState {
   final String message;
 
-  CourseCancellationError({this.message = 'Đã xảy ra lỗi'});
+  RefundRequestSuccess({required this.message});
+}
+
+class RefundRequestError extends CourseState {
+  final String message;
+
+  RefundRequestError({this.message = 'Đã xảy ra lỗi'});
 }
 
 

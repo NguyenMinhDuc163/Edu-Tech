@@ -280,7 +280,17 @@
     "no_course_info": "No course information",
     "search_hint_course": "Find Course",
     "free": "Free",
-    "image_unavailable": "Image unavailable"
+    "image_unavailable": "Image unavailable",
+    "continue_learning_short": "Continue Learning",
+    "review_course": "Review Course",
+    "cancel_course_short": "Cancel Course",
+    "cancel_reason_title": "Reason for Cancellation",
+    "cancel_reason_hint": "Please let us know why you want to cancel this course...",
+    "confirm_refund": "Confirm Refund",
+    "please_enter_reason": "Please enter cancellation reason",
+    "success": "Success",
+    "error": "Error",
+    "close": "Close"
   },
   "course_tab": {
     "choice_your_course": "Choose your course",

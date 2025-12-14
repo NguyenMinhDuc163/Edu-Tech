@@ -3,6 +3,7 @@ import 'package:ed_tech/data/api_client.dart';
 import 'package:ed_tech/data/models/request_method.dart';
 import 'package:ed_tech/modules/home/model/course_response.dart';
 import 'package:ed_tech/modules/course/model/detail_course.dart';
+import 'package:ed_tech/modules/course/model/refund_response.dart';
 import 'package:ed_tech/data/services/user_service.dart';
 
 class CourseRepo {
@@ -38,18 +39,21 @@ class CourseRepo {
     return DataData.fromJson(res.data);
   }
 
-  Future<String> cancelCourse({required String courseId}) async {
+  Future<RefundResponse> createRefund({required String courseId, required String reason}) async {
     final res = await apiClient.fetch(
-      ApiPath.studentRegistrations,
-      RequestMethod.delete,
-      rawData: {'course_id': courseId},
+      ApiPath.createRefund,
+      RequestMethod.post,
+      rawData: {
+        'courseId': courseId,
+        'reason': reason,
+      },
     );
 
-    if (res.code != 200) {
-      throw Exception('Failed to cancel course: ${res.message}');
+    if (res.code != 200 && res.code != 201) {
+      throw Exception('Failed to create refund: ${res.message}');
     }
 
-    return res.data['courseId'] as String? ?? courseId;
+    return RefundResponse.fromJson(res.json);
   }
 
   Future<List<DataCourse>> getCoursesByType({

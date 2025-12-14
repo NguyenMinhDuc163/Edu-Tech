@@ -25,6 +25,13 @@ class CourseCancellationScreen extends StatefulWidget {
 
 class _CourseCancellationScreenState extends State<CourseCancellationScreen> {
   bool _isLoading = false;
+  final TextEditingController _reasonController = TextEditingController();
+
+  @override
+  void dispose() {
+    _reasonController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,27 +52,16 @@ class _CourseCancellationScreenState extends State<CourseCancellationScreen> {
       ),
       body: BlocListener<CourseCubit, CourseState>(
         listener: (context, state) {
-          if (state is CourseCancellationSuccess) {
+          if (state is RefundRequestSuccess) {
             setState(() {
               _isLoading = false;
             });
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('course.cancel_success'.tr()),
-                backgroundColor: AppColors.success,
-              ),
-            );
-            Navigator.pop(context, true);
-          } else if (state is CourseCancellationError) {
+            _showSuccessDialog(context, state.message);
+          } else if (state is RefundRequestError) {
             setState(() {
               _isLoading = false;
             });
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: AppColors.error,
-              ),
-            );
+            _showErrorDialog(context, state.message);
           }
         },
         child: Stack(
@@ -149,6 +145,8 @@ class _CourseCancellationScreenState extends State<CourseCancellationScreen> {
                     content: 'course.commitment_info'.tr(),
                     iconColor: AppColors.limeGreen,
                   ),
+                  const SizedBox(height: 20),
+                  _buildReasonInputSection(),
                   const SizedBox(height: 100),
                 ],
               ),
@@ -199,7 +197,7 @@ class _CourseCancellationScreenState extends State<CourseCancellationScreen> {
                       child: ElevatedButton(
                         onPressed: _isLoading ? null : _handleCancelCourse,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.rustyRed,
+                          backgroundColor: AppColors.primary,
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           elevation: 0,
                           shape: RoundedRectangleBorder(
@@ -207,7 +205,7 @@ class _CourseCancellationScreenState extends State<CourseCancellationScreen> {
                           ),
                         ),
                         child: Text(
-                          'course.proceed_cancel'.tr(),
+                          'course.confirm_refund'.tr(),
                           style: AppTextStyles.button,
                         ),
                       ),
@@ -327,10 +325,144 @@ class _CourseCancellationScreenState extends State<CourseCancellationScreen> {
     );
   }
 
+  Widget _buildReasonInputSection() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: AppColors.silverGray,
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(
+                Icons.edit_note,
+                color: AppColors.primary,
+                size: 24,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'course.cancel_reason_title'.tr(),
+                style: AppTextStyles.textHeader3,
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _reasonController,
+            maxLength: 200,
+            maxLines: 4,
+            decoration: InputDecoration(
+              hintText: 'course.cancel_reason_hint'.tr(),
+              hintStyle: AppTextStyles.textContent2.copyWith(
+                color: AppColors.color8F959E,
+              ),
+              filled: true,
+              fillColor: AppColors.background,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: AppColors.lightGray),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: AppColors.lightGray),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: AppColors.primary, width: 2),
+              ),
+              counterStyle: AppTextStyles.textContent3.copyWith(
+                color: AppColors.color8F959E,
+              ),
+            ),
+            style: AppTextStyles.textContent2,
+          ),
+        ],
+      ),
+    );
+  }
+
   void _handleCancelCourse() {
+    final reason = _reasonController.text.trim();
+
+    if (reason.isEmpty) {
+      _showErrorDialog(context, 'course.please_enter_reason'.tr());
+      return;
+    }
+
     setState(() {
       _isLoading = true;
     });
-    context.read<CourseCubit>().cancelCourse(widget.courseId);
+    context.read<CourseCubit>().createRefundRequest(widget.courseId, reason);
+  }
+
+  void _showSuccessDialog(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: [
+            const Icon(Icons.check_circle, color: AppColors.success, size: 28),
+            const SizedBox(width: 12),
+            Text('course.success'.tr(), style: AppTextStyles.textHeader3),
+          ],
+        ),
+        content: Text(message, style: AppTextStyles.textContent2),
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              Navigator.pop(context, true);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: AppColors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            child: Text('course.close'.tr(), style: AppTextStyles.button),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showErrorDialog(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: [
+            const Icon(Icons.error_outline, color: AppColors.error, size: 28),
+            const SizedBox(width: 12),
+            Text('course.error'.tr(), style: AppTextStyles.textHeader3),
+          ],
+        ),
+        content: Text(message, style: AppTextStyles.textContent2),
+        actions: [
+          ElevatedButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: AppColors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            child: Text('course.close'.tr(), style: AppTextStyles.button),
+          ),
+        ],
+      ),
+    );
   }
 }

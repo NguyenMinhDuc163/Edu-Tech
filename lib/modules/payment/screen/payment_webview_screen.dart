@@ -130,7 +130,7 @@ class _PaymentWebViewScreenState extends State<PaymentWebViewScreen> {
           final responseCode = uri.queryParameters['responseCode'];
           final transactionStatus = uri.queryParameters['transactionStatus'];
           final orderId = uri.queryParameters['orderId'];
-          
+
           if (responseCode != null || transactionStatus != null) {
             if (mounted) {
               Navigator.of(context).pop({
@@ -145,43 +145,38 @@ class _PaymentWebViewScreenState extends State<PaymentWebViewScreen> {
           }
         }
       }
-      
-      if (url.contains('Transaction/Confirm')) {
-        if (mounted) {
-          Navigator.of(context).pop({
-            'success': true,
-            'responseCode': null,
-            'transactionStatus': null,
-            'orderId': null,
-            'fullUrl': url,
-          });
-        }
-      }
     } catch (e) {
-      if (url.contains('Transaction/Confirm')) {
-        if (mounted) {
-          Navigator.of(context).pop({
-            'success': true,
-            'responseCode': null,
-            'transactionStatus': null,
-            'orderId': null,
-            'fullUrl': url,
-          });
-        }
-      }
+      return;
     }
   }
 
   bool _checkPaymentCallback(String url) {
+    final uri = Uri.parse(url);
+
+    if (url.contains('edtech.nguyenduc.click/student/checkout/result')) {
+      final status = uri.queryParameters['status'];
+      final txnRef = uri.queryParameters['txnRef'];
+
+      if (status != null && mounted) {
+        Navigator.of(context).pop({
+          'success': status == 'success',
+          'responseCode': status == 'success' ? '00' : null,
+          'transactionStatus': status == 'success' ? '00' : null,
+          'orderId': txnRef,
+          'fullUrl': url,
+        });
+        return true;
+      }
+    }
+
     if (!url.contains('vnpayment.vn') && !url.contains('check-payment-vnpay')) {
       return false;
     }
 
-    final uri = Uri.parse(url);
     final hasVnpayParams = uri.queryParameters.containsKey('vnp_ResponseCode') ||
         uri.queryParameters.containsKey('vnp_TransactionStatus') ||
         uri.queryParameters.containsKey('vnp_TxnRef');
-    
+
     final isCallbackUrl = url.contains('check-payment-vnpay') ||
         (url.contains('Transaction/Confirm') && hasVnpayParams);
 

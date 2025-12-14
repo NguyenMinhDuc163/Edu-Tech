@@ -280,7 +280,17 @@
     "no_course_info": "Không có thông tin khóa học",
     "search_hint_course": "Tìm khóa học",
     "free": "Miễn phí",
-    "image_unavailable": "Hình ảnh không khả dụng"
+    "image_unavailable": "Hình ảnh không khả dụng",
+    "continue_learning_short": "Tiếp tục học",
+    "review_course": "Đánh giá khóa học",
+    "cancel_course_short": "Hủy khóa học",
+    "cancel_reason_title": "Lý do hủy khóa học",
+    "cancel_reason_hint": "Vui lòng cho chúng tôi biết lý do bạn muốn hủy khóa học...",
+    "confirm_refund": "Xác nhận hoàn tiền",
+    "please_enter_reason": "Vui lòng nhập lý do hủy khóa học",
+    "success": "Thành công",
+    "error": "Lỗi",
+    "close": "Đóng"
   },
   "course_tab": {
     "choice_your_course": "Chọn khóa học của bạn",
