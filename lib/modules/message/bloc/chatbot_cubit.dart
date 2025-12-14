@@ -10,16 +10,23 @@ class ChatbotCubit extends Cubit<ChatbotState> {
 
   ChatbotCubit({required this.repo}) : super(ChatbotInitial());
 
-  Future<void> sendMessage({required String message}) async {
+  Future<void> sendMessage({
+    required String message,
+    String? sessionId,
+  }) async {
     emit(ChatbotInProgress());
     try {
-      final response = await repo.sendMessage(message: message);
+      final response = await repo.sendMessage(
+        message: message,
+        sessionId: sessionId,
+      );
 
       if (response.status == 200 && response.data != null) {
         emit(
           ChatbotSuccess(
             responseHtml: response.data!.responseHtml ?? '',
             responseRaw: response.data!.responseRaw ?? '',
+            sessionId: response.data!.sessionId?.toString() ?? '',
           ),
         );
       } else {

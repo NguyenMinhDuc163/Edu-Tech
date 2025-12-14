@@ -1,11 +1,13 @@
 import 'package:disposable_provider/disposable_provider.dart';
 import 'package:ed_tech/core/data_types.dart';
+import 'package:flutter/foundation.dart';
 
 class ChatController extends Disposable {
   final StringVs messageText = StringVs('');
   final BoolVs isBotResponding = BoolVs(false);
   final BoolVs isHistoryVisible = BoolVs(false);
   final ListVs<ChatMessage> messages = ListVs<ChatMessage>([]);
+  final ValueNotifier<String?> currentSessionId = ValueNotifier<String?>(null);
 
   void updateMessageText(String text) {
     messageText.value = text;
@@ -31,12 +33,22 @@ class ChatController extends Disposable {
     messages.clear();
   }
 
+  void setSessionId(String id) {
+    currentSessionId.value = id;
+  }
+
+  void resetSession() {
+    currentSessionId.value = null;
+    messages.clear();
+  }
+
   @override
   void dispose() {
     messageText.dispose();
     isBotResponding.dispose();
     isHistoryVisible.dispose();
     messages.dispose();
+    currentSessionId.dispose();
   }
 }
 

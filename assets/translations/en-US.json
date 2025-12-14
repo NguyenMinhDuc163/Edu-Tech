@@ -204,7 +204,6 @@
     "transaction_no": "Transaction Number",
     "date": "Date",
     "paid_date": "Paid Date",
-    "buyer_information": "Buyer Information",
     "full_name": "Full Name",
     "course_information": "Course Information",
     "course_title": "Course Title",
@@ -215,11 +214,18 @@
     "refund_amount": "Refund Amount",
     "refund_reason": "Refund Reason",
     "refund_date": "Refund Date",
+    "status": "Status",
     "status_success": "Success",
     "status_pending": "Pending",
     "status_failed": "Failed",
+    "email": "Email",
+    "phone": "Phone",
+    "teacher": "Teacher",
+    "payment_method": "Payment Method",
+    "bank_code": "Bank Code",
+    "refund_status": "Refund Status",
     "thank_you": "Thank you for using our service!",
-    "invoice_not_found": "Invoice not found"
+    "invoice_not_found": "Invoice not found",
     "hint_city": "New York",
     "hint_phone": "+1 800 123 4567",
     "hint_address": "123 Main Street, City"
@@ -457,7 +463,22 @@
     "chat_with_ai": "Chat with AI",
     "type_message": "Type a message...",
     "send": "Send",
-    "you": "You"
+    "you": "You",
+    "empty_state_message": "What would you like to ask today?",
+    "load_history_error": "Failed to load chat history"
+  },
+  "chat_history": {
+    "title": "Chat History",
+    "no_history": "No chat history",
+    "messages": "messages",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "delete_confirm_title": "Confirm Delete",
+    "delete_confirm_message": "Are you sure you want to delete this chat session?",
+    "delete_all_confirm_message": "Are you sure you want to delete all chat sessions?",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "delete_all": "Delete All"
   },
   "profile": {
     "title": "Profile",

@@ -19,8 +19,10 @@ import 'package:ed_tech/modules/home/bloc/home_cubit.dart';
 import 'package:ed_tech/modules/home/repository/home_repo.dart';
 import 'package:ed_tech/modules/home/screen/home_screen.dart';
 import 'package:ed_tech/modules/message/bloc/chat_controller.dart';
+import 'package:ed_tech/modules/message/bloc/chat_history_cubit.dart';
 import 'package:ed_tech/modules/message/bloc/chatbot_cubit.dart';
 import 'package:ed_tech/modules/message/repository/chat_bot_repo.dart';
+import 'package:ed_tech/modules/message/repository/chat_sessions_repo.dart';
 import 'package:ed_tech/modules/message/screen/chat_bot_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -93,13 +95,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
       ),
     ),
-    RepositoryProvider(
-      create: (context) => ChatBotRepo(apiClient: ApiClient()),
-      child: BlocProvider(
-        create: (context) => ChatbotCubit(repo: context.read<ChatBotRepo>()),
+    MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider(
+          create: (context) => ChatBotRepo(apiClient: ApiClient()),
+        ),
+        RepositoryProvider(
+          create: (context) => ChatSessionsRepo(apiClient: ApiClient()),
+        ),
+      ],
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (context) =>
+                ChatbotCubit(repo: context.read<ChatBotRepo>()),
+          ),
+          BlocProvider(
+            create: (context) =>
+                ChatHistoryCubit(repo: context.read<ChatSessionsRepo>()),
+          ),
+        ],
         child: DisposableProvider(
           create: (_) => ChatController(),
-          child: ChatBotScreen(),
+          child: const ChatBotScreen(),
         ),
       ),
     ),

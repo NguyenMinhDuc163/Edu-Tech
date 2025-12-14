@@ -110,9 +110,9 @@ class DrawerWidget extends StatelessWidget {
               ],
             ),
             _buildDrawerItem(
-              icon: IconPath.iconSetting,
+              icon: IconPath.iconCredit,
               title: 'common.payments'.tr(),
-              iconSize: 20,
+              iconSize: 25,
               onTap: () {
                 Navigator.pop(context);
                 Navigator.pushNamed(context, '/myPaymentsScreen');

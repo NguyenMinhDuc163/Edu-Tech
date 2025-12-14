@@ -8,11 +8,17 @@ class ChatBotRepo {
 
   ChatBotRepo({required this.apiClient});
 
-  Future<ChatResponse> sendMessage({required String message}) async {
+  Future<ChatResponse> sendMessage({
+    required String message,
+    String? sessionId,
+  }) async {
     final res = await apiClient.fetch(
       ApiPath.chatBot,
       RequestMethod.post,
-      rawData: {"prompt": message},
+      rawData: {
+        "prompt": message,
+        if (sessionId != null) "session_id": sessionId,
+      },
     );
 
     if (res.code != 200) {

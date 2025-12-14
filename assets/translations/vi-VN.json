@@ -204,7 +204,6 @@
     "transaction_no": "Mã giao dịch",
     "date": "Ngày tạo",
     "paid_date": "Ngày thanh toán",
-    "buyer_information": "Thông tin người mua",
     "full_name": "Họ và tên",
     "course_information": "Thông tin khóa học",
     "course_title": "Tên khóa học",
@@ -215,11 +214,18 @@
     "refund_amount": "Số tiền hoàn",
     "refund_reason": "Lý do hoàn tiền",
     "refund_date": "Ngày yêu cầu hoàn tiền",
+    "status": "Trạng thái",
     "status_success": "Thành công",
     "status_pending": "Đang chờ",
     "status_failed": "Thất bại",
+    "email": "Email",
+    "phone": "Số điện thoại",
+    "teacher": "Giảng viên",
+    "payment_method": "Phương thức thanh toán",
+    "bank_code": "Mã ngân hàng",
+    "refund_status": "Trạng thái hoàn tiền",
     "thank_you": "Cảm ơn bạn đã sử dụng dịch vụ!",
-    "invoice_not_found": "Không tìm thấy hóa đơn"
+    "invoice_not_found": "Không tìm thấy hóa đơn",
     "hint_city": "Hà Nội",
     "hint_phone": "+84 912 345 678",
     "hint_address": "43, Khu phố, Quận/Huyện"
@@ -457,7 +463,22 @@
     "chat_with_ai": "Chat với AI",
     "type_message": "Nhập tin nhắn...",
     "send": "Gửi",
-    "you": "Bạn"
+    "you": "Bạn",
+    "empty_state_message": "Bạn muốn hỏi gì hôm nay?",
+    "load_history_error": "Không thể tải lịch sử chat"
+  },
+  "chat_history": {
+    "title": "Lịch sử chat",
+    "no_history": "Chưa có lịch sử chat",
+    "messages": "tin nhắn",
+    "today": "Hôm nay",
+    "yesterday": "Hôm qua",
+    "delete_confirm_title": "Xác nhận xóa",
+    "delete_confirm_message": "Bạn có chắc chắn muốn xóa phiên chat này?",
+    "delete_all_confirm_message": "Bạn có chắc chắn muốn xóa tất cả phiên chat?",
+    "cancel": "Hủy",
+    "delete": "Xóa",
+    "delete_all": "Xóa tất cả"
   },
   "profile": {
     "title": "Hồ sơ",

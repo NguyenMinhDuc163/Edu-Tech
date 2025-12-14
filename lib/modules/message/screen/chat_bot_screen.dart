@@ -3,6 +3,7 @@ import 'package:ed_tech/init.dart';
 import 'package:ed_tech/modules/message/bloc/chat_controller.dart';
 import 'package:ed_tech/modules/message/bloc/chatbot_cubit.dart';
 import 'package:ed_tech/modules/message/screen/chat_history_screen.dart';
+import 'package:ed_tech/modules/message/repository/chat_sessions_repo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -20,6 +21,51 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
   final TextEditingController _textController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadSessionIfNeeded();
+    });
+  }
+
+  Future<void> _loadSessionIfNeeded() async {
+    final sessionId = ModalRoute.of(context)?.settings.arguments as String?;
+    if (sessionId == null || sessionId.isEmpty) return;
+
+    try {
+      if (!mounted) return;
+      final repo = context.read<ChatSessionsRepo>();
+      final response = await repo.getSessionMessages(sessionId: sessionId);
+
+      if (!mounted) return;
+      if (response.status == 200 && response.data != null) {
+        final controller = context.read<ChatController>();
+        controller.resetSession();
+        controller.setSessionId(sessionId);
+
+        for (final msg in response.data!.messages) {
+          controller.addMessage(
+            ChatMessage(
+              content: msg.content,
+              isUser: msg.role == 'user',
+              timestamp: msg.createdAt ?? DateTime.now(),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('chat.load_history_error'.tr()),
+            backgroundColor: AppColors.crimson,
+          ),
+        );
+      }
+    }
+  }
+
+  @override
   void dispose() {
     _textController.dispose();
     super.dispose();
@@ -32,6 +78,17 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
       isShowDrawer: true,
       isShowBottomButton: false,
       actionsWidget: [
+        InkWell(
+          onTap: () {
+            final controller = context.read<ChatController>();
+            controller.resetSession();
+          },
+          child: const Icon(
+            Icons.add,
+            color: Colors.black,
+            size: 22,
+          ),
+        ),
         InkWell(
           onTap:
               () => Navigator.pushNamed(context, ChatHistoryScreen.routeName),
@@ -49,6 +106,7 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
                 timestamp: DateTime.now(),
               ),
             );
+            controller.setSessionId(state.sessionId);
             controller.setBotResponding(false);
           } else if (state is ChatbotFailure || state is ChatbotError) {
             controller.addMessage(
@@ -74,6 +132,31 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
                     valueListenable:
                         context.read<ChatController>().isBotResponding,
                     builder: (context, isBotResponding, child) {
+                      if (messages.isEmpty && !isBotResponding) {
+                        return Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.chat_bubble_outline,
+                                size: 56,
+                                color: Colors.grey[400],
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                'chat.empty_state_message'.tr(),
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.grey[500],
+                                  fontWeight: FontWeight.w400,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+
                       return ListView.separated(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 16,
@@ -104,7 +187,6 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
                 final controller = context.read<ChatController>();
                 final cubit = context.read<ChatbotCubit>();
 
-                // Add user message
                 controller.addMessage(
                   ChatMessage(
                     content: text,
@@ -113,11 +195,12 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
                   ),
                 );
 
-                // Set bot responding
                 controller.setBotResponding(true);
 
-                // Send to API
-                cubit.sendMessage(message: text);
+                cubit.sendMessage(
+                  message: text,
+                  sessionId: controller.currentSessionId.value,
+                );
 
                 _textController.clear();
               },

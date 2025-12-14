@@ -58,9 +58,11 @@ import 'package:ed_tech/modules/home/screen/home_screen.dart';
 import 'package:ed_tech/modules/home/screen/recommended_courses_screen.dart';
 import 'package:ed_tech/modules/message/screen/chat_bot_screen.dart';
 import 'package:ed_tech/modules/message/screen/chat_history_screen.dart';
+import 'package:ed_tech/modules/message/bloc/chat_history_cubit.dart';
 import 'package:ed_tech/modules/message/bloc/chatbot_cubit.dart';
 import 'package:ed_tech/modules/message/bloc/chat_controller.dart';
 import 'package:ed_tech/modules/message/repository/chat_bot_repo.dart';
+import 'package:ed_tech/modules/message/repository/chat_sessions_repo.dart';
 import 'package:ed_tech/modules/payment/screen/address_form_screen.dart';
 import 'package:ed_tech/modules/payment/screen/confirm_screen.dart';
 import 'package:ed_tech/modules/payment/screen/new_card_screen.dart';
@@ -433,15 +435,31 @@ class Routers {
         return MaterialPageRoute(
           settings: settings,
           builder:
-              (context) => RepositoryProvider(
-                create: (context) => ChatBotRepo(apiClient: ApiClient()),
-                child: BlocProvider(
-                  create:
-                      (context) =>
-                          ChatbotCubit(repo: context.read<ChatBotRepo>()),
+              (context) => MultiRepositoryProvider(
+                providers: [
+                  RepositoryProvider(
+                    create: (context) => ChatBotRepo(apiClient: ApiClient()),
+                  ),
+                  RepositoryProvider(
+                    create: (context) => ChatSessionsRepo(apiClient: ApiClient()),
+                  ),
+                ],
+                child: MultiBlocProvider(
+                  providers: [
+                    BlocProvider(
+                      create:
+                          (context) =>
+                              ChatbotCubit(repo: context.read<ChatBotRepo>()),
+                    ),
+                    BlocProvider(
+                      create:
+                          (context) =>
+                              ChatHistoryCubit(repo: context.read<ChatSessionsRepo>()),
+                    ),
+                  ],
                   child: DisposableProvider(
                     create: (_) => ChatController(),
-                    child: ChatBotScreen(),
+                    child: const ChatBotScreen(),
                   ),
                 ),
               ),
@@ -449,7 +467,35 @@ class Routers {
       case ChatHistoryScreen.routeName:
         return MaterialPageRoute(
           settings: settings,
-          builder: (_) => ChatHistoryScreen(),
+          builder:
+              (context) => MultiRepositoryProvider(
+                providers: [
+                  RepositoryProvider(
+                    create: (context) => ChatBotRepo(apiClient: ApiClient()),
+                  ),
+                  RepositoryProvider(
+                    create: (context) => ChatSessionsRepo(apiClient: ApiClient()),
+                  ),
+                ],
+                child: MultiBlocProvider(
+                  providers: [
+                    BlocProvider(
+                      create:
+                          (context) =>
+                              ChatbotCubit(repo: context.read<ChatBotRepo>()),
+                    ),
+                    BlocProvider(
+                      create:
+                          (context) =>
+                              ChatHistoryCubit(repo: context.read<ChatSessionsRepo>()),
+                    ),
+                  ],
+                  child: DisposableProvider(
+                    create: (_) => ChatController(),
+                    child: const ChatHistoryScreen(),
+                  ),
+                ),
+              ),
         );
       case QuizDetailScreen.routeName:
         return MaterialPageRoute(
