@@ -8,6 +8,7 @@ import 'package:ed_tech/modules/course/model/search_history.dart';
 import 'package:ed_tech/modules/course/model/autocomplete_suggestion.dart';
 import 'package:ed_tech/modules/course/screen/course_detail_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ed_tech/utils/helpers/currency_extension.dart';
 
 class SearchCourseScreen extends StatefulWidget {
   const SearchCourseScreen({super.key});
@@ -446,7 +447,7 @@ class _SearchResultCard extends StatelessWidget {
                       children: [
                         Text(
                           result.price != null
-                              ? '${NumberFormat('#,###').format(double.tryParse(result.price!) ?? 0)} VND'
+                              ? result.price.formatCurrency()
                               : 'course.free'.tr(),
                           style: AppTextStyles.textMedium.copyWith(
                             color: AppColors.primary,

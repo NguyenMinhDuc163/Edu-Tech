@@ -13,6 +13,7 @@ import 'package:ed_tech/modules/course/screen/search_course_screen.dart';
 import 'package:ed_tech/modules/course/screen/course_detail_screen.dart';
 import 'package:ed_tech/core/widgets/search_filter_bottom_sheet.dart';
 import 'package:ed_tech/data/services/user_service.dart';
+import 'package:ed_tech/utils/helpers/currency_extension.dart';
 
 class CourseScreen extends StatefulWidget {
   const CourseScreen({super.key});
@@ -500,7 +501,7 @@ class _FilterResultCard extends StatelessWidget {
                       children: [
                         Text(
                           result.price != null
-                              ? '${NumberFormat('#,###').format(double.tryParse(result.price!) ?? 0)} VND'
+                              ? result.price.formatCurrency()
                               : 'Free',
                           style: AppTextStyles.textMedium.copyWith(
                             color: AppColors.primary,

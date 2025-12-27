@@ -16,6 +16,7 @@ import 'package:ed_tech/data/services/user_service.dart';
 import 'package:ed_tech/modules/message/repository/chat_bot_repo.dart';
 import 'package:video_player/video_player.dart';
 import 'package:chewie/chewie.dart';
+import 'package:ed_tech/utils/helpers/currency_extension.dart';
 
 class CourseDetailScreen extends StatefulWidget {
   static const String routeName = '/CourseDetailScreen';
@@ -360,7 +361,7 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
     return Positioned(
       bottom: 24,
       right: 24,
-      child: hasFullAccess && daysLeftToCancel > 0 && _isPaymentEnabled
+      child: hasFullAccess && _isPaymentEnabled
           ? SpeedDial(
               icon: Icons.menu,
               activeIcon: Icons.close,
@@ -413,18 +414,19 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
                   labelBackgroundColor: AppColors.white,
                   onTap: () => _showChatBubble(context),
                 ),
-                SpeedDialChild(
-                  child: const Icon(Icons.cancel_outlined, color: AppColors.error),
-                  backgroundColor: AppColors.white,
-                  foregroundColor: AppColors.error,
-                  label: 'course.cancel_course_short'.tr(),
-                  labelStyle: AppTextStyles.textContent2.copyWith(
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.error,
+                if (daysLeftToCancel > 0)
+                  SpeedDialChild(
+                    child: const Icon(Icons.cancel_outlined, color: AppColors.error),
+                    backgroundColor: AppColors.white,
+                    foregroundColor: AppColors.error,
+                    label: 'course.cancel_course_short'.tr(),
+                    labelStyle: AppTextStyles.textContent2.copyWith(
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.error,
+                    ),
+                    labelBackgroundColor: AppColors.white,
+                    onTap: () => _showCancelCourseDialog(context, daysLeftToCancel),
                   ),
-                  labelBackgroundColor: AppColors.white,
-                  onTap: () => _showCancelCourseDialog(context, daysLeftToCancel),
-                ),
               ],
             )
           : FloatingActionButton.extended(
@@ -616,6 +618,9 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
   }
 
   Widget _buildCourseDetailsSection() {
+    final accessLevel = widget.courseDetail?.accessLevel ?? 'FREE';
+    final hasFullAccess = accessLevel == 'FULL' || !_isPaymentEnabled;
+
     return Container(
       padding: AppPad.h24.add(AppPad.v20),
       child: Row(
@@ -629,10 +634,10 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
               overflow: TextOverflow.ellipsis,
             ),
           ),
-          if (_isPaymentEnabled) ...[
+          if (_isPaymentEnabled && !hasFullAccess) ...[
             const SizedBox(width: 16),
             Text(
-              widget.price,
+              widget.price.formatCurrency(),
               style: AppTextStyles.textHeader2.copyWith(
                 color: AppColors.primary,
                 fontWeight: FontWeight.bold,

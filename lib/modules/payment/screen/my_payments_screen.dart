@@ -7,6 +7,7 @@ import 'package:ed_tech/core/widgets/template/button_widget.dart';
 import 'package:ed_tech/modules/payment/bloc/payment_cubit.dart';
 import 'package:ed_tech/modules/payment/bloc/payment_state.dart';
 import 'package:ed_tech/modules/payment/model/my_payments_model.dart';
+import 'package:ed_tech/utils/helpers/currency_extension.dart';
 
 class MyPaymentsScreen extends StatefulWidget {
   static const String routeName = '/myPaymentsScreen';
@@ -149,16 +150,6 @@ class _PaymentCard extends StatelessWidget {
 
   const _PaymentCard({required this.payment, this.onTap});
 
-  String _formatPrice(String? price) {
-    if (price == null || price.isEmpty) return '0 VND';
-    try {
-      final numPrice = double.tryParse(price) ?? 0;
-      final formatter = NumberFormat('#,###', 'vi_VN');
-      return '${formatter.format(numPrice)} VND';
-    } catch (e) {
-      return price;
-    }
-  }
 
   String _formatDate(String? dateString) {
     if (dateString == null || dateString.isEmpty) return '';
@@ -279,7 +270,7 @@ class _PaymentCard extends StatelessWidget {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            _formatPrice(payment.amount),
+                            payment.amount.formatCurrency(),
                             style: AppTextStyles.textContent1.copyWith(
                               color: AppColors.primary,
                               fontWeight: FontWeight.bold,

@@ -6,6 +6,7 @@ import 'package:ed_tech/modules/payment/screen/payment_webview_screen.dart';
 import 'package:ed_tech/modules/payment/screen/confirm_screen.dart';
 import 'package:ed_tech/init.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ed_tech/utils/helpers/currency_extension.dart';
 
 class OrderConfirmationScreen extends StatelessWidget {
   static const String routeName = '/orderConfirmationScreen';
@@ -646,17 +647,6 @@ class _PriceSummary extends StatelessWidget {
 
   const _PriceSummary({required this.price});
 
-  String _formatPrice(String price) {
-    try {
-      final numPrice = double.tryParse(price);
-      if (numPrice == null) return price;
-
-      final formatter = NumberFormat.currency(locale: 'vi_VN', symbol: '₫', decimalDigits: 0);
-      return formatter.format(numPrice);
-    } catch (e) {
-      return price;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -710,7 +700,7 @@ class _PriceSummary extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  _formatPrice(price),
+                  price.formatCurrency(),
                   style: AppTextStyles.textHeader1.copyWith(
                     color: AppColors.white,
                     fontWeight: FontWeight.bold,

@@ -409,7 +409,6 @@ class _PurchasedCourseCard extends StatelessWidget {
                   Divider(color: AppColors.silverGray, height: 1),
                   const SizedBox(height: 12),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Row(
                         children: [
@@ -447,36 +446,44 @@ class _PurchasedCourseCard extends StatelessWidget {
                           ),
                         ],
                       ),
+                      const Spacer(),
                       if (course.category != null)
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 8,
-                          ),
-                          decoration: BoxDecoration(
-                            color: _getColorForCategory(course.category),
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(
-                              color: AppColors.primary.withAlpha(50),
-                              width: 1,
+                        Flexible(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
                             ),
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.category_outlined,
-                                size: 14,
-                                color: AppColors.primary,
+                            decoration: BoxDecoration(
+                              color: _getColorForCategory(course.category),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: AppColors.primary.withAlpha(50),
+                                width: 1,
                               ),
-                              const SizedBox(width: 6),
-                              Text(
-                                course.category!,
-                                style: AppTextStyles.textContent3.copyWith(
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.category_outlined,
+                                  size: 14,
                                   color: AppColors.primary,
-                                  fontWeight: FontWeight.w600,
                                 ),
-                              ),
-                            ],
+                                const SizedBox(width: 6),
+                                Flexible(
+                                  child: Text(
+                                    course.category!,
+                                    style: AppTextStyles.textContent3.copyWith(
+                                      color: AppColors.primary,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                     ],
@@ -600,10 +607,4 @@ class _PurchasedCourseCard extends StatelessWidget {
     return DateFormat('dd/MM/yyyy').format(date);
   }
 
-  String _formatCurrency(String? amount) {
-    if (amount == null) return '0 ₫';
-    final value = double.tryParse(amount) ?? 0;
-    final formatter = NumberFormat('#,###', 'vi_VN');
-    return '${formatter.format(value)} ₫';
-  }
 }

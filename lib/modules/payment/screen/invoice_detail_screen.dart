@@ -7,6 +7,7 @@ import 'package:ed_tech/core/widgets/template/button_widget.dart';
 import 'package:ed_tech/modules/payment/bloc/payment_cubit.dart';
 import 'package:ed_tech/modules/payment/bloc/payment_state.dart';
 import 'package:ed_tech/modules/payment/model/invoice_detail_model.dart';
+import 'package:ed_tech/utils/helpers/currency_extension.dart';
 
 class InvoiceDetailScreen extends StatefulWidget {
   static const String routeName = '/invoiceDetailScreen';
@@ -271,7 +272,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
               const SizedBox(height: 12),
               _buildInfoRow(
                 'payment.course_price'.tr(),
-                _formatPrice(course?.price),
+                course?.price.formatCurrency() ?? '0 ₫',
               ),
             ],
           ),
@@ -324,7 +325,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                     ),
                   ),
                   Text(
-                    _formatPrice(invoice.amount),
+                    invoice.amount.formatCurrency(),
                     style: AppTextStyles.textHeader2.copyWith(
                       color: AppColors.text,
                       fontWeight: FontWeight.bold,
@@ -366,7 +367,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                 const SizedBox(height: 12),
                 _buildInfoRow(
                   'payment.refund_amount'.tr(),
-                  _formatPrice(refund.amount),
+                  refund.amount.formatCurrency(),
                 ),
                 const SizedBox(height: 12),
                 _buildInfoRow(
@@ -429,16 +430,6 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
     );
   }
 
-  String _formatPrice(String? price) {
-    if (price == null || price.isEmpty) return '0 VND';
-    try {
-      final numPrice = double.tryParse(price) ?? 0;
-      final formatter = NumberFormat('#,###', 'vi_VN');
-      return '${formatter.format(numPrice)} VND';
-    } catch (e) {
-      return price;
-    }
-  }
 
   String _formatDate(String? dateString) {
     if (dateString == null || dateString.isEmpty) return '-';

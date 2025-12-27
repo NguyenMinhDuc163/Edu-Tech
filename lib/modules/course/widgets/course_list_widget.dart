@@ -7,6 +7,7 @@ import 'package:ed_tech/core/theme/app_pad.dart';
 import 'package:ed_tech/modules/course/screen/course_detail_screen.dart';
 import 'package:ed_tech/modules/course/bloc/course_cubit.dart';
 import 'package:ed_tech/modules/home/model/course_response.dart';
+import 'package:ed_tech/utils/helpers/currency_extension.dart';
 
 class CourseListItem extends StatelessWidget {
   const CourseListItem({
@@ -108,7 +109,7 @@ class CourseListItem extends StatelessWidget {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        '-${NumberFormat('#,###').format(double.parse(discountAmount!))} VND',
+                        '-${double.parse(discountAmount!).formatCurrency()}',
                         style: AppTextStyles.textContent4.copyWith(
                           color: AppColors.white,
                           fontWeight: FontWeight.w600,
@@ -276,7 +277,7 @@ class CourseListWidget extends StatelessWidget {
                   title: course.title ?? 'Untitled Course',
                   instructor: course.teacher?.toString() ?? 'Unknown',
                   price: course.price != null
-                      ? '${NumberFormat('#,###').format(double.tryParse(course.price!) ?? 0)} VND'
+                      ? course.price.formatCurrency()
                       : 'Free',
                   duration: course.courseDuration != null
                       ? '${course.courseDuration} hours'
