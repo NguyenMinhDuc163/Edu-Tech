@@ -9,7 +9,7 @@ class ApiPath {
   /// Base URL
   @EnviedField(varName: 'BASE_URL', obfuscate: true)
   static String baseUrl = _ApiPath.baseUrl;
-  // static String baseUrl = "http://172.17.59.211:3000";
+  // static String baseUrl = "http://172.17.9.122:3000";
   @EnviedField(varName: 'REGISTER_ID', obfuscate: true)
   static String registerId = _ApiPath.registerId;
 
@@ -41,7 +41,7 @@ class ApiPath {
   static const String hybridRecommendations = '/recommendations/hybrid';
   static const String courseStats = '/student/courses/stats';
   static const String purchasedCourses = '/courses/purchased/list';
-  static const String leaderboard = '/courses/leaderboard';
+  static const String leaderboard = '/quizzes/leaderboard';
   static const String courseReviews = '/courses';
   static const String coursesList = '/courses/list';
   static const String learningProgress = '/learning/progress';

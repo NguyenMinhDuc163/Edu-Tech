@@ -451,7 +451,10 @@
     "leaderboard_avg_score": "Điểm TB",
     "leaderboard_completed_quizzes": "Bài đã hoàn thành",
     "leaderboard_no_data": "Chưa có dữ liệu xếp hạng",
-    "leaderboard_error": "Không thể tải bảng xếp hạng"
+    "leaderboard_error": "Không thể tải bảng xếp hạng",
+    "improve": "Cải thiện",
+    "tapToViewLesson": "Nhấn để xem bài học"
+
   },
   "chat": {
     "title": "Chat Bot",

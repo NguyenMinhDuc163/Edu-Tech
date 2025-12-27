@@ -11,20 +11,12 @@ class LeaderboardCubit extends Cubit<LeaderboardState> {
 
   LeaderboardCubit({required this.repo}) : super(LeaderboardInitial());
 
-  Future<void> getLeaderboard({
-    int page = 1,
-    int limit = 20,
-    bool isLoadMore = false,
-  }) async {
-    if (!isLoadMore) {
-      emit(LeaderboardInProgress());
-    } else {
-      emit(LeaderboardLoadingMore());
-    }
+  Future<void> getLeaderboard() async {
+    emit(LeaderboardInProgress());
 
     try {
-      final response = await repo.getLeaderboard(page: page, limit: limit);
-      emit(LeaderboardSuccess(data: response, isLoadMore: isLoadMore));
+      final response = await repo.getLeaderboard();
+      emit(LeaderboardSuccess(data: response, isLoadMore: false));
     } catch (e) {
       emit(LeaderboardError(message: AppErrorState.getFriendlyErrorString(e)));
     }

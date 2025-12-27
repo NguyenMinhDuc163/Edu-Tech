@@ -91,12 +91,9 @@ class QuizRepo {
     return response;
   }
 
-  Future<LeaderboardModel> getLeaderboard({
-    int page = 1,
-    int limit = 20,
-  }) async {
+  Future<LeaderboardModel> getLeaderboard() async {
     final res = await apiClient.fetch(
-      '${ApiPath.leaderboard}?page=$page&limit=$limit',
+      ApiPath.leaderboard,
       RequestMethod.get,
     );
 

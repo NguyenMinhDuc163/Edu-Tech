@@ -51,6 +51,7 @@ dependencies:
   shared_preferences: ^2.5.3
   fluttertoast: ^8.2.12
   flutter_speed_dial: ^7.0.0
+  super_tooltip: ^2.1.0
 
   # Environment
   envied: ^0.5.4+1

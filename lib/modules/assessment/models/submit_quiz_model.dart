@@ -41,6 +41,9 @@ class Data {
     required this.totalQuestions,
     required this.correctAnswers,
     required this.questionResults,
+    this.targetContentId,
+    this.currentTheta,
+    this.adaptiveSuggestion,
   });
 
   final String? attemptId;
@@ -53,6 +56,9 @@ class Data {
   final num? totalQuestions;
   final num? correctAnswers;
   final List<QuestionResult> questionResults;
+  final String? targetContentId;
+  final double? currentTheta;
+  final AdaptiveSuggestion? adaptiveSuggestion;
 
   factory Data.fromJson(Map<String, dynamic> json) {
     return Data(
@@ -71,6 +77,15 @@ class Data {
               : List<QuestionResult>.from(
                 json["questionResults"]!.map((x) => QuestionResult.fromJson(x)),
               ),
+      targetContentId: json["targetContentId"],
+      currentTheta: json["currentTheta"] != null
+          ? (json["currentTheta"] is double
+              ? json["currentTheta"]
+              : double.tryParse(json["currentTheta"].toString()))
+          : null,
+      adaptiveSuggestion: json["adaptiveSuggestion"] == null
+          ? null
+          : AdaptiveSuggestion.fromJson(json["adaptiveSuggestion"]),
     );
   }
 
@@ -85,6 +100,9 @@ class Data {
     "totalQuestions": totalQuestions,
     "correctAnswers": correctAnswers,
     "questionResults": questionResults.map((x) => x?.toJson()).toList(),
+    "targetContentId": targetContentId,
+    "currentTheta": currentTheta,
+    "adaptiveSuggestion": adaptiveSuggestion?.toJson(),
   };
 
   @override
@@ -160,5 +178,77 @@ class UserAnswer {
   @override
   String toString() {
     return "$answerId, $textAnswer, ";
+  }
+}
+
+class AdaptiveSuggestion {
+  AdaptiveSuggestion({
+    required this.action,
+    required this.reason,
+    required this.targetContent,
+  });
+
+  final String? action;
+  final String? reason;
+  final TargetContent? targetContent;
+
+  factory AdaptiveSuggestion.fromJson(Map<String, dynamic> json) {
+    return AdaptiveSuggestion(
+      action: json["action"],
+      reason: json["reason"],
+      targetContent: json["targetContent"] == null
+          ? null
+          : TargetContent.fromJson(json["targetContent"]),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    "action": action,
+    "reason": reason,
+    "targetContent": targetContent?.toJson(),
+  };
+
+  @override
+  String toString() {
+    return "$action, $reason, $targetContent, ";
+  }
+}
+
+class TargetContent {
+  TargetContent({
+    required this.contentId,
+    required this.title,
+    required this.description,
+    required this.sectionId,
+    required this.courseId,
+  });
+
+  final String? contentId;
+  final String? title;
+  final String? description;
+  final String? sectionId;
+  final String? courseId;
+
+  factory TargetContent.fromJson(Map<String, dynamic> json) {
+    return TargetContent(
+      contentId: json["contentId"],
+      title: json["title"],
+      description: json["description"],
+      sectionId: json["sectionId"],
+      courseId: json["courseId"],
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    "contentId": contentId,
+    "title": title,
+    "description": description,
+    "sectionId": sectionId,
+    "courseId": courseId,
+  };
+
+  @override
+  String toString() {
+    return "$contentId, $title, $description, $sectionId, $courseId, ";
   }
 }

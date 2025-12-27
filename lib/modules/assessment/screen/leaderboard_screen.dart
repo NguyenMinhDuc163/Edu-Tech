@@ -15,35 +15,12 @@ class LeaderboardScreen extends StatefulWidget {
 }
 
 class _LeaderboardScreenState extends State<LeaderboardScreen> {
-  final ScrollController _scrollController = ScrollController();
-
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<LeaderboardCubit>().getLeaderboard();
     });
-
-    _scrollController.addListener(_onScroll);
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  void _onScroll() {
-    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
-      final controller = context.read<LeaderboardController>();
-      if (!controller.isLoadingMore.value &&
-          controller.currentPage.value < controller.totalPages.value) {
-        context.read<LeaderboardCubit>().getLeaderboard(
-              page: controller.currentPage.value + 1,
-              isLoadMore: true,
-            );
-      }
-    }
   }
 
   @override
@@ -55,19 +32,13 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
         if (state is LeaderboardInProgress) {
           controller.setLoading(true);
           controller.clearError();
-        } else if (state is LeaderboardLoadingMore) {
-          controller.setLoadingMore(true);
         } else if (state is LeaderboardSuccess) {
           controller.setLoading(false);
-          controller.setLoadingMore(false);
 
-          final items = state.data.data.data;
-          controller.setLeaderboardItems(items, append: state.isLoadMore);
-          controller.setCurrentPage(state.data.data.pagination.page);
-          controller.setTotalPages(state.data.data.pagination.totalPages);
+          final items = state.data.data.leaderboard;
+          controller.setLeaderboardItems(items, append: false);
         } else if (state is LeaderboardError) {
           controller.setLoading(false);
-          controller.setLoadingMore(false);
           controller.setError(state.message);
         }
       },
@@ -94,34 +65,24 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                   );
                 }
 
-                final top3 = items.take(3).toList();
-                final remaining = items.skip(3).toList();
-
                 return RefreshIndicator(
                   onRefresh: _onRefresh,
                   child: SingleChildScrollView(
-                    controller: _scrollController,
                     padding: AppPad.a16,
                     physics: const AlwaysScrollableScrollPhysics(),
                     child: Column(
                       children: [
-                        if (top3.isNotEmpty) _buildTopThreePodium(top3),
-                        const SizedBox(height: 24),
-                        if (remaining.isNotEmpty) ...[
-                          _buildRemainingList(remaining),
-                          ValueListenableBuilder<bool>(
-                            valueListenable: context.read<LeaderboardController>().isLoadingMore,
-                            builder: (context, isLoadingMore, child) {
-                              if (isLoadingMore) {
-                                return const Padding(
-                                  padding: EdgeInsets.all(16.0),
-                                  child: Center(child: CircularProgressIndicator()),
-                                );
-                              }
-                              return const SizedBox.shrink();
-                            },
-                          ),
-                        ],
+                        if (items.length >= 3) ...[
+                          _buildTopThreePodium(items.take(3).toList()),
+                          const SizedBox(height: 16),
+                          if (items.length > 3)
+                            ...items.skip(3).toList().asMap().entries.map((entry) {
+                              return _buildRankedCard(entry.value, entry.key + 4);
+                            }),
+                        ] else
+                          ...items.asMap().entries.map((entry) {
+                            return _buildRankedCard(entry.value, entry.key + 1);
+                          }),
                       ],
                     ),
                   ),
@@ -340,74 +301,153 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
     );
   }
 
-  Widget _buildRemainingList(List<LeaderboardItem> items) {
-    return Column(
-      children: items.asMap().entries.map((entry) {
-        final index = entry.key;
-        final item = entry.value;
-        return _buildLeaderboardCard(item, index + 4);
-      }).toList(),
-    );
-  }
+  Widget _buildRankedCard(LeaderboardItem item, int rank) {
+    Color getRankColor(int r) {
+      if (r == 1) return const Color(0xFFFFD700);
+      if (r == 2) return const Color(0xFFC0C0C0);
+      if (r == 3) return const Color(0xFFCD7F32);
+      return AppColors.primary;
+    }
 
-  Widget _buildLeaderboardCard(LeaderboardItem item, int displayRank) {
+    bool isTopThree = rank <= 3;
+
     return Container(
-      margin: AppPad.b10,
-      padding: AppPad.a16,
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
+        border: isTopThree
+            ? Border.all(
+                color: getRankColor(rank).withValues(alpha: 0.3),
+                width: 2,
+              )
+            : null,
         boxShadow: [
           BoxShadow(
-            color: AppColors.shadowBlack15,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            color: isTopThree
+                ? getRankColor(rank).withValues(alpha: 0.15)
+                : AppColors.shadowBlack15,
+            blurRadius: isTopThree ? 12 : 8,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Row(
         children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: AppColors.lightGray,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Center(
-              child: Text(
-                '#$displayRank',
-                style: AppTextStyles.textStyleDefaultBold.copyWith(
-                  color: AppColors.primary,
-                  fontSize: 14,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
+          _buildAvatar(item, rank),
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  item.username,
-                  style: AppTextStyles.textStyleDefaultBold,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        item.studentName,
+                        style: AppTextStyles.textHeader3.copyWith(
+                          fontWeight: FontWeight.bold,
+                          fontSize: isTopThree ? 16 : 15,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    if (isTopThree)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              getRankColor(rank),
+                              getRankColor(rank).withValues(alpha: 0.7),
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: getRankColor(rank).withValues(alpha: 0.3),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.emoji_events,
+                              color: AppColors.white,
+                              size: 14,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              '#$rank',
+                              style: AppTextStyles.textContent3.copyWith(
+                                color: AppColors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    _buildStatBadge(
+                      Icons.quiz_outlined,
+                      '${item.totalQuizzes} quizzes',
+                      AppColors.primary,
+                    ),
+                    const SizedBox(width: 8),
+                    _buildStatBadge(
+                      Icons.check_circle_outline,
+                      '${item.quizzesPassed} passed',
+                      AppColors.success,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
                 Row(
                   children: [
                     Icon(
-                      Icons.check_circle_outline,
-                      size: 14,
-                      color: AppColors.color8F959E,
+                      Icons.star,
+                      size: 18,
+                      color: getRankColor(rank),
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      '${item.completedQuizzes} ${'assessment.leaderboard_completed_quizzes'.tr()}',
-                      style: AppTextStyles.textContent4.copyWith(
+                      'Avg Score: ',
+                      style: AppTextStyles.textContent3.copyWith(
                         color: AppColors.color8F959E,
+                      ),
+                    ),
+                    Text(
+                      item.averageScore.toStringAsFixed(1),
+                      style: AppTextStyles.textContent2.copyWith(
+                        color: getRankColor(rank),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const Spacer(),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: item.passRate >= 70
+                            ? AppColors.success.withValues(alpha: 0.1)
+                            : AppColors.orange.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        '${item.passRate.toStringAsFixed(0)}% pass rate',
+                        style: AppTextStyles.textContent4.copyWith(
+                          color: item.passRate >= 70 ? AppColors.success : AppColors.orange,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ],
@@ -415,29 +455,143 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
               ],
             ),
           ),
-          const SizedBox(width: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                item.totalScore.toStringAsFixed(1),
-                style: AppTextStyles.textHeader3.copyWith(
-                  color: AppColors.primary,
+          if (!isTopThree) ...[
+            const SizedBox(width: 12),
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Center(
+                child: Text(
+                  '#$rank',
+                  style: AppTextStyles.textContent2.copyWith(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
-              Text(
-                'assessment.leaderboard_avg_score'.tr(),
-                style: AppTextStyles.textContent4.copyWith(
-                  color: AppColors.color8F959E,
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAvatar(LeaderboardItem item, int rank) {
+    Color getRankColor(int r) {
+      if (r == 1) return const Color(0xFFFFD700);
+      if (r == 2) return const Color(0xFFC0C0C0);
+      if (r == 3) return const Color(0xFFCD7F32);
+      return AppColors.primary;
+    }
+
+    final size = rank <= 3 ? 60.0 : 56.0;
+    final hasAvatar = item.avatarUrl != null && item.avatarUrl!.isNotEmpty;
+
+    return Stack(
+      children: [
+        Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: LinearGradient(
+              colors: [
+                getRankColor(rank).withValues(alpha: 0.2),
+                getRankColor(rank).withValues(alpha: 0.05),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            border: Border.all(
+              color: getRankColor(rank).withValues(alpha: 0.4),
+              width: 3,
+            ),
+            image: hasAvatar
+                ? DecorationImage(
+                    image: NetworkImage(item.avatarUrl!),
+                    fit: BoxFit.cover,
+                  )
+                : null,
+          ),
+          child: hasAvatar
+              ? null
+              : Center(
+                  child: Text(
+                    item.studentName.isNotEmpty
+                        ? item.studentName[0].toUpperCase()
+                        : '?',
+                    style: AppTextStyles.textHeader2.copyWith(
+                      fontSize: rank <= 3 ? 24 : 20,
+                      color: getRankColor(rank),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+        ),
+        if (rank <= 3)
+          Positioned(
+            right: 0,
+            bottom: 0,
+            child: Container(
+              width: 24,
+              height: 24,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: LinearGradient(
+                  colors: [getRankColor(rank), getRankColor(rank).withValues(alpha: 0.8)],
+                ),
+                border: Border.all(color: AppColors.white, width: 2),
+                boxShadow: [
+                  BoxShadow(
+                    color: getRankColor(rank).withValues(alpha: 0.4),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Center(
+                child: Text(
+                  '$rank',
+                  style: AppTextStyles.textContent4.copyWith(
+                    color: AppColors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 10,
+                  ),
                 ),
               ),
-              Text(
-                item.avgScore,
-                style: AppTextStyles.textContent3.copyWith(
-                  color: AppColors.color8F959E,
-                ),
-              ),
-            ],
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildStatBadge(IconData icon, String text, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: color.withValues(alpha: 0.2),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 12, color: color),
+          const SizedBox(width: 4),
+          Text(
+            text,
+            style: AppTextStyles.textContent4.copyWith(
+              color: color,
+              fontWeight: FontWeight.w600,
+              fontSize: 11,
+            ),
           ),
         ],
       ),
@@ -445,7 +599,6 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
   }
 
   Future<void> _onRefresh() async {
-    context.read<LeaderboardController>().reset();
     await context.read<LeaderboardCubit>().getLeaderboard();
   }
 }

@@ -5,7 +5,9 @@ import 'package:ed_tech/core/theme/app_text_styles.dart';
 import 'package:ed_tech/core/theme/app_pad.dart';
 import 'package:ed_tech/modules/dashboard/screen/dashboard_screen.dart';
 import 'package:ed_tech/modules/assessment/models/submit_quiz_model.dart';
+import 'package:ed_tech/modules/course/screen/course_detail_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:super_tooltip/super_tooltip.dart';
 
 class QuizResultScreen extends StatefulWidget {
   const QuizResultScreen({super.key});
@@ -19,6 +21,7 @@ class QuizResultScreen extends StatefulWidget {
 class _QuizResultScreenState extends State<QuizResultScreen> {
   SubmitQuizModel? result;
   Duration? timeSpent;
+  SuperTooltipController? _tooltipController;
 
   @override
   void didChangeDependencies() {
@@ -190,6 +193,8 @@ class _QuizResultScreenState extends State<QuizResultScreen> {
   }
 
   Widget _buildStatisticsCard(Data data) {
+    final suggestion = data.adaptiveSuggestion;
+
     return Container(
       margin: AppPad.h16,
       padding: AppPad.a20,
@@ -211,12 +216,16 @@ class _QuizResultScreenState extends State<QuizResultScreen> {
             children: [
               Icon(Icons.bar_chart, color: AppColors.primary, size: 24),
               const SizedBox(width: 8),
-              Text(
-                'assessment.detailed_statistics'.tr(),
-                style: AppTextStyles.textHeader3.copyWith(
-                  fontWeight: FontWeight.bold,
+              Expanded(
+                child: Text(
+                  'assessment.detailed_statistics'.tr(),
+                  style: AppTextStyles.textHeader3.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
+              if (suggestion?.targetContent != null)
+                _buildAITooltipIcon(suggestion!),
             ],
           ),
           const SizedBox(height: 20),
@@ -539,5 +548,117 @@ class _QuizResultScreenState extends State<QuizResultScreen> {
     } else {
       return '${seconds} ${'assessment.seconds'.tr()}';
     }
+  }
+
+  Widget _buildAITooltipIcon(AdaptiveSuggestion suggestion) {
+    _tooltipController = SuperTooltipController();
+
+    return SuperTooltip(
+      controller: _tooltipController,
+      popupDirection: TooltipDirection.down,
+      backgroundColor: const Color(0xFF93C0F3),
+      borderColor: const Color(0xFFB3C3D6),
+      borderWidth: 0,
+      arrowTipDistance: 10,
+      arrowLength: 8,
+      arrowBaseWidth: 12,
+      content: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            _tooltipController?.hideTooltip();
+            if (suggestion.targetContent != null) {
+              _navigateToLesson(suggestion.targetContent!);
+            }
+          },
+          child: Container(
+            padding: AppPad.a12,
+            constraints: BoxConstraints(maxWidth: 250),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.lightbulb_outline, color: AppColors.white, size: 16),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        'assessment.improve'.tr(),
+                        style: AppTextStyles.textContent3.copyWith(
+                          color: AppColors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  suggestion.targetContent?.title ?? '',
+                  style: AppTextStyles.textContent3.copyWith(
+                    color: AppColors.white,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'assessment.tapToViewLesson'.tr(),
+                  style: AppTextStyles.textContent4.copyWith(
+                    color: AppColors.deepBlue,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      child: GestureDetector(
+        onTap: () => _tooltipController?.showTooltip(),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          decoration: BoxDecoration(
+            color: const Color(0xFF6BA6E8).withOpacity(0.15),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: const Color(0xFF7DB0EA).withOpacity(0.4),
+              width: 1,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.auto_awesome,
+                color: const Color(0xFF5B9FED),
+                size: 14,
+              ),
+              const SizedBox(width: 4),
+              Text(
+                'Cải thiện',
+                style: AppTextStyles.textContent3.copyWith(
+                  color: const Color(0xFF87B3E6),
+                  fontWeight: FontWeight.w600,
+                  fontSize: 12,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _navigateToLesson(TargetContent targetContent) {
+    if (targetContent.courseId == null) return;
+
+    Navigator.pushNamed(
+      context,
+      CourseDetailScreen.routeName,
+      arguments: {
+        'courseId': targetContent.courseId,
+        'title': targetContent.title ?? '',
+      },
+    );
   }
 }

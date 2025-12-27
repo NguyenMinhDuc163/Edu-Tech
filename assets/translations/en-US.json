@@ -451,7 +451,10 @@
     "leaderboard_avg_score": "Avg Score",
     "leaderboard_completed_quizzes": "Completed Quizzes",
     "leaderboard_no_data": "No leaderboard data available",
-    "leaderboard_error": "Failed to load leaderboard"
+    "leaderboard_error": "Failed to load leaderboard",
+    "improve": "Improve",
+    "tapToViewLesson": "Tap to view lesson"
+
   },
   "chat": {
     "title": "Chat Bot",
