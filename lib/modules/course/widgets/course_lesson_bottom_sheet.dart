@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:ed_tech/init.dart';
 import 'package:ed_tech/modules/course/model/detail_course.dart';
+import 'package:ed_tech/modules/course/screen/document_viewer_screen.dart';
 import 'package:ed_tech/modules/assessment/screen/quiz_taking_screen.dart';
 import 'package:ed_tech/modules/assessment/models/quiz_model.dart';
 import 'package:video_player/video_player.dart';
@@ -309,6 +310,16 @@ class _ContentItemState extends State<_ContentItem> {
     return null;
   }
 
+  String? _getDocumentUrl() {
+    if (widget.content.files.isEmpty) return null;
+    for (var file in widget.content.files) {
+      if (file.fileType == 'document' && file.url != null) {
+        return file.url;
+      }
+    }
+    return null;
+  }
+
   bool get _isLocked {
     if (widget.hasFullAccess) return false;
     return !(widget.content.isPreview ?? false);
@@ -365,6 +376,20 @@ class _ContentItemState extends State<_ContentItem> {
           ),
         );
       }
+      return;
+    }
+
+    final documentUrl = _getDocumentUrl();
+    if (documentUrl != null && documentUrl.isNotEmpty) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => DocumentViewerScreen(
+            documentUrl: documentUrl,
+            title: widget.content.title ?? '',
+          ),
+        ),
+      );
     } else {
       setState(() {
         _isExpanded = !_isExpanded;
@@ -376,6 +401,8 @@ class _ContentItemState extends State<_ContentItem> {
   Widget build(BuildContext context) {
     final videoUrl = _getVideoUrl();
     final hasVideo = videoUrl != null && videoUrl.isNotEmpty;
+    final documentUrl = _getDocumentUrl();
+    final hasDocument = documentUrl != null && documentUrl.isNotEmpty;
     final hasDescription = widget.content.description != null &&
                           widget.content.description!.isNotEmpty;
 
@@ -432,7 +459,7 @@ class _ContentItemState extends State<_ContentItem> {
                         widget.content.title ?? '',
                         style: AppTextStyles.textContent2.copyWith(
                           color: _isLocked ? AppColors.color8F959E : AppColors.text,
-                          fontWeight: hasVideo || _hasQuiz ? FontWeight.w500 : FontWeight.normal,
+                          fontWeight: hasVideo || _hasQuiz || hasDocument ? FontWeight.w500 : FontWeight.normal,
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,

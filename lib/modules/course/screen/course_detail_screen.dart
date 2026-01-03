@@ -8,6 +8,7 @@ import 'package:ed_tech/init.dart';
 import 'package:ed_tech/modules/course/widgets/course_lesson_bottom_sheet.dart';
 import 'package:ed_tech/modules/course/bloc/course_cubit.dart';
 import 'package:ed_tech/modules/course/screen/course_cancellation_screen.dart';
+import 'package:ed_tech/modules/course/screen/document_viewer_screen.dart';
 import 'package:ed_tech/modules/assessment/screen/quiz_taking_screen.dart';
 import 'package:ed_tech/modules/assessment/models/quiz_model.dart';
 import 'package:ed_tech/modules/home/repository/home_repo.dart';
@@ -1204,16 +1205,21 @@ class _SectionItemState extends State<_SectionItem> {
               child: Column(
                 children: contents.map((content) {
                   String? videoUrl;
+                  String? documentUrl;
                   if (content.files.isNotEmpty) {
                     for (var file in content.files) {
                       if (file.fileType == 'video') {
                         videoUrl = file.url;
+                        break;
+                      } else if (file.fileType == 'document') {
+                        documentUrl = file.url;
                         break;
                       }
                     }
                   }
 
                   final hasVideo = videoUrl != null && videoUrl.isNotEmpty;
+                  final hasDocument = documentUrl != null && documentUrl.isNotEmpty;
                   final hasQuiz = content.quiz != null;
 
                   return InkWell(
@@ -1238,7 +1244,19 @@ class _SectionItemState extends State<_SectionItem> {
                           }
                         : hasVideo
                             ? () => widget.onPlayVideo(videoUrl!, content.title ?? '', content.contentId)
-                            : null,
+                            : hasDocument
+                                ? () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => DocumentViewerScreen(
+                                          documentUrl: documentUrl!,
+                                          title: content.title ?? '',
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                : null,
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       decoration: BoxDecoration(
@@ -1275,7 +1293,7 @@ class _SectionItemState extends State<_SectionItem> {
                                   content.title ?? '',
                                   style: AppTextStyles.textContent2.copyWith(
                                     color: AppColors.text,
-                                    fontWeight: hasVideo || hasQuiz ? FontWeight.w500 : FontWeight.normal,
+                                    fontWeight: hasVideo || hasQuiz || hasDocument ? FontWeight.w500 : FontWeight.normal,
                                   ),
                                 ),
                                 if (content.description != null && content.description!.isNotEmpty) ...[
