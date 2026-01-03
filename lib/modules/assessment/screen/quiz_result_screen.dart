@@ -595,7 +595,7 @@ class _QuizResultScreenState extends State<QuizResultScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  suggestion.targetContent?.title ?? '',
+                  suggestion.reason ?? '',
                   style: AppTextStyles.textContent3.copyWith(
                     color: AppColors.white,
                   ),
