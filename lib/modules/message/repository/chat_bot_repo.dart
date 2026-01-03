@@ -11,6 +11,8 @@ class ChatBotRepo {
   Future<ChatResponse> sendMessage({
     required String message,
     String? sessionId,
+    String? courseId,
+    String? contentId,
   }) async {
     final res = await apiClient.fetch(
       ApiPath.chatBot,
@@ -18,6 +20,8 @@ class ChatBotRepo {
       rawData: {
         "prompt": message,
         if (sessionId != null) "session_id": sessionId,
+        if (courseId != null) "course_id": courseId,
+        if (contentId != null) "content_id": contentId,
       },
     );
 

@@ -12,6 +12,7 @@ class CourseLessonBottomSheet extends StatelessWidget {
   final List<Section> sections;
   final String accessLevel;
   final Function(String videoUrl, String title, String? contentId)? onPlayVideo;
+  final Function(String? contentId)? onContentSelected;
 
   const CourseLessonBottomSheet({
     super.key,
@@ -19,6 +20,7 @@ class CourseLessonBottomSheet extends StatelessWidget {
     required this.sections,
     required this.accessLevel,
     this.onPlayVideo,
+    this.onContentSelected,
   });
 
   @override
@@ -122,6 +124,7 @@ class CourseLessonBottomSheet extends StatelessWidget {
                             sectionIndex: index + 1,
                             accessLevel: accessLevel,
                             onPlayVideo: onPlayVideo,
+                            onContentSelected: onContentSelected,
                           );
                         },
                       ),
@@ -139,12 +142,14 @@ class _SectionItem extends StatefulWidget {
   final int sectionIndex;
   final String accessLevel;
   final Function(String videoUrl, String title, String? contentId)? onPlayVideo;
+  final Function(String? contentId)? onContentSelected;
 
   const _SectionItem({
     required this.section,
     required this.sectionIndex,
     required this.accessLevel,
     this.onPlayVideo,
+    this.onContentSelected,
   });
 
   @override
@@ -270,6 +275,7 @@ class _SectionItemState extends State<_SectionItem> {
                     contentIndex: index + 1,
                     hasFullAccess: hasFullAccess,
                     onPlayVideo: widget.onPlayVideo,
+                    onContentSelected: widget.onContentSelected,
                   );
                 }).toList(),
               ),
@@ -285,12 +291,14 @@ class _ContentItem extends StatefulWidget {
   final int contentIndex;
   final bool hasFullAccess;
   final Function(String videoUrl, String title, String? contentId)? onPlayVideo;
+  final Function(String? contentId)? onContentSelected;
 
   const _ContentItem({
     required this.content,
     required this.contentIndex,
     required this.hasFullAccess,
     this.onPlayVideo,
+    this.onContentSelected,
   });
 
   @override
@@ -342,6 +350,7 @@ class _ContentItemState extends State<_ContentItem> {
     }
 
     if (_hasQuiz) {
+      widget.onContentSelected?.call(widget.content.contentId);
       final quiz = widget.content.quiz!;
       final quizModel = QuizModel(
         id: quiz.questionBankId ?? '',
@@ -381,6 +390,7 @@ class _ContentItemState extends State<_ContentItem> {
 
     final documentUrl = _getDocumentUrl();
     if (documentUrl != null && documentUrl.isNotEmpty) {
+      widget.onContentSelected?.call(widget.content.contentId);
       Navigator.push(
         context,
         MaterialPageRoute(

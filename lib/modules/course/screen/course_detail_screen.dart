@@ -122,6 +122,7 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
   bool _showBottomButton = true;
   bool _isDescriptionExpanded = false;
   final DraggableScrollableController _sheetController = DraggableScrollableController();
+  String? _currentContentId;
 
   bool get _isPaymentEnabled {
     final isPayment = UserService.instance.isPayment;
@@ -164,6 +165,13 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
         sections: sections,
         accessLevel: accessLevel,
         onPlayVideo: (videoUrl, title, contentId) => _playVideo(context, videoUrl, title, contentId),
+        onContentSelected: (contentId) {
+          if (contentId != null) {
+            setState(() {
+              _currentContentId = contentId;
+            });
+          }
+        },
       ),
     );
   }
@@ -203,6 +211,11 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
   }
 
   void _playVideo(BuildContext context, String videoUrl, String title, String? contentId) {
+    if (contentId != null) {
+      setState(() {
+        _currentContentId = contentId;
+      });
+    }
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -493,6 +506,7 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
       builder: (bottomSheetContext) => _ChatBubbleOverlay(
         courseId: widget.courseId,
         courseTitle: widget.title,
+        contentId: _currentContentId,
       ),
     );
   }
@@ -735,6 +749,13 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
           ...sectionsToShow.map((section) => _SectionItem(
             section: section,
             onPlayVideo: (videoUrl, title, contentId) => _playVideo(context, videoUrl, title, contentId),
+            onContentSelected: (contentId) {
+              if (contentId != null) {
+                setState(() {
+                  _currentContentId = contentId;
+                });
+              }
+            },
           )),
 
           if (hasMore) ...[
@@ -1125,10 +1146,12 @@ class _VideoPlayerScreenState extends State<_VideoPlayerScreen> {
 class _SectionItem extends StatefulWidget {
   final dynamic section;
   final Function(String videoUrl, String title, String? contentId) onPlayVideo;
+  final Function(String? contentId) onContentSelected;
 
   const _SectionItem({
     required this.section,
     required this.onPlayVideo,
+    required this.onContentSelected,
   });
 
   @override
@@ -1227,6 +1250,7 @@ class _SectionItemState extends State<_SectionItem> {
                   return InkWell(
                     onTap: hasQuiz
                         ? () {
+                            widget.onContentSelected(content.contentId);
                             final quiz = content.quiz!;
                             final quizModel = QuizModel(
                               id: quiz.questionBankId ?? '',
@@ -1248,6 +1272,7 @@ class _SectionItemState extends State<_SectionItem> {
                             ? () => widget.onPlayVideo(videoUrl!, content.title ?? '', content.contentId)
                             : hasDocument
                                 ? () {
+                                    widget.onContentSelected(content.contentId);
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
@@ -1328,10 +1353,12 @@ class _SectionItemState extends State<_SectionItem> {
 class _ChatBubbleOverlay extends StatefulWidget {
   final String courseId;
   final String courseTitle;
+  final String? contentId;
 
   const _ChatBubbleOverlay({
     required this.courseId,
     required this.courseTitle,
+    this.contentId,
   });
 
   @override
@@ -1387,7 +1414,11 @@ class _ChatBubbleOverlayState extends State<_ChatBubbleOverlay> {
     _scrollToBottom();
 
     try {
-      final response = await _chatRepo.sendMessage(message: message);
+      final response = await _chatRepo.sendMessage(
+        message: message,
+        courseId: widget.courseId,
+        contentId: widget.contentId,
+      );
 
       if (mounted) {
         setState(() {
