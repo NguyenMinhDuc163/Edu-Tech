@@ -217,14 +217,21 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
 
   @override
   Widget build(BuildContext context) {
+    final accessLevel = widget.courseDetail?.accessLevel ?? 'FREE';
+    final hasFullAccess = accessLevel == 'FULL';
+
     return Scaffold(
       backgroundColor: AppColors.white,
       body: Stack(
         children: [
           _buildVideoPlayerSection(context),
           _buildBottomSheet(context),
-          if (_showBottomButton) _buildBottomActionButtons(context),
-          if (!_showBottomButton) _buildFloatingActionButton(context),
+          if (hasFullAccess)
+            _buildFloatingActionButton(context)
+          else ...[
+            if (_showBottomButton) _buildBottomActionButtons(context),
+            if (!_showBottomButton) _buildFloatingActionButton(context),
+          ],
         ],
       ),
     );
@@ -298,12 +305,7 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
 
   Widget _buildBottomActionButtons(BuildContext context) {
     final accessLevel = widget.courseDetail?.accessLevel ?? 'FREE';
-    final hasFullAccess = accessLevel == 'FULL' || !_isPaymentEnabled;
-    final daysLeftToCancel = widget.courseDetail?.daysLeftToCancel ?? 0;
-
-    if (hasFullAccess && daysLeftToCancel > 0 && _isPaymentEnabled) {
-      return const SizedBox.shrink();
-    }
+    final hasFullAccess = accessLevel == 'FULL';
 
     return AnimatedPositioned(
       duration: const Duration(milliseconds: 300),
@@ -356,13 +358,13 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
 
   Widget _buildFloatingActionButton(BuildContext context) {
     final accessLevel = widget.courseDetail?.accessLevel ?? 'FREE';
-    final hasFullAccess = accessLevel == 'FULL' || !_isPaymentEnabled;
+    final hasFullAccess = accessLevel == 'FULL';
     final daysLeftToCancel = widget.courseDetail?.daysLeftToCancel ?? 0;
 
     return Positioned(
       bottom: 24,
       right: 24,
-      child: hasFullAccess && _isPaymentEnabled
+      child: hasFullAccess
           ? SpeedDial(
               icon: Icons.menu,
               activeIcon: Icons.close,
@@ -620,7 +622,7 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
 
   Widget _buildCourseDetailsSection() {
     final accessLevel = widget.courseDetail?.accessLevel ?? 'FREE';
-    final hasFullAccess = accessLevel == 'FULL' || !_isPaymentEnabled;
+    final hasFullAccess = accessLevel == 'FULL';
 
     return Container(
       padding: AppPad.h24.add(AppPad.v20),
@@ -727,8 +729,8 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('course.lessons_title'.tr(), style: AppTextStyles.textHeader3.copyWith(fontWeight: FontWeight.bold)),
-          const SizedBox(height: 16),
+          // Text('course.lessons_title'.tr(), style: AppTextStyles.textHeader3.copyWith(fontWeight: FontWeight.bold)),
+          // const SizedBox(height: 16),
 
           ...sectionsToShow.map((section) => _SectionItem(
             section: section,
@@ -1281,7 +1283,7 @@ class _SectionItemState extends State<_SectionItem> {
                           else
                             Icon(
                               Icons.description_outlined,
-                              color: AppColors.color8F959E,
+                              color: AppColors.colorFF6905,
                               size: 24,
                             ),
                           const SizedBox(width: 12),
