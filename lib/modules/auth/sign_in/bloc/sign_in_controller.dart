@@ -14,7 +14,7 @@ import 'package:ed_tech/modules/auth/sign_in/bloc/sign_in_state.dart';
 class SignInController extends Disposable {
   TextEditingController usernameController = TextEditingController(text: kDebugMode ? "student" : "");
   TextEditingController passwordController = TextEditingController(text: kDebugMode ? '111111' : "");
-  ValueNotifier<bool> isSwitched = ValueNotifier(false);
+  ValueNotifier<bool> rememberMe = ValueNotifier(true);
 
   SignInController({Map<String, String>? prefillData}) {
     if (prefillData != null) {

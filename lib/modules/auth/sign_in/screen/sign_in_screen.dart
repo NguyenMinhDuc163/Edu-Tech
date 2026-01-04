@@ -83,7 +83,17 @@ class _SignInContent extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Checkbox(value: true, onChanged: null),
+                ValueListenableBuilder<bool>(
+                  valueListenable: controller.rememberMe,
+                  builder: (context, value, child) {
+                    return Checkbox(
+                      value: value,
+                      onChanged: (newValue) {
+                        controller.rememberMe.value = newValue ?? true;
+                      },
+                    );
+                  },
+                ),
                 Text("sign_up.remember_me".tr(), style: AppTextStyles.textContent2),
                 Spacer(),
                 GestureDetector(
