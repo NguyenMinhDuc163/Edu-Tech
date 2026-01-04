@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:ed_tech/core/constants/api_path.dart';
 import 'package:ed_tech/init.dart';
 import 'package:ed_tech/modules/message/bloc/chat_controller.dart';
 import 'package:ed_tech/modules/message/bloc/chatbot_cubit.dart';
@@ -200,6 +201,7 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
                 cubit.sendMessage(
                   message: text,
                   sessionId: controller.currentSessionId.value,
+                  customUrl: ApiPath.chatBase,
                 );
 
                 _textController.clear();

@@ -36,7 +36,7 @@ class ChatData {
     required this.responseRaw,
   });
 
-  final int? sessionId;
+  final String? sessionId;
   final String? responseHtml;
   final String? responseRaw;
 

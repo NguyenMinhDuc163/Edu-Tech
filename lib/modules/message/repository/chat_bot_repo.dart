@@ -13,6 +13,7 @@ class ChatBotRepo {
     String? sessionId,
     String? courseId,
     String? contentId,
+    String? customUrl,
   }) async {
     final res = await apiClient.fetch(
       ApiPath.chatBot,
@@ -22,6 +23,7 @@ class ChatBotRepo {
         if (sessionId != null) "session_id": sessionId,
         if (courseId != null) "course_id": courseId,
         if (contentId != null) "content_id": contentId,
+        if (customUrl != null) "custom_url": customUrl,
       },
     );
 

@@ -46,6 +46,7 @@ class ApiPath {
   static const String coursesList = '/courses/list';
   static const String learningProgress = '/learning/progress';
   static const String updateProfile = '/users/me/profile';
+  static const String chatBase = 'https://ai.nguyenduc.click/base';
 }
 
 // TODO trong intercepter => ds api can truyen id
