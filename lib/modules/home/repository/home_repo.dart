@@ -1,4 +1,5 @@
 import 'package:ed_tech/core/constants/api_path.dart';
+import 'package:ed_tech/core/constants/video_tracking_action.dart';
 import 'package:ed_tech/data/api_client.dart';
 import 'package:ed_tech/data/models/request_method.dart';
 import 'package:ed_tech/modules/home/model/course_response.dart';
@@ -58,16 +59,24 @@ class HomeRepo {
     return LearningProgressData.fromJson(res.data);
   }
 
-  Future<void> saveVideoProgress({
+  Future<void> trackVideoProgress({
+    required String courseId,
     required String contentId,
-    required double progressPercentage,
+    required VideoTrackingAction action,
+    required double videoTimestamp,
+    required int durationWatched,
+    required int totalDuration,
   }) async {
     await apiClient.fetch(
       ApiPath.learningProgress,
       RequestMethod.post,
       rawData: {
+        'courseId': courseId,
         'contentId': contentId,
-        'progressPercentage': progressPercentage,
+        'action': action.value,
+        'videoTimestamp': videoTimestamp,
+        'durationWatched': durationWatched,
+        'totalDuration': totalDuration,
       },
     );
   }

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -18,6 +19,8 @@ import 'package:ed_tech/modules/message/repository/chat_bot_repo.dart';
 import 'package:video_player/video_player.dart';
 import 'package:chewie/chewie.dart';
 import 'package:ed_tech/utils/helpers/currency_extension.dart';
+import 'package:ed_tech/core/constants/app_constants.dart';
+import 'package:ed_tech/core/constants/video_tracking_action.dart';
 
 class CourseDetailScreen extends StatefulWidget {
   static const String routeName = '/CourseDetailScreen';
@@ -220,6 +223,7 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
       context,
       MaterialPageRoute(
         builder: (context) => _VideoPlayerScreen(
+          courseId: widget.courseId,
           videoUrl: videoUrl,
           title: title,
           contentId: contentId,
@@ -256,6 +260,7 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
     String? thumbnail = widget.courseDetail?.thumbnailUrl ?? widget.imageUrl;
 
     return _InlineVideoPlayer(
+      courseId: widget.courseId,
       videoUrl: videoUrl,
       contentId: contentId,
       thumbnail: thumbnail,
@@ -793,6 +798,7 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
 }
 
 class _InlineVideoPlayer extends StatefulWidget {
+  final String courseId;
   final String? videoUrl;
   final String? contentId;
   final String? thumbnail;
@@ -800,6 +806,7 @@ class _InlineVideoPlayer extends StatefulWidget {
   final VoidCallback onBack;
 
   const _InlineVideoPlayer({
+    required this.courseId,
     required this.videoUrl,
     this.contentId,
     required this.thumbnail,
@@ -815,39 +822,110 @@ class _InlineVideoPlayerState extends State<_InlineVideoPlayer> {
   VideoPlayerController? _videoPlayerController;
   ChewieController? _chewieController;
   bool _isPlaying = false;
+  DateTime? _playingStartTime;
+  int _totalPlayingDuration = 0;
+  Timer? _trackingTimer;
+  Timer? _videoStateTimer;
+  bool _hasStarted = false;
+  bool _lastPlayingState = false;
 
   @override
   void dispose() {
-    String? contentIdToSave;
-    double? progressToSave;
+    _trackingTimer?.cancel();
+    _videoStateTimer?.cancel();
+
+    if (_isPlaying && _playingStartTime != null) {
+      _totalPlayingDuration += DateTime.now().difference(_playingStartTime!).inSeconds;
+    }
 
     if (widget.contentId != null && _videoPlayerController != null && _videoPlayerController!.value.isInitialized) {
-      final currentPosition = _videoPlayerController!.value.position.inSeconds;
+      final currentPosition = _videoPlayerController!.value.position.inSeconds.toDouble();
       final totalDuration = _videoPlayerController!.value.duration.inSeconds;
 
       if (totalDuration > 0) {
-        contentIdToSave = widget.contentId;
-        progressToSave = currentPosition / totalDuration;
+        final progress = currentPosition / totalDuration;
+        if (progress >= AppConst.videoCompleteThreshold) {
+          _trackVideoProgress(VideoTrackingAction.videoComplete, currentPosition, totalDuration);
+        } else if (_hasStarted) {
+          _trackVideoProgress(VideoTrackingAction.videoPause, currentPosition, totalDuration);
+        }
       }
     }
 
     _videoPlayerController?.dispose();
     _chewieController?.dispose();
     super.dispose();
+  }
 
-    if (contentIdToSave != null && progressToSave != null) {
-      _saveVideoProgress(contentIdToSave, progressToSave);
+  void _trackVideoProgress(VideoTrackingAction action, double currentPosition, int totalDuration) {
+    if (widget.contentId == null) return;
+
+    try {
+      final repo = HomeRepo(apiClient: ApiClient());
+      repo.trackVideoProgress(
+        courseId: widget.courseId,
+        contentId: widget.contentId!,
+        action: action,
+        videoTimestamp: currentPosition,
+        durationWatched: _totalPlayingDuration,
+        totalDuration: totalDuration,
+      );
+    } catch (_) {}
+  }
+
+  void _startPlayingTracking() {
+    _playingStartTime = DateTime.now();
+
+    if (!_hasStarted && _videoPlayerController != null && _videoPlayerController!.value.isInitialized) {
+      _hasStarted = true;
+      final currentPosition = _videoPlayerController!.value.position.inSeconds.toDouble();
+      final totalDuration = _videoPlayerController!.value.duration.inSeconds;
+      _trackVideoProgress(VideoTrackingAction.videoStart, currentPosition, totalDuration);
+    }
+
+    _trackingTimer?.cancel();
+    _trackingTimer = Timer.periodic(
+      Duration(seconds: AppConst.videoTrackingIntervalInSeconds),
+      (_) {
+        if (_videoPlayerController != null && _videoPlayerController!.value.isInitialized && _videoPlayerController!.value.isPlaying) {
+          final currentPosition = _videoPlayerController!.value.position.inSeconds.toDouble();
+          final totalDuration = _videoPlayerController!.value.duration.inSeconds;
+          _trackVideoProgress(VideoTrackingAction.videoWatching, currentPosition, totalDuration);
+        }
+      },
+    );
+  }
+
+  void _stopPlayingTracking() {
+    if (_playingStartTime != null) {
+      _totalPlayingDuration += DateTime.now().difference(_playingStartTime!).inSeconds;
+      _playingStartTime = null;
+    }
+    _trackingTimer?.cancel();
+
+    if (_hasStarted && _videoPlayerController != null && _videoPlayerController!.value.isInitialized) {
+      final currentPosition = _videoPlayerController!.value.position.inSeconds.toDouble();
+      final totalDuration = _videoPlayerController!.value.duration.inSeconds;
+      _trackVideoProgress(VideoTrackingAction.videoPause, currentPosition, totalDuration);
     }
   }
 
-  void _saveVideoProgress(String contentId, double progressPercentage) {
-    try {
-      final repo = HomeRepo(apiClient: ApiClient());
-      repo.saveVideoProgress(
-        contentId: contentId,
-        progressPercentage: progressPercentage,
-      );
-    } catch (_) {}
+  void _monitorVideoState() {
+    _videoStateTimer = Timer.periodic(const Duration(milliseconds: 500), (_) {
+      if (_videoPlayerController != null && _videoPlayerController!.value.isInitialized) {
+        final isCurrentlyPlaying = _videoPlayerController!.value.isPlaying;
+
+        if (isCurrentlyPlaying != _lastPlayingState) {
+          _lastPlayingState = isCurrentlyPlaying;
+
+          if (isCurrentlyPlaying) {
+            _startPlayingTracking();
+          } else {
+            _stopPlayingTracking();
+          }
+        }
+      }
+    });
   }
 
   Future<void> _initializePlayer() async {
@@ -879,6 +957,8 @@ class _InlineVideoPlayerState extends State<_InlineVideoPlayer> {
     setState(() {
       _isPlaying = true;
     });
+
+    _monitorVideoState();
   }
 
   void _openFullscreenPlayer(BuildContext context) {
@@ -886,6 +966,7 @@ class _InlineVideoPlayerState extends State<_InlineVideoPlayer> {
       context,
       MaterialPageRoute(
         builder: (context) => _VideoPlayerScreen(
+          courseId: widget.courseId,
           videoUrl: widget.videoUrl!,
           title: widget.title,
           contentId: widget.contentId,
@@ -1012,11 +1093,13 @@ class _InlineVideoPlayerState extends State<_InlineVideoPlayer> {
 }
 
 class _VideoPlayerScreen extends StatefulWidget {
+  final String courseId;
   final String videoUrl;
   final String title;
   final String? contentId;
 
   const _VideoPlayerScreen({
+    required this.courseId,
     required this.videoUrl,
     required this.title,
     this.contentId,
@@ -1029,6 +1112,12 @@ class _VideoPlayerScreen extends StatefulWidget {
 class _VideoPlayerScreenState extends State<_VideoPlayerScreen> {
   late VideoPlayerController _videoPlayerController;
   ChewieController? _chewieController;
+  DateTime? _playingStartTime;
+  int _totalPlayingDuration = 0;
+  Timer? _trackingTimer;
+  Timer? _videoStateTimer;
+  bool _hasStarted = false;
+  bool _lastPlayingState = false;
 
   @override
   void initState() {
@@ -1072,20 +1161,30 @@ class _VideoPlayerScreenState extends State<_VideoPlayerScreen> {
     );
 
     setState(() {});
+
+    _monitorVideoState();
   }
 
   @override
   void dispose() {
-    String? contentIdToSave;
-    double? progressToSave;
+    _trackingTimer?.cancel();
+    _videoStateTimer?.cancel();
+
+    if (_lastPlayingState && _playingStartTime != null) {
+      _totalPlayingDuration += DateTime.now().difference(_playingStartTime!).inSeconds;
+    }
 
     if (widget.contentId != null && _videoPlayerController.value.isInitialized) {
-      final currentPosition = _videoPlayerController.value.position.inSeconds;
+      final currentPosition = _videoPlayerController.value.position.inSeconds.toDouble();
       final totalDuration = _videoPlayerController.value.duration.inSeconds;
 
       if (totalDuration > 0) {
-        contentIdToSave = widget.contentId;
-        progressToSave = currentPosition / totalDuration;
+        final progress = currentPosition / totalDuration;
+        if (progress >= AppConst.videoCompleteThreshold) {
+          _trackVideoProgress(VideoTrackingAction.videoComplete, currentPosition, totalDuration);
+        } else if (_hasStarted) {
+          _trackVideoProgress(VideoTrackingAction.videoPause, currentPosition, totalDuration);
+        }
       }
     }
 
@@ -1100,20 +1199,77 @@ class _VideoPlayerScreenState extends State<_VideoPlayerScreen> {
     _videoPlayerController.dispose();
     _chewieController?.dispose();
     super.dispose();
+  }
 
-    if (contentIdToSave != null && progressToSave != null) {
-      _saveVideoProgress(contentIdToSave, progressToSave);
+  void _trackVideoProgress(VideoTrackingAction action, double currentPosition, int totalDuration) {
+    if (widget.contentId == null) return;
+
+    try {
+      final repo = HomeRepo(apiClient: ApiClient());
+      repo.trackVideoProgress(
+        courseId: widget.courseId,
+        contentId: widget.contentId!,
+        action: action,
+        videoTimestamp: currentPosition,
+        durationWatched: _totalPlayingDuration,
+        totalDuration: totalDuration,
+      );
+    } catch (_) {}
+  }
+
+  void _startPlayingTracking() {
+    _playingStartTime = DateTime.now();
+
+    if (!_hasStarted && _videoPlayerController.value.isInitialized) {
+      _hasStarted = true;
+      final currentPosition = _videoPlayerController.value.position.inSeconds.toDouble();
+      final totalDuration = _videoPlayerController.value.duration.inSeconds;
+      _trackVideoProgress(VideoTrackingAction.videoStart, currentPosition, totalDuration);
+    }
+
+    _trackingTimer?.cancel();
+    _trackingTimer = Timer.periodic(
+      Duration(seconds: AppConst.videoTrackingIntervalInSeconds),
+      (_) {
+        if (_videoPlayerController.value.isInitialized && _videoPlayerController.value.isPlaying) {
+          final currentPosition = _videoPlayerController.value.position.inSeconds.toDouble();
+          final totalDuration = _videoPlayerController.value.duration.inSeconds;
+          _trackVideoProgress(VideoTrackingAction.videoWatching, currentPosition, totalDuration);
+        }
+      },
+    );
+  }
+
+  void _stopPlayingTracking() {
+    if (_playingStartTime != null) {
+      _totalPlayingDuration += DateTime.now().difference(_playingStartTime!).inSeconds;
+      _playingStartTime = null;
+    }
+    _trackingTimer?.cancel();
+
+    if (_hasStarted && _videoPlayerController.value.isInitialized) {
+      final currentPosition = _videoPlayerController.value.position.inSeconds.toDouble();
+      final totalDuration = _videoPlayerController.value.duration.inSeconds;
+      _trackVideoProgress(VideoTrackingAction.videoPause, currentPosition, totalDuration);
     }
   }
 
-  void _saveVideoProgress(String contentId, double progressPercentage) {
-    try {
-      final repo = HomeRepo(apiClient: ApiClient());
-      repo.saveVideoProgress(
-        contentId: contentId,
-        progressPercentage: progressPercentage,
-      );
-    } catch (_) {}
+  void _monitorVideoState() {
+    _videoStateTimer = Timer.periodic(const Duration(milliseconds: 500), (_) {
+      if (_videoPlayerController.value.isInitialized) {
+        final isCurrentlyPlaying = _videoPlayerController.value.isPlaying;
+
+        if (isCurrentlyPlaying != _lastPlayingState) {
+          _lastPlayingState = isCurrentlyPlaying;
+
+          if (isCurrentlyPlaying) {
+            _startPlayingTracking();
+          } else {
+            _stopPlayingTracking();
+          }
+        }
+      }
+    });
   }
 
   @override

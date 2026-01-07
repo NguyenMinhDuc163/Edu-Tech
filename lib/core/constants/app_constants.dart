@@ -30,6 +30,10 @@ abstract final class AppConst {
   static const Duration timesToFetchCommonDataAgain = Duration(days: 7);
 
   static const int inputDebounceTimeInMilliseconds = 440;
+
+  // Video Tracking
+  static const int videoTrackingIntervalInSeconds = 180; // 3 phút
+  static const double videoCompleteThreshold = 0.95; // 95% coi như hoàn thành
 }
 
 final class _RegExp {
