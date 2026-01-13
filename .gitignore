@@ -48,3 +48,4 @@ app.*.map.json
 .fvm/
 env/.env.dev
 env/.env.prod
+/env/.env.dev
