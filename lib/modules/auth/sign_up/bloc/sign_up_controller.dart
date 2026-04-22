@@ -39,16 +39,16 @@ class SignUpController extends Disposable {
     if (!_isValidateForm()) return;
 
     context.read<SignUpCubit>().onRegisterStarted(
-      username: usernameController.text,
-      password: passwordController.text,
-      email: emailController.text,
+      username: usernameController.text.trim(),
+      password: passwordController.text.trim(),
+      email: emailController.text.trim(),
     );
   }
 
   bool _isValidateForm() {
-    if (usernameController.text.isEmpty ||
-        passwordController.text.isEmpty ||
-        emailController.text.isEmpty) {
+    if (usernameController.text.trim().isEmpty ||
+        passwordController.text.trim().isEmpty ||
+        emailController.text.trim().isEmpty) {
       showToastTop(message: "sign_up.required_fields".tr());
       return false;
     }
@@ -56,7 +56,7 @@ class SignUpController extends Disposable {
       showToastTop(message: "sign_up.password_length".tr());
       return false;
     }
-    if (!Validators.isValidEmail(emailController.text)) {
+    if (!Validators.isValidEmail(emailController.text.trim())) {
       showToastTop(message: "sign_up.invalid_email".tr());
       return false;
     }

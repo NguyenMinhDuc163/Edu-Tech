@@ -39,12 +39,12 @@ class SignInController extends Disposable {
   }
 
   onSignIn(BuildContext context) {
-    if (usernameController.text == '' || passwordController.text == '') {
+    if (usernameController.text.trim() == '' || passwordController.text.trim() == '') {
       showToastTop(message: "sign_up.required_fields".tr());
     }
     context.read<SignInCubit>().onLoginStarted(
-      username: usernameController.text,
-      password: passwordController.text,
+      username: usernameController.text.trim(),
+      password: passwordController.text.trim(),
     );
   }
 
