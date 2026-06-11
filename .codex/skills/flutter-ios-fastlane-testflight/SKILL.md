@@ -124,7 +124,7 @@ For `xcodebuild -exportArchive` exit status `64` after `ARCHIVE SUCCEEDED`:
 - Treat it as invalid export command arguments.
 - Remember Fastlane/gym appends `xcargs` to the `-exportArchive` command too, not only archive/build.
 - Do not pass App Store Connect authentication flags through `build_app(xcargs:)` or `export_xcargs` when a certificate/profile is already installed.
-- For Xcode 26+, prefer `export_options: { method: "app-store-connect", ... }` instead of `export_method: "app-store"` because Xcode marks `app-store` deprecated.
+- With Fastlane 2.236.x, keep the export method value as `app-store`; Fastlane does not accept Xcode 26's newer `app-store-connect` method name yet.
 
 For TestFlight duplicate build errors:
 
