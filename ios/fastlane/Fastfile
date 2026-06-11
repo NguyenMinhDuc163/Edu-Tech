@@ -1,6 +1,7 @@
 default_platform(:ios)
 
 require "rbconfig"
+require "shellwords"
 
 def bundle_command
   ENV["BUNDLE_BIN"] || File.join(File.dirname(RbConfig.ruby), "bundle")
@@ -35,6 +36,22 @@ def flutter_command
   "flutter"
 end
 
+def app_store_connect_key_path
+  ENV["APP_STORE_CONNECT_API_KEY_KEY_FILEPATH"].to_s.strip
+end
+
+def xcodebuild_auth_args
+  key_path = app_store_connect_key_path
+  return "-allowProvisioningUpdates" if key_path.empty?
+
+  [
+    "-allowProvisioningUpdates",
+    "-authenticationKeyPath #{Shellwords.escape(key_path)}",
+    "-authenticationKeyID #{Shellwords.escape(ENV.fetch("APP_STORE_CONNECT_KEY_ID"))}",
+    "-authenticationKeyIssuerID #{Shellwords.escape(ENV.fetch("APP_STORE_CONNECT_ISSUER_ID"))}"
+  ].join(" ")
+end
+
 platform :ios do
   APP_IDENTIFIER = "com.nguyenduc.edtech"
   TEAM_ID = "Q236Z72BGN"
@@ -64,7 +81,8 @@ platform :ios do
       clean: true,
       include_bitcode: false,
       include_symbols: true,
-      export_xcargs: "-allowProvisioningUpdates"
+      xcargs: xcodebuild_auth_args,
+      export_xcargs: xcodebuild_auth_args
     )
   end
 
