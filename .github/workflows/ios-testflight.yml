@@ -79,7 +79,6 @@ jobs:
     env:
       APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
       APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
-      APP_STORE_CONNECT_API_KEY_KEY_FILEPATH: ${{ runner.temp }}/AuthKey.p8
       FASTLANE_SKIP_UPDATE_CHECK: "1"
       FASTLANE_HIDE_CHANGELOG: "1"
     steps:
@@ -92,8 +91,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          printf '%s' '${{ secrets.APP_STORE_CONNECT_API_KEY_P8 }}' > "$APP_STORE_CONNECT_API_KEY_KEY_FILEPATH"
-          chmod 600 "$APP_STORE_CONNECT_API_KEY_KEY_FILEPATH"
+          api_key_path="$RUNNER_TEMP/AuthKey.p8"
+          echo "APP_STORE_CONNECT_API_KEY_KEY_FILEPATH=$api_key_path" >> "$GITHUB_ENV"
+          printf '%s' '${{ secrets.APP_STORE_CONNECT_API_KEY_P8 }}' > "$api_key_path"
+          chmod 600 "$api_key_path"
 
       - name: Select Xcode
         shell: bash
