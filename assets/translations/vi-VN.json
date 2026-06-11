@@ -16,7 +16,13 @@
     "lang_vi_short": "VI",
     "min_short": "phút",
     "payments": "Thanh toán",
-    "retry": "Thử lại"
+    "retry": "Thử lại",
+    "cancel": "Hủy",
+    "confirm": "Xác nhận",
+    "delete_account": "Xóa tài khoản",
+    "delete_account_confirm_title": "Xóa tài khoản",
+    "delete_account_confirm_message": "Dữ liệu tài khoản của bạn sẽ bị xóa. Hành động này không thể hoàn tác. Bạn có muốn tiếp tục không?",
+    "delete_account_success": "Xóa tài khoản thành công"
   },
   "home_screen": {
     "title": "trang chủ",

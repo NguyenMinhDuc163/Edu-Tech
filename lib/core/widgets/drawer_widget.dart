@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:ed_tech/core/widgets/switch_botton_widget.dart';
 import 'package:ed_tech/core/widgets/template/button_widget.dart';
+import 'package:ed_tech/core/widgets/toast.dart';
 import 'package:ed_tech/core/theme/locale_cubit.dart';
 import 'package:ed_tech/core/theme/theme_cubit.dart';
 import 'package:ed_tech/init.dart';
@@ -45,9 +46,7 @@ class DrawerWidget extends StatelessWidget {
                   bottomRight: Radius.circular(30),
                 ),
               ),
-              child: Builder(
-                builder: _buildDrawerHeader,
-              ),
+              child: Builder(builder: _buildDrawerHeader),
             ),
             Row(
               children: [
@@ -62,7 +61,8 @@ class DrawerWidget extends StatelessWidget {
                   padding: AppPad.h10,
                   child: SwitchBottomWidget(
                     onChanged: (value) {
-                      final newThemeMode = value ? ThemeMode.dark : ThemeMode.light;
+                      final newThemeMode =
+                          value ? ThemeMode.dark : ThemeMode.light;
                       context.read<ThemeCubit>().setThemeMode(newThemeMode);
                     },
                   ),
@@ -96,7 +96,9 @@ class DrawerWidget extends StatelessWidget {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
-                            isEnglish ? 'common.lang_en_short'.tr() : 'common.lang_vi_short'.tr(),
+                            isEnglish
+                                ? 'common.lang_en_short'.tr()
+                                : 'common.lang_vi_short'.tr(),
                             style: AppTextStyles.textContent3.copyWith(
                               color: AppColors.coolGray,
                               fontWeight: FontWeight.bold,
@@ -128,6 +130,15 @@ class DrawerWidget extends StatelessWidget {
               },
             ),
             _buildDrawerItem(
+              icon: IconPath.iconTrash,
+              title: 'common.delete_account'.tr(),
+              iconColor: AppColors.crimson,
+              textStyle: AppTextStyles.textContent2.copyWith(
+                color: AppColors.crimson,
+              ),
+              onTap: () => _showDeleteAccountConfirmDialog(context),
+            ),
+            _buildDrawerItem(
               icon: IconPath.iconLogout,
               title: 'common.logout'.tr(),
               iconColor: Colors.red,
@@ -144,6 +155,56 @@ class DrawerWidget extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  void _showDeleteAccountConfirmDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder:
+          (dialogContext) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            title: Text('common.delete_account_confirm_title'.tr()),
+            content: Text('common.delete_account_confirm_message'.tr()),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext),
+                child: Text('common.cancel'.tr()),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  final navigator = Navigator.of(context);
+                  final repo = context.read<SignInRepo>();
+
+                  Navigator.pop(dialogContext);
+                  Navigator.pop(context);
+
+                  try {
+                    final message = await repo.deleteAccount();
+                    showToastTop(
+                      message:
+                          message.isNotEmpty
+                              ? message
+                              : 'common.delete_account_success'.tr(),
+                    );
+                    navigator.pushNamedAndRemoveUntil(
+                      SignInScreen.routeName,
+                      (route) => false,
+                    );
+                  } catch (e) {
+                    showToastTop(message: e.toString());
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.crimson,
+                  foregroundColor: Colors.white,
+                ),
+                child: Text('common.confirm'.tr()),
+              ),
+            ],
+          ),
     );
   }
 
@@ -169,12 +230,16 @@ class DrawerWidget extends StatelessWidget {
                   CircleAvatar(
                     radius: 25,
                     backgroundColor: Colors.grey[200],
-                    backgroundImage: userData?.avatarUrl != null && userData!.avatarUrl!.isNotEmpty
-                        ? NetworkImage(userData.avatarUrl!)
-                        : null,
-                    child: userData?.avatarUrl == null || userData!.avatarUrl!.isEmpty
-                        ? Icon(Icons.person)
-                        : null,
+                    backgroundImage:
+                        userData?.avatarUrl != null &&
+                                userData!.avatarUrl!.isNotEmpty
+                            ? NetworkImage(userData.avatarUrl!)
+                            : null,
+                    child:
+                        userData?.avatarUrl == null ||
+                                userData!.avatarUrl!.isEmpty
+                            ? Icon(Icons.person)
+                            : null,
                   ),
                   Expanded(
                     child: Column(
@@ -184,7 +249,9 @@ class DrawerWidget extends StatelessWidget {
                         if (email.isNotEmpty)
                           Text(
                             email,
-                            style: AppTextStyles.textContent3.copyWith(color: AppColors.coolGray),
+                            style: AppTextStyles.textContent3.copyWith(
+                              color: AppColors.coolGray,
+                            ),
                             overflow: TextOverflow.ellipsis,
                           ),
                       ],
@@ -195,7 +262,9 @@ class DrawerWidget extends StatelessWidget {
                     boderRadius: AppBorderRadius.a8,
                     padding: AppPad.h10v8,
                     backgroundColor: AppColors.offWhite,
-                    titleStyle: AppTextStyles.textContent3.copyWith(color: AppColors.coolGray),
+                    titleStyle: AppTextStyles.textContent3.copyWith(
+                      color: AppColors.coolGray,
+                    ),
                   ),
                 ],
               ),

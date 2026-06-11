@@ -11,20 +11,22 @@ import 'package:ed_tech/data/services/user_service.dart';
 import 'package:ed_tech/modules/auth/login/model/login_social_response.dart';
 import 'package:ed_tech/modules/auth/sign_in/model/login_response.dart';
 
-
 class SignInRepo {
   final ApiClient apiClient;
   final AuthService authService;
 
   SignInRepo({required this.apiClient, required this.authService});
 
-  Future<void> login({required String username, required String password}) async {
+  Future<void> login({
+    required String username,
+    required String password,
+  }) async {
     final res = await apiClient.fetch(
       ApiPath.login,
       RequestMethod.post,
-      rawData: {"username":username, "password": password,},
+      rawData: {"username": username, "password": password},
     );
-    if(res.code != 200){
+    if (res.code != 200) {
       throw res.message;
     }
 
@@ -54,17 +56,22 @@ class SignInRepo {
           phone: user.phone,
           grade: user.grade,
           subjectSpecialty: user.subjectSpecialty,
-          certificates: user.certificates?.map((cert) => CertificateData(
-            id: cert.id,
-            title: cert.title,
-            description: cert.description,
-            issuedBy: cert.issuedBy,
-            issuedAt: cert.issuedAt,
-            expiresAt: cert.expiresAt,
-            fileUrl: cert.fileUrl,
-            createdAt: cert.createdAt,
-            updatedAt: cert.updatedAt,
-          )).toList(),
+          certificates:
+              user.certificates
+                  ?.map(
+                    (cert) => CertificateData(
+                      id: cert.id,
+                      title: cert.title,
+                      description: cert.description,
+                      issuedBy: cert.issuedBy,
+                      issuedAt: cert.issuedAt,
+                      expiresAt: cert.expiresAt,
+                      fileUrl: cert.fileUrl,
+                      createdAt: cert.createdAt,
+                      updatedAt: cert.updatedAt,
+                    ),
+                  )
+                  .toList(),
         ),
       );
     }
@@ -110,4 +117,23 @@ class SignInRepo {
     }
   }
 
+  Future<String> deleteAccount() async {
+    final res = await apiClient.fetch(
+      ApiPath.deleteAccount,
+      RequestMethod.post,
+    );
+
+    if (res.status != 200) {
+      throw res.message;
+    }
+
+    final data = res.data;
+    final message = data['message'] ?? res.message;
+
+    await authService.invalid();
+    await UserService.instance.clearUserData();
+    await AppEventService.notifyUserSignOut();
+
+    return message;
+  }
 }

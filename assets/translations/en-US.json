@@ -16,7 +16,13 @@
     "lang_vi_short": "VI",
     "min_short": "min",
     "payments": "Payments",
-    "retry": "Retry"
+    "retry": "Retry",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "delete_account": "Delete Account",
+    "delete_account_confirm_title": "Delete account",
+    "delete_account_confirm_message": "Your account data will be deleted. This action cannot be undone. Do you want to continue?",
+    "delete_account_success": "Account deleted successfully"
   },
   "home_screen": {
     "title": "Home Screen",
