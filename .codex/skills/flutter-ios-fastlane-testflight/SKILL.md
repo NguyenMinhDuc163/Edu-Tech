@@ -109,6 +109,16 @@ find "$tmp/Payload" -name Info.plist -print0 |
 2. If embedded frameworks/bundles share the app bundle id, remove global `PRODUCT_BUNDLE_IDENTIFIER=...` from `build_app(xcargs:)`.
 3. Rebuild a new IPA with a new build number before uploading again.
 
+For `ARCHIVE SUCCEEDED` followed by `Error packaging up the application` and `Looks like no provisioning profile mapping was provided` on GitHub Actions:
+
+- Treat this as an export/signing problem, not a Flutter compile problem.
+- Do not assume the 3 App Store Connect API key values are enough for a clean hosted macOS runner.
+- Install an Apple Distribution `.p12` certificate and an App Store `.mobileprovision` profile into the runner keychain/profile directory, then pass the extracted profile name through `IOS_PROVISIONING_PROFILE_NAME`.
+- Use `export_options` with `signingStyle: "manual"` and `provisioningProfiles: { APP_IDENTIFIER => profile_name }` when `IOS_PROVISIONING_PROFILE_NAME` is present.
+- Upload `~/Library/Logs/gym/*.log` as a failure artifact so the real `xcodebuild -exportArchive` error is available.
+- Required GitHub Actions secrets for this workflow:
+  `APP_STORE_CONNECT_KEY_ID`, `APP_STORE_CONNECT_ISSUER_ID`, `APP_STORE_CONNECT_API_KEY_P8`, `IOS_DISTRIBUTION_CERTIFICATE_P12_BASE64`, `IOS_DISTRIBUTION_CERTIFICATE_PASSWORD`, `IOS_APPSTORE_PROVISIONING_PROFILE_BASE64`.
+
 For TestFlight duplicate build errors:
 
 - Increase the build number after `+` in `pubspec.yaml`, e.g. `version: 1.0.0+39`.

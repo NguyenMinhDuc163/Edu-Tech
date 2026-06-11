@@ -52,6 +52,29 @@ def xcodebuild_auth_args
   ].join(" ")
 end
 
+def ci_provisioning_profile_name
+  ENV["IOS_PROVISIONING_PROFILE_NAME"].to_s.strip
+end
+
+def build_export_options
+  options = {
+    teamID: TEAM_ID,
+    manageAppVersionAndBuildNumber: false
+  }
+
+  profile_name = ci_provisioning_profile_name
+  if profile_name.empty?
+    options[:signingStyle] = "automatic"
+  else
+    options[:signingStyle] = "manual"
+    options[:provisioningProfiles] = {
+      APP_IDENTIFIER => profile_name
+    }
+  end
+
+  options
+end
+
 platform :ios do
   APP_IDENTIFIER = "com.nguyenduc.edtech"
   TEAM_ID = "Q236Z72BGN"
@@ -76,11 +99,7 @@ platform :ios do
       scheme: "Runner",
       configuration: "Release",
       export_method: "app-store",
-      export_options: {
-        signingStyle: "automatic",
-        teamID: TEAM_ID,
-        manageAppVersionAndBuildNumber: false
-      },
+      export_options: build_export_options,
       output_directory: "../build/ios/ipa",
       output_name: "EdTech-#{version[:name]}-#{version[:number]}.ipa",
       clean: true,
