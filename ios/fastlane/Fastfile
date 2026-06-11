@@ -58,7 +58,10 @@ end
 
 def build_export_options
   options = {
+    method: "app-store-connect",
     teamID: TEAM_ID,
+    uploadSymbols: true,
+    uploadBitcode: false,
     manageAppVersionAndBuildNumber: false
   }
 
@@ -73,6 +76,21 @@ def build_export_options
   end
 
   options
+end
+
+def configure_ci_code_signing
+  profile_name = ci_provisioning_profile_name
+  return if profile_name.empty?
+
+  update_code_signing_settings(
+    path: "Runner.xcodeproj",
+    use_automatic_signing: false,
+    team_id: TEAM_ID,
+    targets: ["Runner"],
+    build_configurations: ["Release"],
+    code_sign_identity: "Apple Distribution",
+    profile_name: profile_name
+  )
 end
 
 platform :ios do
@@ -93,21 +111,19 @@ platform :ios do
     end
 
     sh("#{bundle_command} exec pod install --clean-install")
+    configure_ci_code_signing
 
     build_app(
       workspace: "Runner.xcworkspace",
       scheme: "Runner",
       configuration: "Release",
-      export_method: "app-store",
       export_options: build_export_options,
       output_directory: "../build/ios/ipa",
       output_name: "EdTech-#{version[:name]}-#{version[:number]}.ipa",
       clean: true,
       include_bitcode: false,
       include_symbols: true,
-      skip_profile_detection: true,
-      xcargs: xcodebuild_auth_args,
-      export_xcargs: xcodebuild_auth_args
+      skip_profile_detection: true
     )
   end
 

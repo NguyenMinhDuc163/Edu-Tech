@@ -119,6 +119,13 @@ For `ARCHIVE SUCCEEDED` followed by `Error packaging up the application` and `Lo
 - Required GitHub Actions secrets for this workflow:
   `APP_STORE_CONNECT_KEY_ID`, `APP_STORE_CONNECT_ISSUER_ID`, `APP_STORE_CONNECT_API_KEY_P8`, `IOS_DISTRIBUTION_CERTIFICATE_P12_BASE64`, `IOS_DISTRIBUTION_CERTIFICATE_PASSWORD`, `IOS_APPSTORE_PROVISIONING_PROFILE_BASE64`.
 
+For `xcodebuild -exportArchive` exit status `64` after `ARCHIVE SUCCEEDED`:
+
+- Treat it as invalid export command arguments.
+- Remember Fastlane/gym appends `xcargs` to the `-exportArchive` command too, not only archive/build.
+- Do not pass App Store Connect authentication flags through `build_app(xcargs:)` or `export_xcargs` when a certificate/profile is already installed.
+- For Xcode 26+, prefer `export_options: { method: "app-store-connect", ... }` instead of `export_method: "app-store"` because Xcode marks `app-store` deprecated.
+
 For TestFlight duplicate build errors:
 
 - Increase the build number after `+` in `pubspec.yaml`, e.g. `version: 1.0.0+39`.
