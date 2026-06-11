@@ -76,11 +76,17 @@ platform :ios do
       scheme: "Runner",
       configuration: "Release",
       export_method: "app-store",
+      export_options: {
+        signingStyle: "automatic",
+        teamID: TEAM_ID,
+        manageAppVersionAndBuildNumber: false
+      },
       output_directory: "../build/ios/ipa",
       output_name: "EdTech-#{version[:name]}-#{version[:number]}.ipa",
       clean: true,
       include_bitcode: false,
       include_symbols: true,
+      skip_profile_detection: true,
       xcargs: xcodebuild_auth_args,
       export_xcargs: xcodebuild_auth_args
     )
