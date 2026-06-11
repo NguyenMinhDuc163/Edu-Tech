@@ -11,21 +11,22 @@ concurrency:
   cancel-in-progress: false
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   bump_version:
     name: Bump pubspec build number
     if: ${{ !contains(github.event.head_commit.message || '', '[skip ci]') }}
     runs-on: ubuntu-24.04
+    permissions:
+      contents: write
     outputs:
       version: ${{ steps.bump.outputs.version }}
       build_number: ${{ steps.bump.outputs.build_number }}
+      commit_sha: ${{ steps.commit.outputs.commit_sha }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Increment build number
         id: bump
@@ -56,11 +57,13 @@ jobs:
           PY
 
       - name: Commit version bump
+        id: commit
         shell: bash
         run: |
           set -euo pipefail
           if git diff --quiet -- pubspec.yaml; then
             echo "No pubspec.yaml version change."
+            echo "commit_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
@@ -69,12 +72,15 @@ jobs:
           git add pubspec.yaml
           git commit -m "ci: bump iOS build to ${{ steps.bump.outputs.version }}+${{ steps.bump.outputs.build_number }} [skip ci]"
           git push
+          echo "commit_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
   build_testflight:
     name: Build and upload TestFlight
     needs: bump_version
     if: ${{ !contains(github.event.head_commit.message || '', '[skip ci]') }}
     runs-on: macos-26
+    permissions:
+      contents: read
     timeout-minutes: 60
     env:
       APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
@@ -85,7 +91,36 @@ jobs:
       - name: Checkout bumped main
         uses: actions/checkout@v4
         with:
-          ref: main
+          ref: ${{ needs.bump_version.outputs.commit_sha }}
+          persist-credentials: false
+
+      - name: Validate required secrets
+        shell: bash
+        env:
+          APP_STORE_CONNECT_API_KEY_P8: ${{ secrets.APP_STORE_CONNECT_API_KEY_P8 }}
+          IOS_DISTRIBUTION_CERTIFICATE_P12_BASE64: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE_P12_BASE64 }}
+          IOS_DISTRIBUTION_CERTIFICATE_PASSWORD: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE_PASSWORD }}
+          IOS_APPSTORE_PROVISIONING_PROFILE_BASE64: ${{ secrets.IOS_APPSTORE_PROVISIONING_PROFILE_BASE64 }}
+        run: |
+          set -euo pipefail
+          missing=0
+          for name in \
+            APP_STORE_CONNECT_KEY_ID \
+            APP_STORE_CONNECT_ISSUER_ID \
+            APP_STORE_CONNECT_API_KEY_P8 \
+            IOS_DISTRIBUTION_CERTIFICATE_P12_BASE64 \
+            IOS_DISTRIBUTION_CERTIFICATE_PASSWORD \
+            IOS_APPSTORE_PROVISIONING_PROFILE_BASE64
+          do
+            if [ -z "${!name:-}" ]; then
+              echo "::error::$name is not set"
+              missing=1
+            fi
+          done
+
+          if [ "$missing" -ne 0 ]; then
+            exit 1
+          fi
 
       - name: Write App Store Connect API key
         shell: bash
