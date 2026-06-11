@@ -49,3 +49,9 @@ app.*.map.json
 env/.env.dev
 env/.env.prod
 /env/.env.dev
+
+# fastlane secrets
+ios/fastlane/.env
+ios/fastlane/.env.*
+!ios/fastlane/.env.example
+ios/fastlane/AuthKey_*.p8

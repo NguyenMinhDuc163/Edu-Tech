@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="fastlane.lanes">
+    
+    
+    
+      
+      <testcase classname="fastlane.lanes" name="0: default_platform" time="0.000499">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="1: app_store_connect_api_key" time="0.003802">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="2: Switch to ios build lane" time="0.000161">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="3: /opt/homebrew/bin/fvm flutter pub get" time="2.131906">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="4: /opt/homebrew/Cellar/ruby/4.0.1/bin/bundle exec pod install --clean-install" time="1.842215">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="5: build_app" time="97.050908">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="6: upload_to_testflight" time="173.361275">
+        
+      </testcase>
+    
+  </testsuite>
+</testsuites>
