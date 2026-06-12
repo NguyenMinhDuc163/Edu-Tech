@@ -55,3 +55,4 @@ ios/fastlane/.env
 ios/fastlane/.env.*
 !ios/fastlane/.env.example
 ios/fastlane/AuthKey_*.p8
+android/fastlane/play-store-credentials*.json
