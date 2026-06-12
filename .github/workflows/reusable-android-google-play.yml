@@ -119,6 +119,7 @@ jobs:
         with:
           distribution: temurin
           java-version: "17"
+          cache: gradle
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -132,13 +133,6 @@ jobs:
           ruby-version: "4.0"
           bundler-cache: true
           working-directory: android
-
-      - name: Clean workspace build outputs
-        shell: bash
-        run: |
-          set -euo pipefail
-          flutter clean
-          rm -rf build android/app/build
 
       - name: Upload to Google Play
         working-directory: android

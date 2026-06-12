@@ -85,7 +85,7 @@ platform :android do
     build_args << "--build-number #{options[:build_number].to_s.shellescape}" if options[:build_number]
 
     project_root_sh("#{flutter_bin} pub get")
-    project_root_sh("#{flutter_bin} build appbundle --release #{build_args.join(' ')}".strip)
+    project_root_sh("#{flutter_bin} build appbundle --release --no-pub #{build_args.join(' ')}".strip)
 
     UI.success("AAB generated at #{AAB_PATH}")
   end
