@@ -121,6 +121,14 @@ jobs:
           java-version: "17"
           cache: gradle
 
+      - name: Cache Android SDK packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            /usr/local/lib/android/sdk/ndk/27.0.12077973
+            /usr/local/lib/android/sdk/platforms/android-33
+          key: ${{ runner.os }}-android-sdk-ndk-27.0.12077973-platform-33-v1
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
