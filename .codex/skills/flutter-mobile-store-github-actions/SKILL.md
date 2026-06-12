@@ -12,6 +12,7 @@ description: Configure, review, or debug this project's Flutter mobile store CI/
 - Prefer non-upload validation first: YAML parse, `ruby -c`, `bundle exec fastlane lanes`, and `bundle exec fastlane android doctor` only when local secret files are present.
 - Preserve the single-version-bump invariant: exactly one job should increment `pubspec.yaml`, commit with `[skip ci]`, and expose the bumped commit SHA. Store build jobs must checkout that SHA.
 - Use reusable workflows when the main workflow becomes long, but keep dependency ordering in the caller workflow with `needs: bump_version`.
+- Do not comment out a reusable workflow file to skip a platform. The caller still references that file and GitHub can fail the workflow before the other platform builds. Add root toggles such as `RUN_IOS` and `RUN_ANDROID`, resolve them in a small config job, then skip the caller job with `if`.
 - For Android-specific Fastlane details, also use the `flutter-android-fastlane-google-play` skill. For iOS Fastlane/TestFlight signing details, also use the `flutter-ios-fastlane-testflight` skill.
 
 ## Expected Workflow Shape
@@ -34,7 +35,56 @@ bump_version
 
 `build_testflight` and `build_google_play` should be reusable workflow jobs:
 
+For push-to-main defaults, expose root toggles:
+
 ```yaml
+env:
+  RUN_IOS: "false"
+  RUN_ANDROID: "true"
+  ANDROID_TRACK: "internal"
+  ANDROID_RELEASE_STATUS: "completed"
+```
+
+For manual testing, also expose workflow inputs:
+
+```yaml
+workflow_dispatch:
+  inputs:
+    run_ios:
+      description: "Build and upload iOS TestFlight"
+      type: boolean
+      default: false
+    run_android:
+      description: "Build and upload Android Google Play"
+      type: boolean
+      default: true
+```
+
+GitHub job-level `if` cannot reliably read workflow `env` directly. Add a tiny `release_config` job that converts root `env` plus optional `workflow_dispatch` overrides into job outputs:
+
+```yaml
+release_config:
+  outputs:
+    run_ios: ${{ steps.config.outputs.run_ios }}
+    run_android: ${{ steps.config.outputs.run_android }}
+    android_track: ${{ steps.config.outputs.android_track }}
+    android_release_status: ${{ steps.config.outputs.android_release_status }}
+```
+
+Make `bump_version` depend on `release_config`, and only bump if at least one platform is enabled:
+
+```yaml
+needs: release_config
+if: ${{ needs.release_config.outputs.run_ios == 'true' || needs.release_config.outputs.run_android == 'true' }}
+```
+
+Then make each store job depend only on `release_config` and `bump_version`, not on the other store job:
+
+```yaml
+needs:
+  - release_config
+  - bump_version
+if: ${{ needs.release_config.outputs.run_ios == 'true' }}
 uses: ./.github/workflows/reusable-ios-testflight.yml
 with:
   commit_sha: ${{ needs.bump_version.outputs.commit_sha }}
@@ -42,15 +92,21 @@ secrets: inherit
 ```
 
 ```yaml
+needs:
+  - release_config
+  - bump_version
+if: ${{ needs.release_config.outputs.run_android == 'true' }}
 uses: ./.github/workflows/reusable-android-google-play.yml
 with:
   commit_sha: ${{ needs.bump_version.outputs.commit_sha }}
-  android_track: ${{ github.event_name == 'workflow_dispatch' && inputs.android_track || 'internal' }}
-  android_release_status: ${{ github.event_name == 'workflow_dispatch' && inputs.android_release_status || 'completed' }}
+  android_track: ${{ needs.release_config.outputs.android_track }}
+  android_release_status: ${{ needs.release_config.outputs.android_release_status }}
 secrets: inherit
 ```
 
 Avoid independent workflow files connected only by `workflow_run` unless the user specifically wants separate timeline entries. `workflow_run` makes it easier to accidentally build the wrong commit.
+
+If iOS fails at runtime, Android should still run because Android only needs `bump_version`, not `build_testflight`. If Android does not start, inspect the caller workflow for invalid reusable workflow references or accidental `needs: [bump_version, build_testflight]`.
 
 ## Version Bump Job
 
