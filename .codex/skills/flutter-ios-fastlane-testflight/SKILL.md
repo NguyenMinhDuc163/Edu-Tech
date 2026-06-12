@@ -83,6 +83,40 @@ Do not use `APP_STORE_CONNECT_API_KEY_PATH` for a raw `.p8` file. Fastlane/Pilot
 - If `flutter` is not in PATH, support FVM or `FLUTTER_ROOT/bin/flutter`, but do not hardcode one user's Flutter path unless the repo already does.
 - For local build output, naming the IPA from `pubspec.yaml` is safe, e.g. `EdTech-1.0.0-38.ipa`; do not rely on output filename as the actual app version.
 
+## GitHub Actions Cache Guidance
+
+Hosted macOS runners are clean, so avoid deleting caches that were just restored. In this repo, do not add a generic pre-build step that runs:
+
+```bash
+flutter clean
+rm -rf build ios/build ios/Pods ios/.symlinks
+```
+
+That removes `ios/Pods` and makes CocoaPods cache ineffective. Prefer caching CocoaPods before the Fastlane build:
+
+```yaml
+- name: Cache CocoaPods
+  uses: actions/cache@v4
+  with:
+    path: |
+      ~/Library/Caches/CocoaPods
+      ~/.cocoapods/repos
+      ios/Pods
+    key: ${{ runner.os }}-cocoapods-${{ hashFiles('ios/Podfile.lock', 'pubspec.lock') }}-v1
+    restore-keys: |
+      ${{ runner.os }}-cocoapods-
+```
+
+In CI, prefer:
+
+```bash
+bundle exec pod install --deployment
+```
+
+over `pod install --clean-install` when `ios/Podfile.lock` is committed. `--deployment` respects the lockfile and fails if pods are out of sync, which is useful for reproducible CI. Keep `build_app(clean: true)` if a clean archive is desired; it is separate from CocoaPods dependency caching.
+
+Do not cache Xcode `DerivedData` for signed App Store/TestFlight builds unless logs prove compilation dominates and the user accepts larger, more fragile caches.
+
 ## Debugging Upload Errors
 
 For `invalid number: '-----BEGIN'` at `upload_to_testflight`:

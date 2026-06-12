@@ -145,12 +145,16 @@ jobs:
           bundler-cache: true
           working-directory: ios
 
-      - name: Clean workspace build outputs
-        shell: bash
-        run: |
-          set -euo pipefail
-          flutter clean
-          rm -rf build ios/build ios/Pods ios/.symlinks
+      - name: Cache CocoaPods
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/Library/Caches/CocoaPods
+            ~/.cocoapods/repos
+            ios/Pods
+          key: ${{ runner.os }}-cocoapods-${{ hashFiles('ios/Podfile.lock', 'pubspec.lock') }}-v1
+          restore-keys: |
+            ${{ runner.os }}-cocoapods-
 
       - name: Upload to TestFlight
         working-directory: ios
