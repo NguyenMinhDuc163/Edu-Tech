@@ -1,0 +1,230 @@
+---
+name: flutter-mobile-store-github-actions
+description: Configure, review, or debug this project's Flutter mobile store CI/CD with GitHub Actions. Use when setting up or changing workflows that bump pubspec.yaml once, then build/upload iOS TestFlight and Android Google Play from the bumped commit; when splitting workflows into reusable workflow_call files; when preparing Android keystore, key.properties, and Google Play service account secrets; or when diagnosing mobile GitHub Actions/Fastlane release failures.
+---
+
+# Flutter Mobile Store GitHub Actions
+
+## Operating Rules
+
+- Do not run live store upload commands unless the user explicitly asks. Treat `fastlane ios beta`, `fastlane android deploy*`, and any workflow dispatch that uploads to stores as production-affecting.
+- Keep secret material out of terminal output. Do not print keystore bytes, `key.properties`, `.p8` keys, `.p12` certificates, provisioning profiles, or Google Play JSON contents.
+- Prefer non-upload validation first: YAML parse, `ruby -c`, `bundle exec fastlane lanes`, and `bundle exec fastlane android doctor` only when local secret files are present.
+- Preserve the single-version-bump invariant: exactly one job should increment `pubspec.yaml`, commit with `[skip ci]`, and expose the bumped commit SHA. Store build jobs must checkout that SHA.
+- Use reusable workflows when the main workflow becomes long, but keep dependency ordering in the caller workflow with `needs: bump_version`.
+- For Android-specific Fastlane details, also use the `flutter-android-fastlane-google-play` skill. For iOS Fastlane/TestFlight signing details, also use the `flutter-ios-fastlane-testflight` skill.
+
+## Expected Workflow Shape
+
+Use three workflow files for this repository:
+
+```text
+.github/workflows/mobile-store-release.yml
+.github/workflows/reusable-ios-testflight.yml
+.github/workflows/reusable-android-google-play.yml
+```
+
+The caller workflow owns triggers, concurrency, and the version bump:
+
+```text
+bump_version
+  -> build_testflight
+  -> build_google_play
+```
+
+`build_testflight` and `build_google_play` should be reusable workflow jobs:
+
+```yaml
+uses: ./.github/workflows/reusable-ios-testflight.yml
+with:
+  commit_sha: ${{ needs.bump_version.outputs.commit_sha }}
+secrets: inherit
+```
+
+```yaml
+uses: ./.github/workflows/reusable-android-google-play.yml
+with:
+  commit_sha: ${{ needs.bump_version.outputs.commit_sha }}
+  android_track: ${{ github.event_name == 'workflow_dispatch' && inputs.android_track || 'internal' }}
+  android_release_status: ${{ github.event_name == 'workflow_dispatch' && inputs.android_release_status || 'completed' }}
+secrets: inherit
+```
+
+Avoid independent workflow files connected only by `workflow_run` unless the user specifically wants separate timeline entries. `workflow_run` makes it easier to accidentally build the wrong commit.
+
+## Version Bump Job
+
+The bump job should:
+
+- Run before both store build jobs.
+- Require `contents: write`.
+- Update only `pubspec.yaml`.
+- Match `version: x.y.z+n`.
+- Increment only the build number.
+- Commit with `[skip ci]` to prevent an infinite push loop.
+- Output the bumped commit SHA.
+
+Keep the Flutter version name unchanged unless the user explicitly requests a semantic version bump.
+
+## Android Reusable Workflow
+
+The Android workflow should:
+
+- Run on `ubuntu-24.04`.
+- Checkout `inputs.commit_sha`.
+- Set up Java 17, Flutter from `.fvmrc`, and Ruby/Bundler in `android`.
+- Recreate local-only release files on the runner:
+  - `android/key.properties`
+  - the keystore path declared by `storeFile` in `android/key.properties`
+  - `android/fastlane/play-store-credentials.json`
+- Run Fastlane from `android/`:
+
+```bash
+bundle exec fastlane android deploy track:${{ inputs.android_track }} release_status:${{ inputs.android_release_status }}
+```
+
+Use repository secrets:
+
+```text
+GOOGLE_PLAY_SERVICE_ACCOUNT_JSON
+ANDROID_KEYSTORE_BASE64
+ANDROID_KEY_PROPERTIES_BASE64
+```
+
+`GOOGLE_PLAY_SERVICE_ACCOUNT_JSON` should be the raw JSON content. The other two are single-line base64 strings.
+
+## Export Android Secrets
+
+Run these commands locally from the repository root. Prefer clipboard or `gh secret set` so secret values are not printed.
+
+Copy raw Google Play service account JSON to the clipboard:
+
+```bash
+pbcopy < android/fastlane/play-store-credentials.json
+```
+
+Set it with GitHub CLI instead:
+
+```bash
+gh secret set GOOGLE_PLAY_SERVICE_ACCOUNT_JSON < android/fastlane/play-store-credentials.json
+```
+
+Copy base64 `android/key.properties` to the clipboard:
+
+```bash
+base64 < android/key.properties | tr -d '\n' | pbcopy
+```
+
+Set it with GitHub CLI instead:
+
+```bash
+base64 < android/key.properties | tr -d '\n' | gh secret set ANDROID_KEY_PROPERTIES_BASE64 --body-file -
+```
+
+Copy base64 keystore to the clipboard. This resolves the keystore path from `storeFile` and treats relative paths the same way the Android Gradle file does in this repo:
+
+```bash
+store_file=$(awk -F= '/^storeFile=/{gsub(/^[ \t]+|[ \t]+$/, "", $2); print $2}' android/key.properties)
+case "$store_file" in
+  /*) keystore_path="$store_file" ;;
+  *) keystore_path="android/app/$store_file" ;;
+esac
+base64 < "$keystore_path" | tr -d '\n' | pbcopy
+```
+
+Set it with GitHub CLI instead:
+
+```bash
+store_file=$(awk -F= '/^storeFile=/{gsub(/^[ \t]+|[ \t]+$/, "", $2); print $2}' android/key.properties)
+case "$store_file" in
+  /*) keystore_path="$store_file" ;;
+  *) keystore_path="android/app/$store_file" ;;
+esac
+base64 < "$keystore_path" | tr -d '\n' | gh secret set ANDROID_KEYSTORE_BASE64 --body-file -
+```
+
+If the user only has raw values and not files, create the local files first in ignored paths, then run the commands above. Do not commit these files.
+
+## Android Secret Validation
+
+In workflow code, validate only presence, not values:
+
+```bash
+for name in GOOGLE_PLAY_SERVICE_ACCOUNT_JSON ANDROID_KEYSTORE_BASE64 ANDROID_KEY_PROPERTIES_BASE64; do
+  if [ -z "${!name:-}" ]; then
+    echo "::error::$name is not set"
+    missing=1
+  fi
+done
+```
+
+When recreating the keystore, parse `android/key.properties`, read `storeFile`, and write the decoded keystore to:
+
+```text
+absolute storeFile: storeFile
+relative storeFile: android/app/<storeFile>
+```
+
+This matches this repository's `android/app/build.gradle.kts`, where `file(it)` is evaluated from the app module.
+
+## iOS Reusable Workflow
+
+The iOS workflow should:
+
+- Run on `macos-26` unless the repo intentionally pins a different runner.
+- Checkout `inputs.commit_sha`.
+- Recreate App Store Connect API key and Apple signing assets from secrets.
+- Read Flutter version from `.fvmrc`.
+- Set up Flutter and Ruby/Bundler in `ios`.
+- Run:
+
+```bash
+bundle exec fastlane ios beta
+```
+
+Expected iOS secrets:
+
+```text
+APP_STORE_CONNECT_KEY_ID
+APP_STORE_CONNECT_ISSUER_ID
+APP_STORE_CONNECT_API_KEY_P8
+IOS_DISTRIBUTION_CERTIFICATE_P12_BASE64
+IOS_DISTRIBUTION_CERTIFICATE_PASSWORD
+IOS_APPSTORE_PROVISIONING_PROFILE_BASE64
+```
+
+Do not change iOS signing behavior unless the user asks; preserve existing working TestFlight CI.
+
+## Android Fastlane Expectations
+
+Before relying on GitHub Actions, verify the Android Fastlane setup has:
+
+- `android/Gemfile` with `fastlane`.
+- `android/fastlane/Appfile` with package name and `json_key_file("fastlane/play-store-credentials.json")`.
+- `android/fastlane/Fastfile` lanes `doctor`, `build`, `validate`, and `deploy`.
+- `upload_to_play_store` receives `version_name: play_release_name(options)` when the user wants Google Play release names like `48 (1.0.1)`.
+- `.gitignore` ignores `android/fastlane/play-store-credentials*.json`.
+- `android/.gitignore` ignores `key.properties`, `*.jks`, and `*.keystore`.
+
+## Validation Checklist
+
+Run non-upload checks after editing workflows or Fastlane files:
+
+```bash
+ruby -e 'require "yaml"; ARGV.each { |f| YAML.load_file(f); puts "#{f}: ok" }' \
+  .github/workflows/mobile-store-release.yml \
+  .github/workflows/reusable-ios-testflight.yml \
+  .github/workflows/reusable-android-google-play.yml
+ruby -c android/fastlane/Fastfile
+ruby -c ios/fastlane/Fastfile
+cd android && bundle exec fastlane lanes
+cd ios && bundle exec fastlane lanes
+```
+
+If `actionlint` is installed, run it too:
+
+```bash
+actionlint .github/workflows/*.yml
+```
+
+Do not run store-uploading lanes or dispatch the workflow unless the user explicitly asks.
