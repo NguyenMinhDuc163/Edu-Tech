@@ -5,37 +5,37 @@
     
     
       
-      <testcase classname="fastlane.lanes" name="0: default_platform" time="0.000253">
+      <testcase classname="fastlane.lanes" name="0: default_platform" time="0.000333">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="1: Switch to android deploy lane" time="8.3e-05">
+      <testcase classname="fastlane.lanes" name="1: Switch to android deploy lane" time="5.6e-05">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="2: Switch to android doctor lane" time="4.5e-05">
+      <testcase classname="fastlane.lanes" name="2: Switch to android doctor lane" time="4.4e-05">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="3: Switch to android build lane" time="5.1e-05">
+      <testcase classname="fastlane.lanes" name="3: Switch to android build lane" time="4.2e-05">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="4: cd /Users/seatech/Desktop/project/workspace/Edu-Tech &amp;&amp; /Users/seatech/Desktop/project/workspace/Edu-Tech/.fvm/flutter_sdk/bin/flutter pub get" time="1.64107">
+      <testcase classname="fastlane.lanes" name="4: cd /Users/seatech/Desktop/project/workspace/Edu-Tech &amp;&amp; /Users/seatech/Desktop/project/workspace/Edu-Tech/.fvm/flutter_sdk/bin/flutter pub get" time="1.993174">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="5: cd /Users/seatech/Desktop/project/workspace/Edu-Tech &amp;&amp; /Users/seatech/Desktop/project/workspace/Edu-Tech/.fvm/flutter_sdk/bin/flutter build appbundle --release" time="7.987779">
+      <testcase classname="fastlane.lanes" name="5: cd /Users/seatech/Desktop/project/workspace/Edu-Tech &amp;&amp; /Users/seatech/Desktop/project/workspace/Edu-Tech/.fvm/flutter_sdk/bin/flutter build appbundle --release" time="11.730169">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="6: upload_to_play_store" time="47.704212">
+      <testcase classname="fastlane.lanes" name="6: upload_to_play_store" time="56.561946">
         
       </testcase>
     

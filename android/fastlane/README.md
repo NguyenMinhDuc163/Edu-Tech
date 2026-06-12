@@ -1,92 +1,80 @@
-# Android Fastlane
+fastlane documentation
+----
 
-Chay tu thu muc `android/`:
+# Installation
 
-```bash
-cd android
+Make sure you have the latest version of the Xcode command line tools installed:
+
+```sh
+xcode-select --install
 ```
 
-## Lenh chinh
+For _fastlane_ installation instructions, see [Installing _fastlane_](https://docs.fastlane.tools/#installing-fastlane)
 
-```bash
-bundle exec fastlane android doctor
+# Available Actions
+
+## Android
+
+### android doctor
+
+```sh
+[bundle exec] fastlane android doctor
 ```
 
-Kiem tra cau hinh local.
+Check local Android release setup
 
-```bash
-bundle exec fastlane android build
+### android test
+
+```sh
+[bundle exec] fastlane android test
 ```
 
-Build file AAB release.
+Run Flutter tests
 
-```bash
-bundle exec fastlane android validate
+### android build
+
+```sh
+[bundle exec] fastlane android build
 ```
 
-Build va validate upload voi Google Play, khong publish.
+Build signed Android App Bundle
 
-```bash
-bundle exec fastlane android deploy_internal
+### android validate
+
+```sh
+[bundle exec] fastlane android validate
 ```
 
-Build va day len Internal testing.
+Validate Google Play upload without publishing
 
-```bash
-bundle exec fastlane android deploy_closed
+### android deploy_internal
+
+```sh
+[bundle exec] fastlane android deploy_internal
 ```
 
-Build va day len Closed testing.
+Upload a new build to Google Play internal testing
 
-```bash
-bundle exec fastlane android deploy
+### android deploy_closed
+
+```sh
+[bundle exec] fastlane android deploy_closed
 ```
 
-Build va day len track tuy chon.
+Upload a new build to Google Play closed testing
 
-## Tham so co the doi
+### android deploy
 
-```bash
-bundle exec fastlane android build build_number:46
-bundle exec fastlane android build build_name:1.0.1 build_number:46
+```sh
+[bundle exec] fastlane android deploy
 ```
 
-```bash
-bundle exec fastlane android deploy track:internal
-bundle exec fastlane android deploy track:alpha
-bundle exec fastlane android deploy track:beta
-bundle exec fastlane android deploy track:production
-```
+Upload a new build to Google Play
 
-```bash
-bundle exec fastlane android deploy track:alpha release_status:draft
-bundle exec fastlane android deploy track:alpha release_status:completed
-```
+----
 
-```bash
-bundle exec fastlane android deploy_closed build_number:46
-bundle exec fastlane android deploy_closed build_name:1.0.1 build_number:46
-```
+This README.md is auto-generated and will be re-generated every time [_fastlane_](https://fastlane.tools) is run.
 
-## Track
+More information about _fastlane_ can be found on [fastlane.tools](https://fastlane.tools).
 
-```text
-internal   Internal testing
-alpha      Closed testing
-beta       Open testing / beta track
-production Production
-```
-
-## Release status
-
-```text
-draft       Tao ban nhap tren Google Play
-completed   Gui/phat hanh len track da chon
-```
-
-## File can co
-
-```text
-android/key.properties
-android/fastlane/play-store-credentials.json
-```
+The documentation of _fastlane_ can be found on [docs.fastlane.tools](https://docs.fastlane.tools).

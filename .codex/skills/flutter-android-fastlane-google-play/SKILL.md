@@ -29,7 +29,7 @@ Ask for or discover these before finalizing setup:
 - Google Play service account JSON file:
   place it at `android/fastlane/play-store-credentials.json`.
 - Versioning policy:
-  update `pubspec.yaml` `version: x.y.z+N`, or pass `build_number:N` to Fastlane.
+  update `pubspec.yaml` `version: x.y.z+N`, or pass `build_name:x.y.z build_number:N` to Fastlane.
 
 For first-time Play Console setup, guide the user to create/link a Google Cloud project, enable Google Play Android Developer API, create a service account JSON key, then invite the service account email in Google Play Console with release/testing permissions.
 
@@ -104,6 +104,7 @@ default_platform(:android)
 
 PROJECT_ROOT = File.expand_path("../..", __dir__)
 AAB_PATH = File.join(PROJECT_ROOT, "build", "app", "outputs", "bundle", "release", "app-release.aab")
+PUBSPEC_PATH = File.join(PROJECT_ROOT, "pubspec.yaml")
 DEFAULT_TRACK = "internal"
 
 def project_root_sh(command)
@@ -134,6 +135,27 @@ def require_existing_file(path, label)
   UI.user_error!("#{label} not found at #{expanded_path}") unless File.file?(expanded_path)
 
   expanded_path
+end
+
+def pubspec_version_parts
+  version_line = File.readlines(PUBSPEC_PATH).find { |line| line.match?(/^\s*version:/) }
+  UI.user_error!("Flutter version is not configured in #{PUBSPEC_PATH}") if version_line.to_s.empty?
+
+  match = version_line.match(/^\s*version:\s*([^\s+]+)(?:\+(\d+))?/)
+  UI.user_error!("Flutter version must use format x.y.z+N in #{PUBSPEC_PATH}") unless match
+
+  [match[1], match[2]]
+end
+
+def play_release_name(options)
+  pubspec_build_name, pubspec_build_number = pubspec_version_parts
+  build_name = (options[:build_name] || pubspec_build_name).to_s
+  build_number = (options[:build_number] || pubspec_build_number).to_s
+
+  UI.user_error!("Android build name is not configured.") if build_name.empty?
+  UI.user_error!("Android build number is not configured.") if build_number.empty?
+
+  "#{build_number} (#{build_name})"
 end
 
 platform :android do
@@ -178,6 +200,7 @@ platform :android do
     upload_to_play_store(
       track: track,
       aab: AAB_PATH,
+      version_name: play_release_name(options),
       validate_only: true,
       skip_upload_metadata: true,
       skip_upload_changelogs: true,
@@ -207,6 +230,7 @@ platform :android do
     upload_to_play_store(
       track: track,
       aab: AAB_PATH,
+      version_name: play_release_name(options),
       release_status: release_status,
       changes_not_sent_for_review: false,
       skip_upload_metadata: true,
@@ -216,6 +240,37 @@ platform :android do
     )
   end
 end
+```
+
+## Google Play Release Name Pitfall
+
+Google Play Console shows a release name separately from the AAB `versionCode` and Android `versionName`. Manual uploads may appear as `36 (1.0.0)`, while Fastlane uploads can appear as only `1.0.0` if `upload_to_play_store` does not receive `version_name`.
+
+When the project expects Play Console release rows to keep the manual-upload style, set Fastlane's `version_name` upload option explicitly. For Flutter projects, derive it from `pubspec.yaml` `version: x.y.z+N` and format it as:
+
+```ruby
+version_name: "#{build_number} (#{build_name})"
+```
+
+In the template above, `play_release_name(options)` reads `pubspec.yaml` by default and still honors explicit lane parameters:
+
+```bash
+bundle exec fastlane android deploy_internal build_name:1.0.1 build_number:48
+```
+
+This produces the Google Play release name:
+
+```text
+48 (1.0.1)
+```
+
+Do not confuse this with Android's binary version fields:
+
+```text
+version: 1.0.1+48
+versionName = 1.0.1
+versionCode = 48
+Google Play release name = 48 (1.0.1)
 ```
 
 ## Lane Commands

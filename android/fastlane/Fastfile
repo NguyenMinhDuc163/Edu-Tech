@@ -4,6 +4,7 @@ default_platform(:android)
 
 PROJECT_ROOT = File.expand_path("../..", __dir__)
 AAB_PATH = File.join(PROJECT_ROOT, "build", "app", "outputs", "bundle", "release", "app-release.aab")
+PUBSPEC_PATH = File.join(PROJECT_ROOT, "pubspec.yaml")
 DEFAULT_TRACK = "internal"
 
 def project_root_sh(command)
@@ -34,6 +35,27 @@ def require_existing_file(path, label)
   UI.user_error!("#{label} not found at #{expanded_path}") unless File.file?(expanded_path)
 
   expanded_path
+end
+
+def pubspec_version_parts
+  version_line = File.readlines(PUBSPEC_PATH).find { |line| line.match?(/^\s*version:/) }
+  UI.user_error!("Flutter version is not configured in #{PUBSPEC_PATH}") if version_line.to_s.empty?
+
+  match = version_line.match(/^\s*version:\s*([^\s+]+)(?:\+(\d+))?/)
+  UI.user_error!("Flutter version must use format x.y.z+N in #{PUBSPEC_PATH}") unless match
+
+  [match[1], match[2]]
+end
+
+def play_release_name(options)
+  pubspec_build_name, pubspec_build_number = pubspec_version_parts
+  build_name = (options[:build_name] || pubspec_build_name).to_s
+  build_number = (options[:build_number] || pubspec_build_number).to_s
+
+  UI.user_error!("Android build name is not configured.") if build_name.empty?
+  UI.user_error!("Android build number is not configured.") if build_number.empty?
+
+  "#{build_number} (#{build_name})"
 end
 
 platform :android do
@@ -78,6 +100,7 @@ platform :android do
     upload_to_play_store(
       track: track,
       aab: AAB_PATH,
+      version_name: play_release_name(options),
       validate_only: true,
       skip_upload_metadata: true,
       skip_upload_changelogs: true,
@@ -107,6 +130,7 @@ platform :android do
     upload_to_play_store(
       track: track,
       aab: AAB_PATH,
+      version_name: play_release_name(options),
       release_status: release_status,
       changes_not_sent_for_review: false,
       skip_upload_metadata: true,
