@@ -26,7 +26,7 @@
 - 📊 **Theo dõi tiến độ**: Báo cáo chi tiết, xuất file PDF/Excel, bảng điểm tự động
 - 💬 **Chatbot AI**: Trợ lý học tập 24/7 hỗ trợ giải đáp thắc mắc
 - 💳 **Thanh toán tích hợp**: Hỗ trợ nhiều phương thức thanh toán an toàn
-- 🌐 **Đa ngôn ngữ**: Hỗ trợ tiếng Việt và tiếng Anh
+- 🌐 **Đa ngôn ngữ**: Hỗ trợ tiếng Việt và tiếng Anh 
 
 ---
 
