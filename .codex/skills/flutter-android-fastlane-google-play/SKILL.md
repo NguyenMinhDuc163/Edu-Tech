@@ -273,6 +273,45 @@ versionCode = 48
 Google Play release name = 48 (1.0.1)
 ```
 
+## GitHub Actions Android SDK/NDK Cache Pitfall
+
+If Android CI logs repeatedly show package installation during `flutter build appbundle`, the slow part may be Android SDK package downloads rather than Dart/Gradle compile. Cache the SDK directories that match the project; do not assume fixed versions.
+
+Discover the cache targets first:
+
+- Read `android/app/build.gradle*` for `ndkVersion`, for example `ndkVersion = "27.0.12077973"`.
+- Read the CI log for `Install Android SDK Platform XX`; use that `android-XX` platform. This is more reliable than guessing when `compileSdk` is `flutter.compileSdkVersion`.
+
+Example log:
+
+```text
+Install NDK (Side by side) 27.0.12077973
+Install Android SDK Platform 33
+```
+
+Add an `actions/cache@v4` step in the Android workflow before Fastlane/build, substituting the discovered values:
+
+```yaml
+- name: Cache Android SDK packages
+  uses: actions/cache@v4
+  with:
+    path: |
+      /usr/local/lib/android/sdk/ndk/<ndk-version>
+      /usr/local/lib/android/sdk/platforms/android-<platform-api>
+    key: ${{ runner.os }}-android-sdk-ndk-<ndk-version>-platform-<platform-api>-v1
+```
+
+For the example log above:
+
+```yaml
+path: |
+  /usr/local/lib/android/sdk/ndk/27.0.12077973
+  /usr/local/lib/android/sdk/platforms/android-33
+key: ${{ runner.os }}-android-sdk-ndk-27.0.12077973-platform-33-v1
+```
+
+This cache is safe because it stores SDK/NDK toolchain packages, not app source or release build output. Change the key/path when `ndkVersion` or the required Android SDK platform changes.
+
 ## Lane Commands
 
 Run from `android/`:

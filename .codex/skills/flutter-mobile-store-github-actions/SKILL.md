@@ -129,6 +129,7 @@ The Android workflow should:
 - Run on `ubuntu-24.04`.
 - Checkout `inputs.commit_sha`.
 - Set up Java 17, Flutter from `.fvmrc`, and Ruby/Bundler in `android`.
+- Cache Android SDK packages that Gradle downloads during `flutter build`, especially NDK and SDK platforms shown in the logs.
 - Recreate local-only release files on the runner:
   - `android/key.properties`
   - the keystore path declared by `storeFile` in `android/key.properties`
@@ -148,6 +149,46 @@ ANDROID_KEY_PROPERTIES_BASE64
 ```
 
 `GOOGLE_PLAY_SERVICE_ACCOUNT_JSON` should be the raw JSON content. The other two are single-line base64 strings.
+
+## Android SDK/NDK Cache Pitfall
+
+If GitHub Actions logs show Gradle reinstalling Android SDK packages on every run, cache the SDK directories that match the current project. Do not blindly reuse old versions.
+
+First discover the values:
+
+- Read `android/app/build.gradle*` for `ndkVersion`, for example `ndkVersion = "27.0.12077973"`.
+- Read the failed/slow CI log for lines like `Install Android SDK Platform 33`; use that `android-XX` value.
+- If the log is unavailable, inspect `compileSdk`. In Flutter projects it may be `flutter.compileSdkVersion`, so prefer the CI log because it reveals the actual installed platform.
+
+Example log:
+
+```text
+Install NDK (Side by side) 27.0.12077973
+Install Android SDK Platform 33
+```
+
+Then cache those exact paths before the Flutter build:
+
+```yaml
+- name: Cache Android SDK packages
+  uses: actions/cache@v4
+  with:
+    path: |
+      /usr/local/lib/android/sdk/ndk/<ndk-version>
+      /usr/local/lib/android/sdk/platforms/android-<platform-api>
+    key: ${{ runner.os }}-android-sdk-ndk-<ndk-version>-platform-<platform-api>-v1
+```
+
+For the current log above, the concrete cache paths are:
+
+```yaml
+path: |
+  /usr/local/lib/android/sdk/ndk/27.0.12077973
+  /usr/local/lib/android/sdk/platforms/android-33
+key: ${{ runner.os }}-android-sdk-ndk-27.0.12077973-platform-33-v1
+```
+
+This caches toolchain packages, not app source or build output, so it does not build old code. In this repo it reduced the second Android run dramatically because NDK/platform restore replaced repeated downloads. Update the key/path when `android/app/build.gradle*` changes `ndkVersion` or the logs show a different `android-XX` platform.
 
 ## Export Android Secrets
 
