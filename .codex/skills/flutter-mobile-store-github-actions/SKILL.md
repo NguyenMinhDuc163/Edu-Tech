@@ -9,6 +9,7 @@ description: Configure, review, or debug this project's Flutter mobile store CI/
 
 - Do not run live store upload commands unless the user explicitly asks. Treat `fastlane ios beta`, `fastlane android deploy*`, and any workflow dispatch that uploads to stores as production-affecting.
 - Keep secret material out of terminal output. Do not print keystore bytes, `key.properties`, `.p8` keys, `.p12` certificates, provisioning profiles, or Google Play JSON contents.
+- If `pubspec.yaml` includes `.env` under `flutter.assets`, recreate `.env` on CI from the GitHub secret `ENV_FILE_CONTENTS` before any Flutter build. Do not commit the real `.env` file and do not print its contents.
 - Prefer non-upload validation first: YAML parse, `ruby -c`, `bundle exec fastlane lanes`, and `bundle exec fastlane android doctor` only when local secret files are present.
 - Preserve the single-version-bump invariant: exactly one job should increment `pubspec.yaml`, commit with `[skip ci]`, and expose the bumped commit SHA. Store build jobs must checkout that SHA.
 - Use reusable workflows when the main workflow becomes long, but keep dependency ordering in the caller workflow with `needs: bump_version`.
@@ -129,11 +130,25 @@ The Android workflow should:
 - Run on `ubuntu-24.04`.
 - Checkout `inputs.commit_sha`.
 - Set up Java 17, Flutter from `.fvmrc`, and Ruby/Bundler in `android`.
+- When using `ruby/setup-ruby@v1`, always specify `ruby-version` unless the repo has a committed `.ruby-version` or `.tool-versions` file. Without one of these, GitHub Actions fails before Bundler runs:
+
+```yaml
+- name: Set up Ruby
+  uses: ruby/setup-ruby@v1
+  with:
+    ruby-version: "3.3"
+    working-directory: android
+    bundler-cache: true
+```
+
 - Cache Android SDK packages that Gradle downloads during `flutter build`, especially NDK and SDK platforms shown in the logs.
 - Recreate local-only release files on the runner:
   - `android/key.properties`
   - the keystore path declared by `storeFile` in `android/key.properties`
   - `android/fastlane/play-store-credentials.json`
+- Upload build diagnostics artifacts after the deploy step with `if: always()`:
+  - AAB from `build/app/outputs/bundle/release/*.aab`
+  - native libs from `build/app/intermediates/merged_native_libs/release/mergeReleaseNativeLibs/out/lib`
 - Run Fastlane from `android/`:
 
 ```bash
@@ -146,9 +161,31 @@ Use repository secrets:
 GOOGLE_PLAY_SERVICE_ACCOUNT_JSON
 ANDROID_KEYSTORE_BASE64
 ANDROID_KEY_PROPERTIES_BASE64
+ENV_FILE_CONTENTS
 ```
 
-`GOOGLE_PLAY_SERVICE_ACCOUNT_JSON` should be the raw JSON content. The other two are single-line base64 strings.
+`GOOGLE_PLAY_SERVICE_ACCOUNT_JSON` should be the raw JSON content. `ANDROID_KEYSTORE_BASE64` and `ANDROID_KEY_PROPERTIES_BASE64` are single-line base64 strings. `ENV_FILE_CONTENTS` is the raw `.env` file content used by Flutter asset bundling.
+
+If Android fails during `flutter build appbundle` with:
+
+```text
+Error detected in pubspec.yaml:
+No file or variants found for asset: .env.
+Target aot_android_asset_bundle failed: Exception: Failed to bundle asset files.
+```
+
+the runner is missing `.env`. Add `ENV_FILE_CONTENTS` to the reusable workflow `secrets`, validate it with the other required secrets, then write it in the repository root before Fastlane:
+
+```yaml
+- name: Write Flutter dotenv file
+  shell: bash
+  env:
+    ENV_FILE_CONTENTS: ${{ secrets.ENV_FILE_CONTENTS }}
+  run: |
+    set -euo pipefail
+    printf '%s' "$ENV_FILE_CONTENTS" > .env
+    chmod 600 .env
+```
 
 ## Android SDK/NDK Cache Pitfall
 
@@ -242,12 +279,18 @@ base64 < "$keystore_path" | tr -d '\n' | gh secret set ANDROID_KEYSTORE_BASE64 -
 
 If the user only has raw values and not files, create the local files first in ignored paths, then run the commands above. Do not commit these files.
 
+Set the Flutter dotenv secret from the local `.env` file without printing it:
+
+```bash
+gh secret set ENV_FILE_CONTENTS < .env
+```
+
 ## Android Secret Validation
 
 In workflow code, validate only presence, not values:
 
 ```bash
-for name in GOOGLE_PLAY_SERVICE_ACCOUNT_JSON ANDROID_KEYSTORE_BASE64 ANDROID_KEY_PROPERTIES_BASE64; do
+for name in GOOGLE_PLAY_SERVICE_ACCOUNT_JSON ANDROID_KEYSTORE_BASE64 ANDROID_KEY_PROPERTIES_BASE64 ENV_FILE_CONTENTS; do
   if [ -z "${!name:-}" ]; then
     echo "::error::$name is not set"
     missing=1
@@ -273,11 +316,27 @@ The iOS workflow should:
 - Recreate App Store Connect API key and Apple signing assets from secrets.
 - Read Flutter version from `.fvmrc`.
 - Set up Flutter and Ruby/Bundler in `ios`.
+- When using `ruby/setup-ruby@v1`, always specify `ruby-version` unless the repo has a committed `.ruby-version` or `.tool-versions` file. Without one of these, GitHub Actions fails before Bundler runs:
+
+```yaml
+- name: Set up Ruby
+  uses: ruby/setup-ruby@v1
+  with:
+    ruby-version: "3.3"
+    working-directory: ios
+    bundler-cache: true
+```
+
 - Run:
 
 ```bash
 bundle exec fastlane ios beta
 ```
+
+- Keep the Fastlane archive path stable, e.g. `archive_path: "../build/ios/archive/Runner.xcarchive"`.
+- Upload build diagnostics artifacts after the TestFlight step with `if: always()`:
+  - IPA from `build/ios/ipa/*.ipa`
+  - dSYM files from `build/ios/archive/Runner.xcarchive/dSYMs`
 
 Expected iOS secrets:
 
@@ -297,11 +356,31 @@ Do not change iOS signing behavior unless the user asks; preserve existing worki
 Before relying on GitHub Actions, verify the Android Fastlane setup has:
 
 - `android/Gemfile` with `fastlane`.
+- `android/Gemfile.lock` committed and compatible with CI Bundler.
 - `android/fastlane/Appfile` with package name and `json_key_file("fastlane/play-store-credentials.json")`.
 - `android/fastlane/Fastfile` lanes `doctor`, `build`, `validate`, and `deploy`.
 - `upload_to_play_store` receives `version_name: play_release_name(options)` when the user wants Google Play release names like `48 (1.0.1)`.
 - `.gitignore` ignores `android/fastlane/play-store-credentials*.json`.
-- `android/.gitignore` ignores `key.properties`, `*.jks`, and `*.keystore`.
+- `android/.gitignore` ignores `key.properties`, `*.jks`, `*.keystore`, `.bundle/`, and `vendor/bundle/`.
+
+## Android Bundler 4 Checksum Pitfall
+
+If GitHub Actions fails inside `ruby/setup-ruby@v1` with:
+
+```text
+Your lockfile has an empty CHECKSUMS entry for "rake", but can't be updated because frozen mode is set
+```
+
+fix the committed lockfile locally from `android/`:
+
+```bash
+bundle lock --add-checksums
+bundle config set --local path vendor/bundle
+bundle config set --local deployment true
+bundle install --jobs 4
+```
+
+Commit only `android/Gemfile.lock` and ignore/remove generated `android/.bundle/` and `android/vendor/bundle/`.
 
 ## Validation Checklist
 
@@ -316,6 +395,7 @@ ruby -c android/fastlane/Fastfile
 ruby -c ios/fastlane/Fastfile
 cd android && bundle exec fastlane lanes
 cd ios && bundle exec fastlane lanes
+cd android && bundle lock --add-checksums
 ```
 
 If `actionlint` is installed, run it too:

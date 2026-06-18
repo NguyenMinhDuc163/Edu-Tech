@@ -10,6 +10,7 @@ description: Configure, review, or debug Flutter Android Fastlane delivery to Go
 - Do not run `flutter build appbundle`, `fastlane android deploy*`, or any upload command unless the user explicitly asks to build or upload.
 - Prefer minimal configuration. Do not add many environment variables. Use fixed local paths unless the user asks for a configurable setup.
 - Never print secret values from `play-store-credentials.json`, keystores, passwords, or `key.properties`. Only report existence, path, readability, and missing keys.
+- If `pubspec.yaml` declares `.env` as a Flutter asset, CI must create `.env` from a GitHub secret such as `ENV_FILE_CONTENTS` before running `flutter build appbundle`.
 - Treat `android/key.properties` and `android/fastlane/play-store-credentials*.json` as local secrets that must be ignored by Git.
 - Use `ruby -c`, `bundle install`, `bundle exec fastlane lanes`, and `bundle exec fastlane android doctor` as non-uploading validation.
 - Use FVM automatically when `.fvm/flutter_sdk/bin/flutter` exists; otherwise use `flutter` from PATH.
@@ -59,6 +60,21 @@ android/fastlane/play-store-credentials*.json
 
 Most Flutter templates already ignore `android/key.properties`, `*.jks`, and `*.keystore` in `android/.gitignore`. Add those ignores if missing.
 
+## GitHub Push Protection / Secret History
+
+Do not commit `android/fastlane/play-store-credentials.json` or any real Google Cloud service account JSON. The file may be the stable Fastlane path, but it must be created only at CI runtime from the GitHub secret `GOOGLE_PLAY_SERVICE_ACCOUNT_JSON`.
+
+Before committing store-release changes, check the staged diff:
+
+```bash
+git diff --cached --name-only | rg 'play-store-credentials|key\.properties|\.jks$|\.keystore$'
+git diff --cached | rg 'private_key|client_email|BEGIN PRIVATE KEY'
+```
+
+If a secret has entered a commit, deleting it in a later commit is not enough. GitHub push protection scans every commit being pushed and will still reject the push if an earlier commit contains the credential. Rewrite the local history so the secret never appears in the pushed commits.
+
+Do not use GitHub's "unblock secret" URL for real credentials. Rotate or revoke the Google Cloud service account key if it has appeared in any local commit or Git object.
+
 ## Gemfile
 
 Use a minimal Android Gemfile:
@@ -81,6 +97,24 @@ If Bundler complains about missing gems, run `bundle install`. If macOS system R
 bundle config set path vendor/bundle
 bundle install
 ```
+
+When using `ruby/setup-ruby` with `bundler-cache: true`, CI runs Bundler in deployment/frozen mode. If CI fails with an empty `CHECKSUMS` entry such as:
+
+```text
+Your lockfile has an empty CHECKSUMS entry for "rake", but can't be updated because frozen mode is set
+```
+
+regenerate checksums locally and commit the lockfile:
+
+```bash
+cd android
+bundle lock --add-checksums
+bundle config set --local path vendor/bundle
+bundle config set --local deployment true
+bundle install --jobs 4
+```
+
+Add `.bundle/` and `vendor/bundle/` to `android/.gitignore`; do not commit those generated directories.
 
 ## Appfile
 
@@ -275,6 +309,16 @@ Google Play release name = 48 (1.0.1)
 
 ## GitHub Actions Android SDK/NDK Cache Pitfall
 
+If Fastlane reports only that `flutter build appbundle --release --no-pub` exited 1, inspect the Gradle/Flutter output above the Fastlane summary. For this project, this message means the runner did not create `.env`:
+
+```text
+Error detected in pubspec.yaml:
+No file or variants found for asset: .env.
+Target aot_android_asset_bundle failed: Exception: Failed to bundle asset files.
+```
+
+Fix the workflow by writing `.env` from `ENV_FILE_CONTENTS` before the Fastlane deploy step, and keep the real `.env` out of Git.
+
 If Android CI logs repeatedly show package installation during `flutter build appbundle`, the slow part may be Android SDK package downloads rather than Dart/Gradle compile. Cache the SDK directories that match the project; do not assume fixed versions.
 
 Discover the cache targets first:
@@ -311,6 +355,22 @@ key: ${{ runner.os }}-android-sdk-ndk-27.0.12077973-platform-33-v1
 ```
 
 This cache is safe because it stores SDK/NDK toolchain packages, not app source or release build output. Change the key/path when `ndkVersion` or the required Android SDK platform changes.
+
+## Android Native Libs Artifact
+
+Upload release native libraries after the Google Play deploy step with `if: always()` so crash/native logs can be traced later:
+
+```yaml
+- name: Upload Android native libs artifact
+  if: always()
+  uses: actions/upload-artifact@v4
+  with:
+    name: android-native-libs
+    path: build/app/intermediates/merged_native_libs/release/mergeReleaseNativeLibs/out/lib
+    if-no-files-found: warn
+```
+
+Keep the existing AAB artifact upload as well. This artifact should contain the built ABI folders and native `.so` files from the release build.
 
 ## Lane Commands
 
@@ -563,6 +623,7 @@ bundle exec fastlane run validate_play_store_json_key json_key:fastlane/play-sto
 
 - Missing gems: run `cd android && bundle install`.
 - Bundler version mismatch: install the Bundler version named in `android/Gemfile.lock`, or regenerate the lock with the local Bundler if appropriate.
+- Empty `CHECKSUMS` entry in CI frozen mode: run `cd android && bundle lock --add-checksums`, then verify with `bundle config set --local deployment true && bundle install --jobs 4`.
 - `Google Play service account JSON not found`: place the file at `android/fastlane/play-store-credentials.json`.
 - `403 permission denied`: grant the service account the required app permissions in Google Play Console.
 - Package/app not found: confirm `package_name(...)` matches the Play Console app package and Android `applicationId`.
