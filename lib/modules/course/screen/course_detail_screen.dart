@@ -127,10 +127,23 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
   final DraggableScrollableController _sheetController = DraggableScrollableController();
   String? _currentContentId;
 
+  String? get _paymentStatus =>
+      UserService.instance.isPayment?.trim().toUpperCase();
+
   bool get _isPaymentEnabled {
-    final isPayment = UserService.instance.isPayment;
+    final isPayment = _paymentStatus;
     return isPayment == null || isPayment == 'Y';
   }
+
+  String get _serverAccessLevel => widget.courseDetail?.accessLevel ?? 'FREE';
+
+  bool get _hasFullAccess {
+    if (_paymentStatus == 'N') return true;
+    return _serverAccessLevel == 'FULL';
+  }
+
+  String get _effectiveAccessLevel =>
+      _hasFullAccess ? 'FULL' : _serverAccessLevel;
 
   @override
   void initState() {
@@ -157,7 +170,6 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
 
   void _showLessonBottomSheet(BuildContext context) {
     final sections = widget.courseDetail?.sections ?? [];
-    final accessLevel = widget.courseDetail?.accessLevel ?? 'FREE';
 
     showModalBottomSheet(
       context: context,
@@ -166,7 +178,7 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
       builder: (context) => CourseLessonBottomSheet(
         courseTitle: widget.title,
         sections: sections,
-        accessLevel: accessLevel,
+        accessLevel: _effectiveAccessLevel,
         onPlayVideo: (videoUrl, title, contentId) => _playVideo(context, videoUrl, title, contentId),
         onContentSelected: (contentId) {
           if (contentId != null) {
@@ -234,8 +246,7 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
 
   @override
   Widget build(BuildContext context) {
-    final accessLevel = widget.courseDetail?.accessLevel ?? 'FREE';
-    final hasFullAccess = accessLevel == 'FULL';
+    final hasFullAccess = _hasFullAccess;
 
     return Scaffold(
       backgroundColor: AppColors.white,
@@ -322,8 +333,7 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
   }
 
   Widget _buildBottomActionButtons(BuildContext context) {
-    final accessLevel = widget.courseDetail?.accessLevel ?? 'FREE';
-    final hasFullAccess = accessLevel == 'FULL';
+    final hasFullAccess = _hasFullAccess;
 
     return AnimatedPositioned(
       duration: const Duration(milliseconds: 300),
@@ -375,8 +385,7 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
   }
 
   Widget _buildFloatingActionButton(BuildContext context) {
-    final accessLevel = widget.courseDetail?.accessLevel ?? 'FREE';
-    final hasFullAccess = accessLevel == 'FULL';
+    final hasFullAccess = _hasFullAccess;
     final daysLeftToCancel = widget.courseDetail?.daysLeftToCancel ?? 0;
 
     return Positioned(
@@ -640,8 +649,7 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
   }
 
   Widget _buildCourseDetailsSection() {
-    final accessLevel = widget.courseDetail?.accessLevel ?? 'FREE';
-    final hasFullAccess = accessLevel == 'FULL';
+    final hasFullAccess = _hasFullAccess;
 
     return Container(
       padding: AppPad.h24.add(AppPad.v20),

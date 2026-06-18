@@ -280,10 +280,17 @@ class ApiClient {
     final requestResponse = await RequestResponse.fromDioResponse(response);
 
     final responseStatus = requestResponse.status;
-    if (responseStatus != null && responseStatus != 200 && responseStatus != 201) {
-      final errorMessage = requestResponse.message.isNotEmpty
-          ? requestResponse.message
-          : 'Đã có lỗi xảy ra vui lòng kiểm tra lại';
+    final isRefreshTokenRequest = response.realUri.path.contains(
+      ApiPath.refreshToken,
+    );
+    if (!isRefreshTokenRequest &&
+        responseStatus != null &&
+        responseStatus != 200 &&
+        responseStatus != 201) {
+      final errorMessage =
+          requestResponse.message.isNotEmpty
+              ? requestResponse.message
+              : 'Đã có lỗi xảy ra vui lòng kiểm tra lại';
       ErrorDialogService.showError(errorMessage);
     }
 

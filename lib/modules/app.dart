@@ -14,9 +14,9 @@ import 'package:ed_tech/core/theme/theme_cubit.dart';
 import 'package:ed_tech/core/theme/locale_cubit.dart';
 import 'package:ed_tech/data/api_client.dart';
 import 'package:ed_tech/data/services/auth_service.dart';
-import 'package:ed_tech/modules/auth/initial/screen/splash_screen.dart';
 import 'package:ed_tech/modules/auth/sign_in/bloc/sign_in_cubit.dart';
 import 'package:ed_tech/modules/auth/sign_in/bloc/sign_in_state.dart';
+import 'package:ed_tech/modules/auth/sign_in/screen/sign_in_screen.dart';
 import 'package:ed_tech/modules/auth/sign_in/use_case/social_login.dart';
 
 import 'auth/sign_in/repository/sign_in_repo.dart';
@@ -91,23 +91,31 @@ class _AppState extends State<App> implements AppAuthenticationBindingObserver {
     return RepositoryProvider(
       create:
           (context) => SignInRepo(
-        apiClient: ApiClient(),
-        authService: widget.authService,
-      ),
+            apiClient: ApiClient(),
+            authService: widget.authService,
+          ),
       child: MultiBlocProvider(
         providers: [
-          BlocProvider(create: (context) => SignInCubit(repo: context.read<SignInRepo>(), socialLogin: SocialLogin(repo: context.read<SignInRepo>()))),
+          BlocProvider(
+            create:
+                (context) => SignInCubit(
+                  repo: context.read<SignInRepo>(),
+                  socialLogin: SocialLogin(repo: context.read<SignInRepo>()),
+                ),
+          ),
           BlocProvider(create: (context) => ThemeCubit()),
           BlocProvider(create: (context) => LocaleCubit()),
         ],
         child: BlocListener<SignInCubit, SignInState>(
           listener: (context, state) {
             if (state is SignInAuthenticated) {
-              NavigationService.navigatorKey.currentState
-                  ?.pushReplacementNamed(DashboardScreen.routeName);
+              NavigationService.navigatorKey.currentState?.pushReplacementNamed(
+                DashboardScreen.routeName,
+              );
             } else if (state is SignInInitial) {
-              NavigationService.navigatorKey.currentState
-                  ?.pushReplacementNamed(SplashScreen.routeName);
+              NavigationService.navigatorKey.currentState?.pushReplacementNamed(
+                SignInScreen.routeName,
+              );
             }
           },
           child: BlocBuilder<ThemeCubit, ThemeMode>(
@@ -121,7 +129,11 @@ class _AppState extends State<App> implements AppAuthenticationBindingObserver {
                         breakpoints: [
                           const Breakpoint(start: 0, end: 450, name: MOBILE),
                           const Breakpoint(start: 451, end: 800, name: TABLET),
-                          const Breakpoint(start: 801, end: 1920, name: DESKTOP),
+                          const Breakpoint(
+                            start: 801,
+                            end: 1920,
+                            name: DESKTOP,
+                          ),
                           const Breakpoint(
                             start: 1921,
                             end: double.infinity,
