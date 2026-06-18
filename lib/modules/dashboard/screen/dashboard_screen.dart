@@ -2,6 +2,7 @@ import 'package:disposable_provider/disposable_provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:ed_tech/core/constants/icon_path.dart';
 import 'package:ed_tech/core/theme/app_colors.dart';
+import 'package:ed_tech/core/theme/app_text_styles.dart';
 import 'package:ed_tech/core/widgets/drawer_widget.dart';
 import 'package:ed_tech/data/api_client.dart';
 import 'package:ed_tech/modules/assessment/bloc/list_quiz_controller.dart';
@@ -29,6 +30,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
+import 'package:sp_util/sp_util.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -38,16 +40,13 @@ class DashboardScreen extends StatefulWidget {
   State<DashboardScreen> createState() => _DashboardScreenState();
 }
 
-// Danh sách route names để sử dụng trong navigation
-final List<String> _tabRoutes = [
-  HomeScreen.routeName,
-  CourseScreen.routeName,
-  ChatBotScreen.routeName,
-  QuizListScreen.routeName,
-];
-
 class _DashboardScreenState extends State<DashboardScreen> {
+  static const int _homeTabIndex = 0;
+  static const int _chatBotTabIndex = 2;
+  static const String _aiDataConsentKey = 'ai_chat_data_consent_accepted';
+
   int _currentIndex = 0;
+  bool _isShowingAiConsentDialog = false;
 
   List<Widget> get _tabWidgets => [
     RepositoryProvider(
@@ -86,7 +85,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
             create: (context) => CourseCubit(repo: context.read<CourseRepo>()),
           ),
           BlocProvider(
-            create: (context) => FilterCourseCubit(repo: context.read<SearchCourseRepo>()),
+            create:
+                (context) =>
+                    FilterCourseCubit(repo: context.read<SearchCourseRepo>()),
           ),
         ],
         child: DisposableProvider(
@@ -107,12 +108,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
-            create: (context) =>
-                ChatbotCubit(repo: context.read<ChatBotRepo>()),
+            create:
+                (context) => ChatbotCubit(repo: context.read<ChatBotRepo>()),
           ),
           BlocProvider(
-            create: (context) =>
-                ChatHistoryCubit(repo: context.read<ChatSessionsRepo>()),
+            create:
+                (context) =>
+                    ChatHistoryCubit(repo: context.read<ChatSessionsRepo>()),
           ),
         ],
         child: DisposableProvider(
@@ -154,11 +156,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
             selectedColorOpacity: 0.0,
             backgroundColor: Colors.transparent,
             duration: Duration.zero,
-            onTap: (index) {
+            onTap: (index) async {
+              if (index == _chatBotTabIndex &&
+                  !(SpUtil.getBool(_aiDataConsentKey) ?? false)) {
+                final accepted = await _showAiDataConsentDialog();
+                if (!mounted) return;
+
+                if (!accepted) {
+                  setState(() {
+                    _currentIndex = _homeTabIndex;
+                  });
+                  return;
+                }
+              }
+
               setState(() {
                 _currentIndex = index;
               });
-              print('====>: ${_tabRoutes[index]}');
             },
             items: [
               SalomonBottomBarItem(
@@ -166,7 +180,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   IconPath.iconHome,
                   width: 25,
                   height: 25,
-                  color: AppColors.color8F959E,
+                  colorFilter: const ColorFilter.mode(
+                    AppColors.color8F959E,
+                    BlendMode.srcIn,
+                  ),
                 ),
                 title: Text("home_screen.home".tr()),
                 activeIcon: SizedBox.shrink(),
@@ -176,7 +193,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   IconPath.iconBook,
                   width: 25,
                   height: 25,
-                  color: AppColors.color8F959E,
+                  colorFilter: const ColorFilter.mode(
+                    AppColors.color8F959E,
+                    BlendMode.srcIn,
+                  ),
                 ),
                 title: Text("home_screen.course".tr()),
                 activeIcon: SizedBox.shrink(),
@@ -186,7 +206,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   IconPath.iconChat,
                   width: 25,
                   height: 25,
-                  color: AppColors.color8F959E,
+                  colorFilter: const ColorFilter.mode(
+                    AppColors.color8F959E,
+                    BlendMode.srcIn,
+                  ),
                 ),
                 title: Text("home_screen.message".tr()),
                 activeIcon: SizedBox.shrink(),
@@ -196,7 +219,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   IconPath.iconAssigment,
                   width: 25,
                   height: 25,
-                  color: AppColors.color8F959E,
+                  colorFilter: const ColorFilter.mode(
+                    AppColors.color8F959E,
+                    BlendMode.srcIn,
+                  ),
                 ),
                 title: Text("assessment.exam".tr()),
                 activeIcon: SizedBox.shrink(),
@@ -206,5 +232,56 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
       ),
     );
+  }
+
+  Future<bool> _showAiDataConsentDialog() async {
+    if (_isShowingAiConsentDialog) return false;
+    _isShowingAiConsentDialog = true;
+
+    final accepted = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder:
+          (dialogContext) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            title: Text(
+              'chat.ai_consent_title'.tr(),
+              style: AppTextStyles.textStyleDefaultBold,
+            ),
+            content: Text(
+              'chat.ai_consent_message'.tr(),
+              style: AppTextStyles.textContent2,
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext, false),
+                child: Text(
+                  'common.cancel'.tr(),
+                  style: AppTextStyles.textButton.copyWith(
+                    color: AppColors.coolGray,
+                  ),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  await SpUtil.putBool(_aiDataConsentKey, true);
+                  if (dialogContext.mounted) {
+                    Navigator.pop(dialogContext, true);
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: AppColors.white,
+                ),
+                child: Text('common.confirm'.tr(), style: AppTextStyles.button),
+              ),
+            ],
+          ),
+    );
+
+    _isShowingAiConsentDialog = false;
+    return accepted ?? false;
   }
 }

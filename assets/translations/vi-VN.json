@@ -474,7 +474,9 @@
     "send": "Gửi",
     "you": "Bạn",
     "empty_state_message": "Bạn muốn hỏi gì hôm nay?",
-    "load_history_error": "Không thể tải lịch sử chat"
+    "load_history_error": "Không thể tải lịch sử chat",
+    "ai_consent_title": "Thông báo sử dụng dữ liệu với AI",
+    "ai_consent_message": "Khi bạn sử dụng Chat Bot, nội dung tin nhắn và thông tin phiên chat liên quan sẽ được gửi đến máy chủ của chúng tôi và có thể được xử lý bởi các nhà cung cấp dịch vụ AI đối tác để tạo câu trả lời. Vui lòng không nhập thông tin cá nhân nhạy cảm. Bạn có đồng ý chia sẻ dữ liệu này và tiếp tục không?"
   },
   "chat_history": {
     "title": "Lịch sử chat",

@@ -474,7 +474,9 @@
     "send": "Send",
     "you": "You",
     "empty_state_message": "What would you like to ask today?",
-    "load_history_error": "Failed to load chat history"
+    "load_history_error": "Failed to load chat history",
+    "ai_consent_title": "AI data use notice",
+    "ai_consent_message": "When you use Chat Bot, your chat messages and related session information will be sent to our servers and may be processed by our AI service providers to generate responses. Please do not enter sensitive personal information. Do you agree to share this data and continue?"
   },
   "chat_history": {
     "title": "Chat History",
