@@ -111,15 +111,7 @@ class DrawerWidget extends StatelessWidget {
                 ),
               ],
             ),
-            _buildDrawerItem(
-              icon: IconPath.iconCredit,
-              title: 'common.payments'.tr(),
-              iconSize: 25,
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, '/myPaymentsScreen');
-              },
-            ),
+            _buildPaymentDrawerItem(context),
             _buildDrawerItem(
               icon: IconPath.iconSetting,
               title: 'common.change_password'.tr(),
@@ -270,6 +262,29 @@ class DrawerWidget extends StatelessWidget {
               ),
             ],
           ),
+        );
+      },
+    );
+  }
+
+  Widget _buildPaymentDrawerItem(BuildContext context) {
+    return ValueListenableBuilder<UserData?>(
+      valueListenable: UserService.instance.userDataNotifier,
+      builder: (context, userData, _) {
+        final isPayment =
+            userData?.isPayment?.trim().toUpperCase() ??
+            UserService.instance.isPayment?.trim().toUpperCase();
+
+        if (isPayment == 'N') return const SizedBox.shrink();
+
+        return _buildDrawerItem(
+          icon: IconPath.iconCredit,
+          title: 'common.payments'.tr(),
+          iconSize: 25,
+          onTap: () {
+            Navigator.pop(context);
+            Navigator.pushNamed(context, '/myPaymentsScreen');
+          },
         );
       },
     );

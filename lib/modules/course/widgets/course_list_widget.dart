@@ -7,6 +7,7 @@ import 'package:ed_tech/core/theme/app_pad.dart';
 import 'package:ed_tech/modules/course/screen/course_detail_screen.dart';
 import 'package:ed_tech/modules/course/bloc/course_cubit.dart';
 import 'package:ed_tech/modules/home/model/course_response.dart';
+import 'package:ed_tech/data/services/user_service.dart';
 import 'package:ed_tech/utils/helpers/currency_extension.dart';
 
 class CourseListItem extends StatelessWidget {
@@ -20,6 +21,7 @@ class CourseListItem extends StatelessWidget {
     this.onTap,
     this.rating,
     this.discountAmount,
+    this.showPrice = true,
   });
 
   final String title;
@@ -30,10 +32,13 @@ class CourseListItem extends StatelessWidget {
   final VoidCallback? onTap;
   final double? rating;
   final String? discountAmount;
+  final bool showPrice;
 
   @override
   Widget build(BuildContext context) {
-    final hasDiscount = discountAmount != null &&
+    final hasDiscount =
+        showPrice &&
+        discountAmount != null &&
         double.tryParse(discountAmount!) != null &&
         double.parse(discountAmount!) > 0;
 
@@ -71,28 +76,29 @@ class CourseListItem extends StatelessWidget {
                       topLeft: Radius.circular(16),
                       topRight: Radius.circular(16),
                     ),
-                    child: imageUrl != null
-                        ? Image.network(
-                            imageUrl!,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Center(
-                                child: Icon(
-                                  Icons.image_outlined,
-                                  color: AppColors.colorB8B8D2,
-                                  size: 48,
-                                ),
-                              );
-                            },
-                          )
-                        : Center(
-                            child: Icon(
-                              Icons.image_outlined,
-                              color: AppColors.colorB8B8D2,
-                              size: 48,
+                    child:
+                        imageUrl != null
+                            ? Image.network(
+                              imageUrl!,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Center(
+                                  child: Icon(
+                                    Icons.image_outlined,
+                                    color: AppColors.colorB8B8D2,
+                                    size: 48,
+                                  ),
+                                );
+                              },
+                            )
+                            : Center(
+                              child: Icon(
+                                Icons.image_outlined,
+                                color: AppColors.colorB8B8D2,
+                                size: 48,
+                              ),
                             ),
-                          ),
                   ),
                 ),
                 if (hasDiscount)
@@ -207,14 +213,15 @@ class CourseListItem extends StatelessWidget {
                           ),
                         ],
                       ),
-                      Text(
-                        price,
-                        style: AppTextStyles.textMedium.copyWith(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 16,
+                      if (showPrice)
+                        Text(
+                          price,
+                          style: AppTextStyles.textMedium.copyWith(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 16,
+                          ),
                         ),
-                      ),
                     ],
                   ),
                 ],
@@ -232,67 +239,85 @@ class CourseListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<CourseCubit, CourseState>(
-      builder: (context, state) {
-        if (state is CourseListProgress) {
-          return const Padding(
-            padding: EdgeInsets.all(32),
-            child: Center(child: CircularProgressIndicator()),
-          );
-        }
+    return ValueListenableBuilder<UserData?>(
+      valueListenable: UserService.instance.userDataNotifier,
+      builder: (context, userData, _) {
+        final isPayment =
+            userData?.isPayment?.trim().toUpperCase() ??
+            UserService.instance.isPayment?.trim().toUpperCase();
+        final showPrice = isPayment != 'N';
 
-        if (state is CourseListError) {
-          return Padding(
-            padding: AppPad.h24,
-            child: Center(
-              child: Text(
-                state.message,
-                style: AppTextStyles.text.copyWith(color: AppColors.coolGray),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          );
-        }
+        return BlocBuilder<CourseCubit, CourseState>(
+          builder: (context, state) {
+            if (state is CourseListProgress) {
+              return const Padding(
+                padding: EdgeInsets.all(32),
+                child: Center(child: CircularProgressIndicator()),
+              );
+            }
 
-        if (state is CourseListSuccess) {
-          final courses = state.courses;
-
-          if (courses.isEmpty) {
-            return Padding(
-              padding: AppPad.h24,
-              child: Center(
-                child: Text(
-                  'course.no_courses'.tr(),
-                  style: AppTextStyles.text.copyWith(color: AppColors.coolGray),
+            if (state is CourseListError) {
+              return Padding(
+                padding: AppPad.h24,
+                child: Center(
+                  child: Text(
+                    state.message,
+                    style: AppTextStyles.text.copyWith(
+                      color: AppColors.coolGray,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
-              ),
-            );
-          }
+              );
+            }
 
-          return Padding(
-            padding: AppPad.h24,
-            child: Column(
-              children: courses.map((course) {
-                return CourseListItem(
-                  title: course.title ?? 'Untitled Course',
-                  instructor: course.teacher?.toString() ?? 'Unknown',
-                  price: course.price != null
-                      ? course.price.formatCurrency()
-                      : 'Free',
-                  duration: course.courseDuration != null
-                      ? '${course.courseDuration} hours'
-                      : '0 hours',
-                  imageUrl: course.thumbnailUrl?.toString(),
-                  rating: course.rating,
-                  discountAmount: course.discountAmount,
-                  onTap: () => _navigateToCourseDetail(context, course),
+            if (state is CourseListSuccess) {
+              final courses = state.courses;
+
+              if (courses.isEmpty) {
+                return Padding(
+                  padding: AppPad.h24,
+                  child: Center(
+                    child: Text(
+                      'course.no_courses'.tr(),
+                      style: AppTextStyles.text.copyWith(
+                        color: AppColors.coolGray,
+                      ),
+                    ),
+                  ),
                 );
-              }).toList(),
-            ),
-          );
-        }
+              }
 
-        return const SizedBox.shrink();
+              return Padding(
+                padding: AppPad.h24,
+                child: Column(
+                  children:
+                      courses.map((course) {
+                        return CourseListItem(
+                          title: course.title ?? 'Untitled Course',
+                          instructor: course.teacher?.toString() ?? 'Unknown',
+                          price:
+                              course.price != null
+                                  ? course.price.formatCurrency()
+                                  : 'Free',
+                          duration:
+                              course.courseDuration != null
+                                  ? '${course.courseDuration} hours'
+                                  : '0 hours',
+                          imageUrl: course.thumbnailUrl?.toString(),
+                          rating: course.rating,
+                          discountAmount: course.discountAmount,
+                          showPrice: showPrice,
+                          onTap: () => _navigateToCourseDetail(context, course),
+                        );
+                      }).toList(),
+                ),
+              );
+            }
+
+            return const SizedBox.shrink();
+          },
+        );
       },
     );
   }
@@ -306,11 +331,11 @@ class CourseListWidget extends StatelessWidget {
         'title': course.title ?? 'Untitled Course',
         'instructor': course.teacher?.toString() ?? 'Unknown',
         'price': course.price ?? '0',
-        'duration': course.courseDuration != null
-            ? '${course.courseDuration}h'
-            : '0h',
+        'duration':
+            course.courseDuration != null ? '${course.courseDuration}h' : '0h',
         'imageUrl': course.thumbnailUrl?.toString(),
-        'description': course.courseDescription?.toString() ?? course.description,
+        'description':
+            course.courseDescription?.toString() ?? course.description,
       },
     );
   }
