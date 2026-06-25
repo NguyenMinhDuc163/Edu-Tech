@@ -250,15 +250,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
               'chat.ai_consent_title'.tr(),
               style: AppTextStyles.textStyleDefaultBold,
             ),
-            content: Text(
-              'chat.ai_consent_message'.tr(),
-              style: AppTextStyles.textContent2,
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildAiConsentText('chat.ai_consent_description'),
+                  _buildAiConsentText('chat.ai_consent_data_sent'),
+                  _buildAiConsentText('chat.ai_consent_sent_to'),
+                  _buildAiConsentText('chat.ai_consent_purpose'),
+                  _buildAiConsentText('chat.ai_consent_privacy_notice'),
+                  _buildAiConsentText('chat.ai_consent_permission'),
+                ],
+              ),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(dialogContext, false),
                 child: Text(
-                  'common.cancel'.tr(),
+                  'chat.ai_consent_cancel'.tr(),
                   style: AppTextStyles.textButton.copyWith(
                     color: AppColors.coolGray,
                   ),
@@ -275,7 +285,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   backgroundColor: AppColors.primary,
                   foregroundColor: AppColors.white,
                 ),
-                child: Text('common.confirm'.tr(), style: AppTextStyles.button),
+                child: Text(
+                  'chat.ai_consent_confirm'.tr(),
+                  style: AppTextStyles.button,
+                ),
               ),
             ],
           ),
@@ -283,5 +296,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     _isShowingAiConsentDialog = false;
     return accepted ?? false;
+  }
+
+  Widget _buildAiConsentText(String translationKey) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Text(translationKey.tr(), style: AppTextStyles.textContent2),
+    );
   }
 }

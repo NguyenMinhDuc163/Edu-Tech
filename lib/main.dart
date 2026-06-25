@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:ed_tech/core/app_bloc_observer.dart';
+import 'package:ed_tech/core/theme/locale_service.dart';
 import 'package:ed_tech/data/services/auth_service.dart';
 import 'package:ed_tech/data/services/user_service.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -29,7 +30,7 @@ void main() async {
   AuthService authService = await AuthService.initialize();
   await UserService.initialize();
 
-  Locale defaultLocale = const Locale('en', 'US');
+  final defaultLocale = LocaleService.load();
 
   runApp(
     EasyLocalization(

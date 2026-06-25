@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:sp_util/sp_util.dart';
 
 /// Service quản lý lưu trữ và tải ngôn ngữ
 class LocaleService {
   static const String _key = 'app_locale';
+  static const List<Locale> supportedLocales = [
+    Locale('en', 'US'),
+    Locale('vi', 'VN'),
+  ];
 
   /// Load locale từ SharedPreferences
   static Locale load() {
     final String? value = SpUtil.getString(_key);
 
     if (value == null) {
-      // Mặc định là tiếng Việt
-      return const Locale('vi', 'VN');
+      return systemLocale;
     }
 
     // Parse locale từ string format: "en_US" hoặc "vi_VN"
@@ -20,8 +24,16 @@ class LocaleService {
       return Locale(parts[0], parts[1]);
     }
 
-    // Fallback
-    return const Locale('vi', 'VN');
+    return systemLocale;
+  }
+
+  /// Lấy locale theo ngôn ngữ hệ thống nếu app hỗ trợ
+  static Locale get systemLocale {
+    final locale = PlatformDispatcher.instance.locale;
+    return supportedLocales.firstWhere(
+      (supportedLocale) => supportedLocale.languageCode == locale.languageCode,
+      orElse: () => const Locale('en', 'US'),
+    );
   }
 
   /// Lưu locale vào SharedPreferences

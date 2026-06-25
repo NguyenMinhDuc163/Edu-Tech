@@ -21,6 +21,7 @@ import 'package:chewie/chewie.dart';
 import 'package:ed_tech/utils/helpers/currency_extension.dart';
 import 'package:ed_tech/core/constants/app_constants.dart';
 import 'package:ed_tech/core/constants/video_tracking_action.dart';
+import 'package:sp_util/sp_util.dart';
 
 class CourseDetailScreen extends StatefulWidget {
   static const String routeName = '/CourseDetailScreen';
@@ -122,8 +123,11 @@ class _CourseDetailContent extends StatefulWidget {
 }
 
 class _CourseDetailContentState extends State<_CourseDetailContent> {
+  static const String _aiDataConsentKey = 'ai_chat_data_consent_accepted';
+
   bool _showBottomButton = true;
   bool _isDescriptionExpanded = false;
+  bool _isShowingAiConsentDialog = false;
   final DraggableScrollableController _sheetController = DraggableScrollableController();
   String? _currentContentId;
 
@@ -442,7 +446,7 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
                     fontWeight: FontWeight.w500,
                   ),
                   labelBackgroundColor: AppColors.white,
-                  onTap: () => _showChatBubble(context),
+                  onTap: () => _openChatBubbleWithConsent(context),
                 ),
                 if (daysLeftToCancel > 0)
                   SpeedDialChild(
@@ -511,6 +515,16 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
     }
   }
 
+  Future<void> _openChatBubbleWithConsent(BuildContext context) async {
+    if (!(SpUtil.getBool(_aiDataConsentKey) ?? false)) {
+      final accepted = await _showAiDataConsentDialog(context);
+      if (!mounted || !accepted) return;
+    }
+
+    if (context.mounted) {
+      _showChatBubble(context);
+    }
+  }
 
   void _showChatBubble(BuildContext context) {
     showModalBottomSheet(
@@ -522,6 +536,74 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
         courseTitle: widget.title,
         contentId: _currentContentId,
       ),
+    );
+  }
+
+  Future<bool> _showAiDataConsentDialog(BuildContext context) async {
+    if (_isShowingAiConsentDialog) return false;
+    _isShowingAiConsentDialog = true;
+
+    final accepted = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(
+          'chat.ai_consent_title'.tr(),
+          style: AppTextStyles.textStyleDefaultBold,
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildAiConsentText('chat.ai_consent_description'),
+              _buildAiConsentText('chat.ai_consent_data_sent'),
+              _buildAiConsentText('chat.ai_consent_sent_to'),
+              _buildAiConsentText('chat.ai_consent_purpose'),
+              _buildAiConsentText('chat.ai_consent_privacy_notice'),
+              _buildAiConsentText('chat.ai_consent_permission'),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: Text(
+              'chat.ai_consent_cancel'.tr(),
+              style: AppTextStyles.textButton.copyWith(
+                color: AppColors.coolGray,
+              ),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              await SpUtil.putBool(_aiDataConsentKey, true);
+              if (dialogContext.mounted) {
+                Navigator.pop(dialogContext, true);
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: AppColors.white,
+            ),
+            child: Text(
+              'chat.ai_consent_confirm'.tr(),
+              style: AppTextStyles.button,
+            ),
+          ),
+        ],
+      ),
+    );
+
+    _isShowingAiConsentDialog = false;
+    return accepted ?? false;
+  }
+
+  Widget _buildAiConsentText(String translationKey) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Text(translationKey.tr(), style: AppTextStyles.textContent2),
     );
   }
 

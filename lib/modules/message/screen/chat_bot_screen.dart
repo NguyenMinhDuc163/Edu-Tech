@@ -471,13 +471,14 @@ class _ChatInput extends StatelessWidget {
                       ),
                     ),
                   ),
-                  IconButton(
-                    icon: const Icon(
-                      Icons.attachment,
-                      color: Color(0xFF8491A5),
-                    ),
-                    onPressed: () {},
-                  ),
+                  // TODO: Re-enable when file attachment support is implemented.
+                  // IconButton(
+                  //   icon: const Icon(
+                  //     Icons.attachment,
+                  //     color: Color(0xFF8491A5),
+                  //   ),
+                  //   onPressed: () {},
+                  // ),
                 ],
               ),
             ),

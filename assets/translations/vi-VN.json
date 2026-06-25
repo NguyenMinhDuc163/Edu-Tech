@@ -475,8 +475,17 @@
     "you": "Bạn",
     "empty_state_message": "Bạn muốn hỏi gì hôm nay?",
     "load_history_error": "Không thể tải lịch sử chat",
-    "ai_consent_title": "Thông báo sử dụng dữ liệu với AI",
-    "ai_consent_message": "Khi bạn sử dụng Chat Bot, nội dung tin nhắn và thông tin phiên chat liên quan sẽ được gửi đến máy chủ của chúng tôi và có thể được xử lý bởi các nhà cung cấp dịch vụ AI đối tác để tạo câu trả lời. Vui lòng không nhập thông tin cá nhân nhạy cảm. Bạn có đồng ý chia sẻ dữ liệu này và tiếp tục không?"
+    "ai_consent_title": "Thông báo về Trợ lý AI",
+    "ai_consent_description": "Trước khi sử dụng Trợ lý AI, vui lòng đọc và xác nhận cách dữ liệu của bạn được xử lý.",
+    "ai_consent_data_sent": "Dữ liệu được gửi bao gồm nội dung tin nhắn bạn nhập trong Trợ lý AI và ngữ cảnh hội thoại cần thiết để tạo phản hồi.",
+    "ai_consent_sent_to": "Dữ liệu được gửi đến máy chủ Edu-Tech. Để tạo phản hồi AI, máy chủ Edu-Tech có thể chuyển dữ liệu này đến các nhà cung cấp dịch vụ AI bên thứ ba, bao gồm OpenAI, LLC thông qua OpenAI API và Google LLC thông qua Gemini API.",
+    "ai_consent_purpose": "Dữ liệu này chỉ được sử dụng để xử lý yêu cầu chat của bạn, tạo phản hồi AI, vận hành, bảo mật và cải thiện chất lượng dịch vụ.",
+    "ai_consent_privacy_notice": "Vui lòng không nhập mật khẩu, thông tin thanh toán, giấy tờ tùy thân, thông tin sức khỏe hoặc dữ liệu cá nhân nhạy cảm không cần thiết.",
+    "ai_consent_permission": "Bằng cách chọn \"Đồng ý\", bạn cho phép Edu-Tech gửi và chia sẻ dữ liệu nêu trên với các bên được liệt kê để cung cấp chức năng Trợ lý AI.",
+    "ai_consent_cancel": "Hủy",
+    "ai_consent_confirm": "Đồng ý",
+    "ai_consent_privacy_policy": "Xem Chính sách quyền riêng tư",
+    "ai_consent_privacy_policy_error": "Không thể mở Chính sách quyền riêng tư. Vui lòng thử lại."
   },
   "chat_history": {
     "title": "Lịch sử chat",

@@ -475,8 +475,17 @@
     "you": "You",
     "empty_state_message": "What would you like to ask today?",
     "load_history_error": "Failed to load chat history",
-    "ai_consent_title": "AI data use notice",
-    "ai_consent_message": "When you use Chat Bot, your chat messages and related session information will be sent to our servers and may be processed by our AI service providers to generate responses. Please do not enter sensitive personal information. Do you agree to share this data and continue?"
+    "ai_consent_title": "AI Assistant Notice",
+    "ai_consent_description": "Before using the AI Assistant, please read and confirm how your data will be processed.",
+    "ai_consent_data_sent": "The data sent includes the messages you enter in the AI Assistant and the conversation context needed to generate a response.",
+    "ai_consent_sent_to": "Data is sent to Edu-Tech servers. To generate AI responses, Edu-Tech servers may transfer this data to third-party AI service providers, including OpenAI, LLC via the OpenAI API and Google LLC via the Gemini API.",
+    "ai_consent_purpose": "This data is used only to process your chat request, generate AI responses, operate, secure, and improve the quality of the service.",
+    "ai_consent_privacy_notice": "Please do not enter passwords, payment information, identity documents, health information, or unnecessary sensitive personal data.",
+    "ai_consent_permission": "By selecting \"Agree\", you allow Edu-Tech to send and share the data described above with the listed parties to provide the AI Assistant feature.",
+    "ai_consent_cancel": "Cancel",
+    "ai_consent_confirm": "Agree",
+    "ai_consent_privacy_policy": "View Privacy Policy",
+    "ai_consent_privacy_policy_error": "Unable to open the Privacy Policy. Please try again."
   },
   "chat_history": {
     "title": "Chat History",

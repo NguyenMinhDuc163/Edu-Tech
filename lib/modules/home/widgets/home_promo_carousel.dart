@@ -120,8 +120,10 @@ class _PromoCard extends StatelessWidget {
                           style: AppTextStyles.textHeader3.copyWith(
                             color: AppColors.raisinBlack,
                           ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 12),
                         ButtonWidget(
                           title: item.cta.tr(),
                           backgroundColor: AppColors.colorFF7043,
