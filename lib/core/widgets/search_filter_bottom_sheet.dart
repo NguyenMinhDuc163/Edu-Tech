@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:ed_tech/core/theme/app_colors.dart';
 import 'package:ed_tech/core/theme/app_text_styles.dart';
+import 'package:ed_tech/data/services/user_service.dart';
 
 class SearchFilterBottomSheet extends StatefulWidget {
   final List<String> categories;
@@ -88,8 +89,14 @@ class _SearchFilterBottomSheetState extends State<SearchFilterBottomSheet> {
   }
 
   void _applyFilter() {
-    final minPrice = double.tryParse(_minPriceController.text) ?? widget.minPrice;
-    final maxPrice = double.tryParse(_maxPriceController.text) ?? widget.maxPrice;
+    final showPriceFilter =
+        _shouldShowPriceFilter(UserService.instance.userDataNotifier.value);
+    final minPrice = showPriceFilter
+        ? double.tryParse(_minPriceController.text) ?? widget.minPrice
+        : widget.minPrice;
+    final maxPrice = showPriceFilter
+        ? double.tryParse(_maxPriceController.text) ?? widget.maxPrice
+        : widget.maxPrice;
 
     widget.onApplyFilter(
       _selectedCategories,
@@ -113,77 +120,94 @@ class _SearchFilterBottomSheetState extends State<SearchFilterBottomSheet> {
     }
   }
 
+  bool _shouldShowPriceFilter(UserData? userData) {
+    final isPayment =
+        userData?.isPayment?.trim().toUpperCase() ??
+        UserService.instance.isPayment?.trim().toUpperCase();
+
+    return isPayment == 'Y';
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(20),
-          topRight: Radius.circular(20),
-        ),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Header
-          Container(
-            padding: const EdgeInsets.all(20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Icon(Icons.close, color: AppColors.text),
-                Text(
-                  "filter.title".tr(),
-                  style: AppTextStyles.textHeader3.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+    return ValueListenableBuilder<UserData?>(
+      valueListenable: UserService.instance.userDataNotifier,
+      builder: (context, userData, _) {
+        final showPriceFilter = _shouldShowPriceFilter(userData);
+
+        return Container(
+          decoration: const BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header
+              Container(
+                padding: const EdgeInsets.all(20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Icon(Icons.close, color: AppColors.text),
+                    Text(
+                      "filter.title".tr(),
+                      style: AppTextStyles.textHeader3.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(width: 24), // Để cân bằng với icon close
+                  ],
                 ),
-                const SizedBox(width: 24), // Để cân bằng với icon close
-              ],
-            ),
+              ),
+
+              // Content
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Categories Section
+                    _buildSectionTitle("filter.categories".tr()),
+                    const SizedBox(height: 12),
+                    _buildCategoryTags(),
+                    const SizedBox(height: 24),
+
+                    if (showPriceFilter) ...[
+                      // Price Section
+                      _buildSectionTitle("filter.price".tr()),
+                      const SizedBox(height: 12),
+                      _buildPriceInputs(),
+                      const SizedBox(height: 24),
+                    ],
+
+                    // Duration Section
+                    _buildSectionTitle("filter.duration".tr()),
+                    const SizedBox(height: 12),
+                    _buildDurationTags(),
+                    const SizedBox(height: 32),
+                  ],
+                ),
+              ),
+
+              // Action Buttons
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Row(
+                  children: [
+                    Expanded(child: _buildClearButton()),
+                    const SizedBox(width: 12),
+                    Expanded(flex: 2, child: _buildApplyButton()),
+                  ],
+                ),
+              ),
+            ],
           ),
-
-          // Content
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Categories Section
-                _buildSectionTitle("filter.categories".tr()),
-                const SizedBox(height: 12),
-                _buildCategoryTags(),
-                const SizedBox(height: 24),
-
-                // Price Section
-                _buildSectionTitle("filter.price".tr()),
-                const SizedBox(height: 12),
-                _buildPriceInputs(),
-                const SizedBox(height: 24),
-
-                // Duration Section
-                _buildSectionTitle("filter.duration".tr()),
-                const SizedBox(height: 12),
-                _buildDurationTags(),
-                const SizedBox(height: 32),
-              ],
-            ),
-          ),
-
-          // Action Buttons
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: Row(
-              children: [
-                Expanded(child: _buildClearButton()),
-                const SizedBox(width: 12),
-                Expanded(child: _buildApplyButton(), flex: 2,),
-              ],
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 

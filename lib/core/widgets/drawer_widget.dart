@@ -54,13 +54,21 @@ class DrawerWidget extends StatelessWidget {
                   child: _buildDrawerItem(
                     icon: IconPath.iconSun,
                     title: 'common.dark_mode'.tr(),
-                    onTap: () => Navigator.pop(context),
+                    onTap: () {
+                      showToastTop(
+                        message: 'common.dark_mode_coming_soon'.tr(),
+                      );
+                      Navigator.pop(context);
+                    },
                   ),
                 ),
                 Padding(
                   padding: AppPad.h10,
                   child: SwitchBottomWidget(
                     onChanged: (value) {
+                      showToastTop(
+                        message: 'common.dark_mode_coming_soon'.tr(),
+                      );
                       final newThemeMode =
                           value ? ThemeMode.dark : ThemeMode.light;
                       context.read<ThemeCubit>().setThemeMode(newThemeMode);
