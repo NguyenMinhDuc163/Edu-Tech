@@ -25,12 +25,29 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final GlobalKey _learningProgressKey = GlobalKey();
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<HomeCubit>().getProduct();
     });
+  }
+
+  Future<void> _scrollToLearningProgress() async {
+    final learningProgressContext = _learningProgressKey.currentContext;
+    if (learningProgressContext == null) {
+      return;
+    }
+
+    Scrollable.ensureVisible(
+      learningProgressContext,
+      duration: const Duration(milliseconds: 520),
+      curve: Curves.easeInOutCubic,
+      alignment: 0.05,
+      alignmentPolicy: ScrollPositionAlignmentPolicy.explicit,
+    );
   }
 
   @override
@@ -104,10 +121,16 @@ class _HomeScreenState extends State<HomeScreen> {
               child: HomePromoCarousel(
                 onNavigateToCourseTab: widget.onNavigateToCourseTab,
                 onNavigateToQuizTab: widget.onNavigateToQuizTab,
+                onNavigateToLearningProgress: _scrollToLearningProgress,
               ),
             ),
             AppGap.h32,
-            LearningPlanWidget(onNavigateToQuizTab: widget.onNavigateToQuizTab),
+            KeyedSubtree(
+              key: _learningProgressKey,
+              child: LearningPlanWidget(
+                onNavigateToQuizTab: widget.onNavigateToQuizTab,
+              ),
+            ),
             AppGap.h28,
             const CourseSuggestionsWidget(),
             AppGap.h24,
