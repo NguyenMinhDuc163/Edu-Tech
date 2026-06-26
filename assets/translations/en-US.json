@@ -349,7 +349,7 @@
   },
   "purchased_courses": {
     "title": "My Courses",
-    "no_courses": "You haven't purchased any courses yet",
+    "no_courses": "You have not joined any courses yet.",
     "loading": "Loading courses...",
     "error": "Failed to load courses",
     "progress": "Progress",
