@@ -1,6 +1,7 @@
 import 'package:disposable_provider/disposable_provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:ed_tech/core/constants/icon_path.dart';
+import 'package:ed_tech/core/constants/ai_consent_constants.dart';
 import 'package:ed_tech/core/theme/app_colors.dart';
 import 'package:ed_tech/core/theme/app_text_styles.dart';
 import 'package:ed_tech/core/widgets/drawer_widget.dart';
@@ -44,9 +45,8 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   static const int _homeTabIndex = 0;
   static const int _chatBotTabIndex = 2;
-  static const String _aiDataConsentKey = 'ai_chat_data_consent_accepted';
   static final Uri _privacyPolicyUri = Uri.parse(
-    'https://nguyenduc163.notion.site/Privacy-Policy-for-EdTech-38303bc29711802394ade6a5fb8ecee9',
+    AiConsentConstants.privacyPolicyUrl,
   );
 
   int _currentIndex = 0;
@@ -161,8 +161,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
             backgroundColor: Colors.transparent,
             duration: Duration.zero,
             onTap: (index) async {
+              final acceptedVersion = SpUtil.getString(
+                AiConsentConstants.consentVersionStorageKey,
+              );
+              final hasAcceptedCurrentConsent =
+                  acceptedVersion == AiConsentConstants.currentConsentVersion;
+
               if (index == _chatBotTabIndex &&
-                  !(SpUtil.getBool(_aiDataConsentKey) ?? false)) {
+                  !hasAcceptedCurrentConsent) {
                 final accepted = await _showAiDataConsentDialog();
                 if (!mounted) return;
 
@@ -299,7 +305,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
               ElevatedButton(
                 onPressed: () async {
-                  await SpUtil.putBool(_aiDataConsentKey, true);
+                  await SpUtil.putString(
+                    AiConsentConstants.consentVersionStorageKey,
+                    AiConsentConstants.currentConsentVersion,
+                  );
                   if (dialogContext.mounted) {
                     Navigator.pop(dialogContext, true);
                   }

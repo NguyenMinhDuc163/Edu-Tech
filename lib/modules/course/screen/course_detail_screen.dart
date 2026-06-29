@@ -20,6 +20,7 @@ import 'package:video_player/video_player.dart';
 import 'package:chewie/chewie.dart';
 import 'package:ed_tech/utils/helpers/currency_extension.dart';
 import 'package:ed_tech/core/constants/app_constants.dart';
+import 'package:ed_tech/core/constants/ai_consent_constants.dart';
 import 'package:ed_tech/core/constants/video_tracking_action.dart';
 import 'package:sp_util/sp_util.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -125,10 +126,8 @@ class _CourseDetailContent extends StatefulWidget {
 
 class _CourseDetailContentState extends State<_CourseDetailContent> {
   static final Uri _privacyPolicyUri = Uri.parse(
-    'https://nguyenduc163.notion.site/Privacy-Policy-for-EdTech-38303bc29711802394ade6a5fb8ecee9',
+    AiConsentConstants.privacyPolicyUrl,
   );
-
-  static const String _aiDataConsentKey = 'ai_chat_data_consent_accepted';
 
   bool _showBottomButton = true;
   bool _isDescriptionExpanded = false;
@@ -521,7 +520,13 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
   }
 
   Future<void> _openChatBubbleWithConsent(BuildContext context) async {
-    if (!(SpUtil.getBool(_aiDataConsentKey) ?? false)) {
+    final acceptedVersion = SpUtil.getString(
+      AiConsentConstants.consentVersionStorageKey,
+    );
+    final hasAcceptedCurrentConsent =
+        acceptedVersion == AiConsentConstants.currentConsentVersion;
+
+    if (!hasAcceptedCurrentConsent) {
       final accepted = await _showAiDataConsentDialog(context);
       if (!mounted || !accepted) return;
     }
@@ -602,7 +607,10 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
           ),
           ElevatedButton(
             onPressed: () async {
-              await SpUtil.putBool(_aiDataConsentKey, true);
+              await SpUtil.putString(
+                AiConsentConstants.consentVersionStorageKey,
+                AiConsentConstants.currentConsentVersion,
+              );
               if (dialogContext.mounted) {
                 Navigator.pop(dialogContext, true);
               }
