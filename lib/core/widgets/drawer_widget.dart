@@ -5,7 +5,6 @@ import 'package:ed_tech/core/widgets/switch_botton_widget.dart';
 import 'package:ed_tech/core/widgets/template/button_widget.dart';
 import 'package:ed_tech/core/widgets/toast.dart';
 import 'package:ed_tech/core/theme/locale_cubit.dart';
-import 'package:ed_tech/core/theme/theme_cubit.dart';
 import 'package:ed_tech/init.dart';
 import 'package:ed_tech/modules/auth/sign_in/repository/sign_in_repo.dart';
 import 'package:ed_tech/modules/auth/sign_in/screen/sign_in_screen.dart';
@@ -69,9 +68,11 @@ class DrawerWidget extends StatelessWidget {
                       showToastTop(
                         message: 'common.dark_mode_coming_soon'.tr(),
                       );
-                      final newThemeMode =
-                          value ? ThemeMode.dark : ThemeMode.light;
-                      context.read<ThemeCubit>().setThemeMode(newThemeMode);
+                      // Dark mode chưa được hỗ trợ. Giữ switch để minh họa
+                      // nhưng không cập nhật theme của ứng dụng.
+                      // final newThemeMode =
+                      //     value ? ThemeMode.dark : ThemeMode.light;
+                      // context.read<ThemeCubit>().setThemeMode(newThemeMode);
                     },
                   ),
                 ),
