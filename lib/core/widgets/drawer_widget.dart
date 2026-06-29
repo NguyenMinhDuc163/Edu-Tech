@@ -258,15 +258,16 @@ class DrawerWidget extends StatelessWidget {
                       ],
                     ),
                   ),
-                  ButtonWidget(
-                    title: "common.orders".tr(),
-                    boderRadius: AppBorderRadius.a8,
-                    padding: AppPad.h10v8,
-                    backgroundColor: AppColors.offWhite,
-                    titleStyle: AppTextStyles.textContent3.copyWith(
-                      color: AppColors.coolGray,
+                  if (userData?.isPayment?.trim().toUpperCase() == 'Y')
+                    ButtonWidget(
+                      title: "common.orders".tr(),
+                      boderRadius: AppBorderRadius.a8,
+                      padding: AppPad.h10v8,
+                      backgroundColor: AppColors.offWhite,
+                      titleStyle: AppTextStyles.textContent3.copyWith(
+                        color: AppColors.coolGray,
+                      ),
                     ),
-                  ),
                 ],
               ),
             ],
@@ -284,7 +285,7 @@ class DrawerWidget extends StatelessWidget {
             userData?.isPayment?.trim().toUpperCase() ??
             UserService.instance.isPayment?.trim().toUpperCase();
 
-        if (isPayment == 'N') return const SizedBox.shrink();
+        if (isPayment != 'Y') return const SizedBox.shrink();
 
         return _buildDrawerItem(
           icon: IconPath.iconCredit,

@@ -416,6 +416,9 @@ class _FilterResultCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final showPrice =
+        UserService.instance.isPayment?.trim().toUpperCase() == 'Y';
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -499,14 +502,29 @@ class _FilterResultCard extends StatelessWidget {
                     ],
                     Row(
                       children: [
-                        Text(
-                          result.price != null
-                              ? result.price.formatCurrency()
-                              : 'Free',
-                          style: AppTextStyles.textMedium.copyWith(
+                        if (showPrice)
+                          Text(
+                            result.price != null
+                                ? result.price.formatCurrency()
+                                : 'course.free'.tr(),
+                            style: AppTextStyles.textMedium.copyWith(
+                              color: AppColors.primary,
+                            ),
+                          )
+                        else ...[
+                          Text(
+                            'course.view_details'.tr(),
+                            style: AppTextStyles.textMedium.copyWith(
+                              color: AppColors.primary,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          const Icon(
+                            Icons.arrow_forward_ios,
+                            size: 12,
                             color: AppColors.primary,
                           ),
-                        ),
+                        ],
                       ],
                     ),
                   ],

@@ -9,6 +9,7 @@ import 'package:ed_tech/modules/course/model/autocomplete_suggestion.dart';
 import 'package:ed_tech/modules/course/screen/course_detail_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ed_tech/utils/helpers/currency_extension.dart';
+import 'package:ed_tech/data/services/user_service.dart';
 
 class SearchCourseScreen extends StatefulWidget {
   const SearchCourseScreen({super.key});
@@ -363,6 +364,9 @@ class _SearchResultCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final showPrice =
+        UserService.instance.isPayment?.trim().toUpperCase() == 'Y';
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -441,20 +445,21 @@ class _SearchResultCard extends StatelessWidget {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 8),
+                      if (showPrice) const SizedBox(height: 8),
                     ],
-                    Row(
-                      children: [
-                        Text(
-                          result.price != null
-                              ? result.price.formatCurrency()
-                              : 'course.free'.tr(),
-                          style: AppTextStyles.textMedium.copyWith(
-                            color: AppColors.primary,
+                    if (showPrice)
+                      Row(
+                        children: [
+                          Text(
+                            result.price != null
+                                ? result.price.formatCurrency()
+                                : 'course.free'.tr(),
+                            style: AppTextStyles.textMedium.copyWith(
+                              color: AppColors.primary,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
+                        ],
+                      ),
                   ],
                 ),
               ),

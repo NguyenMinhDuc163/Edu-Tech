@@ -557,4 +557,3 @@ class _RecentResultItem extends StatelessWidget {
     );
   }
 }
-

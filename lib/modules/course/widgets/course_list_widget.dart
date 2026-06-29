@@ -245,7 +245,7 @@ class CourseListWidget extends StatelessWidget {
         final isPayment =
             userData?.isPayment?.trim().toUpperCase() ??
             UserService.instance.isPayment?.trim().toUpperCase();
-        final showPrice = isPayment != 'N';
+        final showPrice = isPayment == 'Y';
 
         return BlocBuilder<CourseCubit, CourseState>(
           builder: (context, state) {

@@ -296,6 +296,7 @@
     "purchase_to_unlock": "Mua khóa học để mở khóa",
     "video_unavailable": "Video không khả dụng",
     "no_content": "Chưa có nội dung",
+    "view_details": "Xem chi tiết",
     "buy_now": "Mua ngay",
     "enrolled": "Đã đăng ký",
     "continue_learning": "Tiếp tục học",
@@ -349,7 +350,7 @@
   },
   "purchased_courses": {
     "title": "Khóa học của tôi",
-    "no_courses": "Bạn chưa mua khóa học nào",
+    "no_courses": "Bạn chưa tham gia khóa học nào",
     "loading": "Đang tải khóa học...",
     "error": "Không thể tải khóa học",
     "progress": "Tiến độ",

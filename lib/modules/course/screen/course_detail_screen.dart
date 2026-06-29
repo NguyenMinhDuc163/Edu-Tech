@@ -139,14 +139,13 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
       UserService.instance.isPayment?.trim().toUpperCase();
 
   bool get _isPaymentEnabled {
-    final isPayment = _paymentStatus;
-    return isPayment == null || isPayment == 'Y';
+    return _paymentStatus == 'Y';
   }
 
   String get _serverAccessLevel => widget.courseDetail?.accessLevel ?? 'FREE';
 
   bool get _hasFullAccess {
-    if (_paymentStatus == 'N') return true;
+    if (!_isPaymentEnabled) return true;
     return _serverAccessLevel == 'FULL';
   }
 
@@ -452,7 +451,7 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
                   labelBackgroundColor: AppColors.white,
                   onTap: () => _openChatBubbleWithConsent(context),
                 ),
-                if (daysLeftToCancel > 0)
+                if (_paymentStatus == 'Y' && daysLeftToCancel > 0)
                   SpeedDialChild(
                     child: const Icon(Icons.cancel_outlined, color: AppColors.error),
                     backgroundColor: AppColors.white,

@@ -4,6 +4,7 @@ import 'package:ed_tech/modules/purchased_courses/bloc/purchased_course_cubit.da
 import 'package:ed_tech/modules/purchased_courses/bloc/purchased_course_state.dart';
 import 'package:ed_tech/modules/purchased_courses/model/purchased_course_response.dart';
 import 'package:ed_tech/modules/course/screen/course_detail_screen.dart';
+import 'package:ed_tech/data/services/user_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class PurchasedCoursesScreen extends StatefulWidget {
@@ -26,6 +27,9 @@ class _PurchasedCoursesScreenState extends State<PurchasedCoursesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isPaymentEnabled =
+        UserService.instance.isPayment?.trim().toUpperCase() == 'Y';
+
     return FunctionScreenTemplate(
       isShowBottomButton: false,
       isShowAppBar: true,
@@ -89,6 +93,7 @@ class _PurchasedCoursesScreenState extends State<PurchasedCoursesScreen> {
                 itemBuilder: (context, index) {
                   return _PurchasedCourseCard(
                     course: courses[index],
+                    showPurchaseDate: isPaymentEnabled,
                     onTap: () => _navigateToCourseDetail(context, courses[index]),
                   );
                 },
@@ -163,10 +168,12 @@ class _PurchasedCoursesScreenState extends State<PurchasedCoursesScreen> {
 
 class _PurchasedCourseCard extends StatelessWidget {
   final PurchasedCourse course;
+  final bool showPurchaseDate;
   final VoidCallback onTap;
 
   const _PurchasedCourseCard({
     required this.course,
+    required this.showPurchaseDate,
     required this.onTap,
   });
 
@@ -405,51 +412,53 @@ class _PurchasedCourseCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 12),
-                  Divider(color: AppColors.silverGray, height: 1),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: AppColors.primary.withAlpha(26),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Icon(
-                              Icons.calendar_today,
-                              size: 16,
-                              color: AppColors.primary,
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                  if (showPurchaseDate || course.category != null) ...[
+                    const SizedBox(height: 12),
+                    Divider(color: AppColors.silverGray, height: 1),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        if (showPurchaseDate)
+                          Row(
                             children: [
-                              Text(
-                                'purchased_courses.purchased_on'.tr(),
-                                style: AppTextStyles.textContent4.copyWith(
-                                  color: AppColors.coolGray,
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary.withAlpha(26),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Icon(
+                                  Icons.calendar_today,
+                                  size: 16,
+                                  color: AppColors.primary,
                                 ),
                               ),
-                              const SizedBox(height: 3),
-                              Text(
-                                _formatDate(course.purchaseDate),
-                                style: AppTextStyles.textContent2.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColors.text,
-                                ),
+                              const SizedBox(width: 10),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'purchased_courses.purchased_on'.tr(),
+                                    style: AppTextStyles.textContent4.copyWith(
+                                      color: AppColors.coolGray,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 3),
+                                  Text(
+                                    _formatDate(course.purchaseDate),
+                                    style: AppTextStyles.textContent2.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.text,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
-                        ],
-                      ),
-                      const Spacer(),
-                      if (course.category != null)
-                        Flexible(
-                          child: Container(
+                        const Spacer(),
+                        if (course.category != null)
+                          Flexible(
+                            child: Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 12,
                               vertical: 8,
@@ -484,10 +493,11 @@ class _PurchasedCourseCard extends StatelessWidget {
                                 ),
                               ],
                             ),
+                            ),
                           ),
-                        ),
-                    ],
-                  ),
+                      ],
+                    ),
+                  ],
                 ],
               ),
             ),
