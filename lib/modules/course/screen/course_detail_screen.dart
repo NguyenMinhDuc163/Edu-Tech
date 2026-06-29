@@ -22,6 +22,7 @@ import 'package:ed_tech/utils/helpers/currency_extension.dart';
 import 'package:ed_tech/core/constants/app_constants.dart';
 import 'package:ed_tech/core/constants/video_tracking_action.dart';
 import 'package:sp_util/sp_util.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class CourseDetailScreen extends StatefulWidget {
   static const String routeName = '/CourseDetailScreen';
@@ -123,6 +124,10 @@ class _CourseDetailContent extends StatefulWidget {
 }
 
 class _CourseDetailContentState extends State<_CourseDetailContent> {
+  static final Uri _privacyPolicyUri = Uri.parse(
+    'https://nguyenduc163.notion.site/Privacy-Policy-for-EdTech-38303bc29711802394ade6a5fb8ecee9',
+  );
+
   static const String _aiDataConsentKey = 'ai_chat_data_consent_accepted';
 
   bool _showBottomButton = true;
@@ -563,6 +568,25 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
               _buildAiConsentText('chat.ai_consent_purpose'),
               _buildAiConsentText('chat.ai_consent_privacy_notice'),
               _buildAiConsentText('chat.ai_consent_permission'),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () => _openPrivacyPolicy(dialogContext),
+                  icon: const Icon(Icons.open_in_new, size: 18),
+                  label: Text('chat.ai_consent_privacy_policy'.tr()),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.primary,
+                    alignment: Alignment.centerLeft,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 12,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -598,6 +622,28 @@ class _CourseDetailContentState extends State<_CourseDetailContent> {
 
     _isShowingAiConsentDialog = false;
     return accepted ?? false;
+  }
+
+  Future<void> _openPrivacyPolicy(BuildContext context) async {
+    try {
+      final opened = await launchUrl(
+        _privacyPolicyUri,
+        mode: LaunchMode.externalApplication,
+      );
+      if (!opened && context.mounted) {
+        _showPrivacyPolicyError(context);
+      }
+    } catch (_) {
+      if (context.mounted) {
+        _showPrivacyPolicyError(context);
+      }
+    }
+  }
+
+  void _showPrivacyPolicyError(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('chat.ai_consent_privacy_policy_error'.tr())),
+    );
   }
 
   Widget _buildAiConsentText(String translationKey) {

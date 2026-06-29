@@ -45,7 +45,11 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
-    <key>ITSAppUsesNonExemptEncryption</key>
-    <false/>
+	<key>NSCameraUsageDescription</key>
+	<string>Ứng dụng cần sử dụng camera để chụp ảnh đại diện và chứng chỉ.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Ứng dụng cần truy cập thư viện ảnh để chọn ảnh đại diện và chứng chỉ.</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 </dict>
 </plist>

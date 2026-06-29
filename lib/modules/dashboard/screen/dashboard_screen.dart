@@ -31,6 +31,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 import 'package:sp_util/sp_util.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -44,6 +45,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   static const int _homeTabIndex = 0;
   static const int _chatBotTabIndex = 2;
   static const String _aiDataConsentKey = 'ai_chat_data_consent_accepted';
+  static final Uri _privacyPolicyUri = Uri.parse(
+    'https://nguyenduc163.notion.site/Privacy-Policy-for-EdTech-38303bc29711802394ade6a5fb8ecee9',
+  );
 
   int _currentIndex = 0;
   bool _isShowingAiConsentDialog = false;
@@ -261,6 +265,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   _buildAiConsentText('chat.ai_consent_purpose'),
                   _buildAiConsentText('chat.ai_consent_privacy_notice'),
                   _buildAiConsentText('chat.ai_consent_permission'),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: () => _openPrivacyPolicy(dialogContext),
+                      icon: const Icon(Icons.open_in_new, size: 18),
+                      label: Text('chat.ai_consent_privacy_policy'.tr()),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.primary,
+                        alignment: Alignment.centerLeft,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -296,6 +319,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     _isShowingAiConsentDialog = false;
     return accepted ?? false;
+  }
+
+  Future<void> _openPrivacyPolicy(BuildContext context) async {
+    try {
+      final opened = await launchUrl(
+        _privacyPolicyUri,
+        mode: LaunchMode.externalApplication,
+      );
+      if (!opened && context.mounted) {
+        _showPrivacyPolicyError(context);
+      }
+    } catch (_) {
+      if (context.mounted) {
+        _showPrivacyPolicyError(context);
+      }
+    }
+  }
+
+  void _showPrivacyPolicyError(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('chat.ai_consent_privacy_policy_error'.tr())),
+    );
   }
 
   Widget _buildAiConsentText(String translationKey) {
