@@ -5,7 +5,7 @@ class AiConsentConstants {
   ///
   /// Do not reuse the old boolean key because users/reviewers may update
   /// from an older build where that boolean was already true.
-  static const String consentVersionStorageKey = 'ai_consent_version_v2';
+  static const String consentVersionStorageKey = 'ai_consent_version_v3';
 
   /// Current AI consent content version.
   ///
